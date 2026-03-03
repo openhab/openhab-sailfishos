@@ -49,6 +49,17 @@
         <source>If selected, Notifications from openHAB Cloud Service can be received.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Scroll to top</source>
+        <translation type="unfinished">Nach oben scrollen</translation>
+    </message>
+</context>
+<context>
+    <name>SitemapPage</name>
+    <message>
+        <source>Scroll to top</source>
+        <translation type="unfinished">Nach oben scrollen</translation>
+    </message>
 </context>
 <context>
     <name>SitemapPullDownMenu</name>

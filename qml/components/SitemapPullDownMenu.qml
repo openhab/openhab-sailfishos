@@ -1,6 +1,7 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
 import "../base"
+import "../base/utilities/SitemapLoader.js" as SitemapLoader
 
 Item {
     id: root
@@ -15,32 +16,7 @@ Item {
     ListModel { id: availableSitemapModel }
 
     function loadAvailableSitemaps() {
-        var url = settings.base_url + "/rest/sitemaps/"
-        console.log("[SitemapPullDownMenu] Loading from: " + url)
-
-        var xhr = new XMLHttpRequest()
-        xhr.onreadystatechange = function() {
-            if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
-                try {
-                    var data = JSON.parse(xhr.responseText)
-                    availableSitemapModel.clear()
-
-                    if (Array.isArray(data)) {
-                        console.log("[SitemapPullDownMenu] Found " + data.length + " sitemaps")
-                        data.forEach(function(sitemap) {
-                            availableSitemapModel.append({
-                                name: sitemap.name,
-                                label: sitemap.label || sitemap.name
-                            })
-                        })
-                    }
-                } catch (e) {
-                    console.log("[SitemapPullDownMenu] Error: " + e)
-                }
-            }
-        }
-        xhr.open("GET", url, true)
-        xhr.send()
+        SitemapLoader.loadAvailableSitemaps(settings.base_url, availableSitemapModel)
     }
 
     // Automatisch laden, wenn die Component sichtbar wird

@@ -2,17 +2,28 @@ import QtQuick 2.0
 import Sailfish.Silica 1.0
 import "pages"
 import "base"
+import "base/utilities/SitemapLoader.js" as SitemapLoader
 
 ApplicationWindow {
 
     Settings { id: settings }
 
+    ListModel {
+        id: availableSitemapModel
+    }
+
+    function loadAvailableSitemaps() {
+        SitemapLoader.loadAvailableSitemaps(settings.base_url, availableSitemapModel)
+    }
+
     initialPage: {
         console.log("[Start] settings.demoMode = " + settings.demoMode)
         console.log("[Start] settings.lastVisitedPage = " + settings.lastVisitedPage)
+        loadAvailableSitemaps()
         if (settings.demoMode) {
             console.log("[Start] - demoMode == ON")
             settings.base_url = "https://demo.openhab.org"
+            loadAvailableSitemaps()
             return mainUiPageComponent
         }
         else {

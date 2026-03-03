@@ -2,6 +2,7 @@ import QtQuick 2.0
 import Sailfish.Silica 1.0
 import "../base"
 import "../components"
+import "../base/utilities/SitemapLoader.js" as SitemapLoader
 
 Dialog {
     id: settingspage
@@ -15,35 +16,15 @@ Dialog {
     }
 
     function loadAvailableSitemaps() {
-        var url = settings.base_url + "/rest/sitemaps/"
-        console.log("[SettingsPage] Loading sitemaps from: " + url)
+        SitemapLoader.loadAvailableSitemaps(settings.base_url, availableSitemapModel)
+    }
 
-        var xhr = new XMLHttpRequest()
-        xhr.onreadystatechange = function() {
-            if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
-                try {
-                    var data = JSON.parse(xhr.responseText)
-                    availableSitemapModel.clear()
-
-                    if (Array.isArray(data)) {
-                        console.log("[SettingsPage] Found " + data.length + " sitemaps")
-                        data.forEach(function(sitemap) {
-                            availableSitemapModel.append({
-                                name: sitemap.name,
-                                label: sitemap.label || sitemap.name
-                            })
-                        })
-                    }
-                } catch (e) {
-                    console.log("[SettingsPage] Error parsing sitemaps: " + e)
-                }
-            }
-        }
-        xhr.open("GET", url, true)
-        xhr.send()
+    Component.onCompleted: {
+        //loadAvailableSitemaps()
     }
 
     SilicaFlickable {
+        id: settingsPage
         anchors.fill: parent
         Column {
             anchors.fill: parent
@@ -78,6 +59,13 @@ Dialog {
             }
         }
         VerticalScrollDecorator {}
+
+        PushUpMenu {
+            MenuItem {
+                text: qsTr("Scroll to top")
+                onClicked: settingsPage.scrollToTop()
+            }
+        }
     }
     onDone: {
         if (result == DialogResult.Accepted) {
@@ -88,13 +76,13 @@ Dialog {
             if (settings.demoMode && settings.base_url !== "https://demo.openhab.org") {
                 console.log("demoMode == ON -- change base-url")
                 settings.base_url = "https://demo.openhab.org"
-                availableSitemapModel.clear()
-                loadAvailableSitemaps()
+                //availableSitemapModel.clear()
+                //loadAvailableSitemaps()
             }
             else if (!settings.demoMode && settings.base_url !== "https://demo.openhab.org") {
                 console.log("demoMode == OFF -- base-url changed")
-                availableSitemapModel.clear()
-                loadAvailableSitemaps()
+                //availableSitemapModel.clear()
+                //loadAvailableSitemaps()
             }
         }
 

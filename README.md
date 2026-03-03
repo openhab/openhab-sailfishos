@@ -22,6 +22,7 @@ The documentation is available at [www.openhab.org/docs/](https://www.openhab.or
   * Add App Notifications (via openHAB cloud)
 * Version 0.0.3 (planned):
   * Migration to Qt6
+  * Management of translations via CrowdIn
 
 ## Localization
 

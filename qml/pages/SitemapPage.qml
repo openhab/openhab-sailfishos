@@ -3,6 +3,7 @@ import QtQuick.Layouts 1.1
 import Sailfish.Silica 1.0
 import "../base"
 import "../components"
+import "../base/utilities/SitemapLoader.js" as SitemapLoader
 
 Page {
     id: page
@@ -18,8 +19,11 @@ Page {
 
     ListModel {
         id: sitemapModel
-        // Das erlaubt unterschiedliche Datentypen (Maps, Listen, Strings) in 'itemData'
         dynamicRoles: true
+    }
+
+    ListModel {
+        id: availableSitemapModel
     }
 
     // --- Logik ---
@@ -145,6 +149,7 @@ Page {
 
    Component.onCompleted: {
       fetchSitemap();
+      loadAvailableSitemaps()
 
       // SSE-Signal verbinden
       if (sseManager) {
@@ -278,6 +283,13 @@ Page {
                 pageTitle = label
                 settings.lastVisitedPage = name
                 fetchSitemap()
+            }
+        }
+
+        PushUpMenu {
+            MenuItem {
+                text: qsTr("Scroll to top")
+                onClicked: listView.scrollToTop()
             }
         }
 
