@@ -4,6 +4,7 @@ import Sailfish.Silica 1.0
 import "../base"
 import "../components"
 import "../base/utilities/SitemapLoader.js" as SitemapLoader
+import "../base/utilities/SseEvents.js" as SseEvents
 
 Page {
     id: page
@@ -11,7 +12,22 @@ Page {
     property string sitemapName: ""
     property string pageTitle: sitemapName
 
+    // Unterseiten werden mit voller URL (http...) aufgerufen → kein eigener SSE-Start
+    readonly property bool isSubPage: sitemapName.indexOf("http") === 0
+
     Settings { id: settings }
+
+    // Restart SSE when base_url changes
+    Connections {
+        target: settings
+        onBase_urlChanged: {
+            if (!isSubPage && sseManager) {
+                console.log("[SitemapPage] base_url changed, restarting SSE...");
+                SseEvents.restartSSE(sseManager, settings.base_url, sitemapModel);
+                fetchSitemap();
+            }
+        }
+    }
 
     readonly property string fullApiUrl: sitemapName.indexOf("http") === 0
         ? sitemapName
@@ -27,6 +43,10 @@ Page {
     }
 
     // --- Logik ---
+
+    function loadAvailableSitemaps() {
+        SitemapLoader.loadAvailableSitemaps(settings.base_url, availableSitemapModel)
+    }
 
     function sendCommand(itemName, command) {
         // itemName ist jetzt garantiert ein String (dank .name Zugriff in den Komponenten)
@@ -51,22 +71,26 @@ Page {
                 sitemapModel.clear();
 
                 // --- TRAINING START ---
-                // Wir fügen ein Dummy-Objekt ein, um 'itemData' als VariantMap zu definieren
+                // Insert a dummy object to define the role types for dynamicRoles
                 sitemapModel.append({
                     "type": "dummy",
+                    "itemName": "",
                     "itemData": { "label": "", "state": "", "item": { "name": "" } }
                 });
-                sitemapModel.clear(); // Sofort wieder leer machen, der Typ der Rolle bleibt gespeichert
+                sitemapModel.clear();
                 // --- TRAINING END ---
 
                 var rootWidgets = (json.homepage && json.homepage.widgets) ? json.homepage.widgets : (json.widgets ? json.widgets : []);
 
                 function unpackWidgets(widgetList) {
                     widgetList.forEach(function(widget) {
+                        // Extract item name as top-level role for reliable SSE matching
+                        var name = (widget.item && widget.item.name) ? widget.item.name : "";
+
                         if (widget.type === "Frame" && widget.widgets) {
-                            // Header ebenfalls als sauberes Objekt übergeben
                             sitemapModel.append({
                                 "type": "Header",
+                                "itemName": "",
                                 "itemData": { "label": (widget.label ? widget.label.toUpperCase() : ""), "state": "" }
                             });
                             unpackWidgets(widget.widgets);
@@ -74,25 +98,32 @@ Page {
                         else if (widget.item && widget.type === "Slider") {
                             sitemapModel.append({
                                 "type": widget.type || "Unknown",
+                                "itemName": name,
                                 "itemData": widget
                             });
                         }
                         else if (widget.item && widget.item.type === "Rollershutter") {
                             sitemapModel.append({
                                 "type": "Rollershutter",
+                                "itemName": name,
                                 "itemData": widget
                             });
                         }
                         else {
-                            // WICHTIG: Sicherstellen, dass widget ein Objekt ist
                             sitemapModel.append({
                                 "type": widget.type,
+                                "itemName": name,
                                 "itemData": widget
                             });
                         }
                     });
                 }
                 unpackWidgets(rootWidgets);
+
+                // After async model load, rebind SSE to this (now populated) model
+                SseEvents.rebindModel(sitemapModel);
+                console.log("[SitemapPage] Model populated with " + sitemapModel.count + " entries, SSE rebound");
+
                 fetchAllItemStates();
             }
         }
@@ -103,17 +134,16 @@ Page {
 
    function fetchAllItemStates() {
        var itemNames = [];
-       // Sammle alle Item-Namen aus dem Model
+       // Collect all item names from the model using top-level itemName role
        for (var i = 0; i < sitemapModel.count; i++) {
            var entry = sitemapModel.get(i);
-           if (entry.itemData && entry.itemData.item && entry.itemData.item.name) {
-               itemNames.push(entry.itemData.item.name);
+           if (entry.itemName && entry.itemName !== "") {
+               itemNames.push(entry.itemName);
            }
        }
 
        if (itemNames.length === 0) return;
 
-       // Nutze die OpenHAB API, um alle States auf einmal zu holen
        var itemsUrl = settings.base_url + "/rest/items?fields=name,state";
        var xhr = new XMLHttpRequest();
        xhr.onreadystatechange = function() {
@@ -121,19 +151,18 @@ Page {
                var items = JSON.parse(xhr.responseText);
                var itemStateMap = {};
 
-               // Map erstellen: { "ItemName": "StateValue" }
+               // Build map: { "ItemName": "StateValue" }
                items.forEach(function(item) {
                    itemStateMap[item.name] = item.state;
                });
 
-               // Model einmalig und vollständig aktualisieren
+               // Update model using top-level itemName role
                for (var i = 0; i < sitemapModel.count; i++) {
                    var entry = sitemapModel.get(i);
-                   if (entry.itemData && entry.itemData.item && entry.itemData.item.name) {
-                       var itemName = entry.itemData.item.name;
-                       var newState = itemStateMap[itemName];
+                   if (entry.itemName && entry.itemName !== "") {
+                       var newState = itemStateMap[entry.itemName];
 
-                       if (newState !== undefined && entry.itemData.state !== newState.toString()) {
+                       if (newState !== undefined) {
                            var data = entry.itemData;
                            data.state = newState.toString();
                            sitemapModel.setProperty(i, "itemData", data);
@@ -143,7 +172,6 @@ Page {
            }
        }
        xhr.open("GET", itemsUrl);
-       // ACHTUNG: Hier muss ggf. Ihr Authorization Header rein, falls benötigt
        xhr.send();
    }
 
@@ -151,94 +179,44 @@ Page {
       fetchSitemap();
       loadAvailableSitemaps()
 
-      // SSE-Signal verbinden
-      if (sseManager) {
-          sseManager.messageReceived.connect(onSSEMessage);
-          sseManager.connectToOpenHAB(settings.base_url);
-          console.log("SSE-Listener aktiviert");
+      if (!isSubPage && sseManager) {
+          // Top-level sitemap: start SSE connection and bind to our model
+          SseEvents.startSSE(sseManager, settings.base_url, sitemapModel);
+          console.log("[SitemapPage] SSE started (top-level sitemap)");
+      } else if (isSubPage) {
+          // Sub-page: rebind the existing SSE handler to our model
+          SseEvents.rebindModel(sitemapModel);
+          console.log("[SitemapPage] SSE model rebound to sub-page");
       } else {
-          console.error("SSEManager nicht verfügbar!");
+          console.error("[SitemapPage] SSEManager not available!");
       }
    }
 
    Component.onDestruction: {
-       // Cleanup
-       if (sseManager) {
-           try {
-               sseManager.messageReceived.disconnect(onSSEMessage);
-           } catch (e) {
-               // Fehler beim Disconnect sind normal und können ignoriert werden
-           }
+       if (!isSubPage && sseManager) {
+           // Top-level sitemap leaving: stop SSE entirely
+           SseEvents.stopSSE(sseManager);
+           console.log("[SitemapPage] SSE stopped (leaving top-level sitemap)");
+       } else if (isSubPage) {
+           // Sub-page leaving: nothing to do, the parent page will rebind
+           // when it becomes active again (handled by status change below)
+           console.log("[SitemapPage] Sub-page destroyed, parent will rebind model");
        }
    }
 
-
-    // JavaScript Funktion, die von C++ Signal aufgerufen wird
-    function handleConnectionEstablished() {
-        console.log("SSE verbunden. Lade Sitemap erneut zur Statussynchronisierung.");
-        fetchSitemap(); // Zweiter Ladeversuch (mit aktiver SSE Verbindung)
-    }
-
-    // Externe Slot-Funktion für C++-Signale
-    function onSSEMessage(message) {
-        handleSSEMessage(message);
-    }
-
-    function handleSSEMessage(message) {
-        if (!message) return;
-
-        try {
-            var event = JSON.parse(message);
-
-            if (event.type === "ItemStateEvent" || event.type === "ItemStateChangedEvent") {
-                var topicParts = event.topic.split('/');
-                var itemName = topicParts[2];
-
-                var payload;
-                if (typeof event.payload === "string") {
-                    payload = JSON.parse(event.payload);
-                } else {
-                    payload = event.payload;
-                }
-
-                var newState = (payload.value !== undefined) ? payload.value : payload.state;
-
-                if (!itemName || newState === undefined) return;
-
-                var model = sitemapModel;
-                if (!model) {
-                    console.log("Fehler: sitemapModel nicht verfügbar");
-                    return;
-                }
-
-                console.log("Update empfangen für:", itemName, "Neuer Wert:", newState);
-
-                var found = false;
-                for (var i = 0; i < model.count; i++) {
-                    var entry = model.get(i);
-
-                    if (entry.itemData && entry.itemData.item && entry.itemData.item.name === itemName) {
-                        found = true;
-
-                        if (entry.itemData.state === newState.toString()) {
-                            break;
-                        }
-
-                        var data = entry.itemData;
-                        data.state = newState.toString();
-                        model.setProperty(i, "itemData", data);
-                        console.log("Erfolgreich aktualisiert: Zeile", i);
-                        break;
-                    }
-                }
-            }
-        } catch (e) {
-            console.log("Fehler beim Message-Parsing: " + e);
-        }
-    }
-
-
-
+   // When this page becomes the active (top) page again after a sub-page
+   // is popped, rebind the SSE handler to our model
+   property bool _wasActive: false
+   onStatusChanged: {
+       if (status === PageStatus.Active && _wasActive) {
+           // Returning from a sub-page - rebind SSE to our model
+           SseEvents.rebindModel(sitemapModel);
+           console.log("[SitemapPage] SSE model rebound after returning from sub-page");
+       }
+       if (status === PageStatus.Active) {
+           _wasActive = true;
+       }
+   }
 
 
     // --- UI Komponenten ---
@@ -283,6 +261,12 @@ Page {
                 pageTitle = label
                 settings.lastVisitedPage = name
                 fetchSitemap()
+
+                // Restart SSE on sitemap switch
+                if (sseManager) {
+                    SseEvents.restartSSE(sseManager, settings.base_url, sitemapModel);
+                    console.log("[SitemapPage] SSE restarted after sitemap switch");
+                }
             }
         }
 
