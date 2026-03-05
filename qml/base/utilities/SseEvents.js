@@ -124,6 +124,9 @@ function handleSSEMessage(message) {
         console.log("[SseEvents] Update received for: " + itemName + " New value: " + newState + " (model count: " + model.count + ")");
 
         // Iterate model and match by top-level itemName role
+        // Do NOT return after first match - an item can appear in multiple rows
+        // (e.g. Rollershutter has both a button row and a slider row)
+        var found = false;
         for (var i = 0; i < model.count; i++) {
             var entry = model.get(i);
             var entryItemName = entry.itemName;
@@ -134,17 +137,22 @@ function handleSSEMessage(message) {
 
                 if (currentState !== undefined && currentState === newState.toString()) {
                     console.log("[SseEvents] State unchanged for row " + i + " - skipping");
-                    return;
+                    found = true;
+                    continue;
                 }
 
                 data.state = newState.toString();
                 model.setProperty(i, "itemData", data);
+                // Also update the top-level itemState role for reactive UI bindings
+                model.setProperty(i, "itemState", newState.toString());
                 console.log("[SseEvents] Successfully updated: row " + i + " item: " + itemName + " -> " + newState);
-                return;
+                found = true;
             }
         }
 
-        // No match found - normal for items not on current sitemap page
+        if (!found) {
+            // No match found - normal for items not on current sitemap page
+        }
     } catch (e) {
         console.log("[SseEvents] Error parsing message: " + e);
     }

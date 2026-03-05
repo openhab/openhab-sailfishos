@@ -75,6 +75,7 @@ Page {
                 sitemapModel.append({
                     "type": "dummy",
                     "itemName": "",
+                    "itemState": "",
                     "itemData": { "label": "", "state": "", "item": { "name": "" } }
                 });
                 sitemapModel.clear();
@@ -84,13 +85,15 @@ Page {
 
                 function unpackWidgets(widgetList) {
                     widgetList.forEach(function(widget) {
-                        // Extract item name as top-level role for reliable SSE matching
+                        // Extract item name and state as top-level roles for reliable access
                         var name = (widget.item && widget.item.name) ? widget.item.name : "";
+                        var state = (widget.state !== undefined && widget.state !== null) ? widget.state.toString() : "";
 
                         if (widget.type === "Frame" && widget.widgets) {
                             sitemapModel.append({
                                 "type": "Header",
                                 "itemName": "",
+                                "itemState": "",
                                 "itemData": { "label": (widget.label ? widget.label.toUpperCase() : ""), "state": "" }
                             });
                             unpackWidgets(widget.widgets);
@@ -99,6 +102,7 @@ Page {
                             sitemapModel.append({
                                 "type": widget.type || "Unknown",
                                 "itemName": name,
+                                "itemState": state,
                                 "itemData": widget
                             });
                         }
@@ -106,6 +110,7 @@ Page {
                             sitemapModel.append({
                                 "type": "Rollershutter",
                                 "itemName": name,
+                                "itemState": state,
                                 "itemData": widget
                             });
                         }
@@ -113,6 +118,7 @@ Page {
                             sitemapModel.append({
                                 "type": widget.type,
                                 "itemName": name,
+                                "itemState": state,
                                 "itemData": widget
                             });
                         }
@@ -166,6 +172,7 @@ Page {
                            var data = entry.itemData;
                            data.state = newState.toString();
                            sitemapModel.setProperty(i, "itemData", data);
+                           sitemapModel.setProperty(i, "itemState", newState.toString());
                        }
                    }
                }
@@ -286,6 +293,7 @@ Page {
                 id: componentLoader
                 anchors.fill: parent
                 property var widget: itemData
+                property string currentState: model.itemState || ""
                 sourceComponent: {
                     switch(type) {
                         case "Header": return headerComp;
@@ -324,9 +332,9 @@ Page {
         id: switchComp
         ListItem {
             id: switchListItem
-            width: listView.width // Breite explizit auf ListView beziehen
+            width: listView.width
             contentHeight: Theme.itemSizeMedium
-            onClicked: sendCommand(widget.item.name, widget.state === "ON" ? "OFF" : "ON")
+            onClicked: sendCommand(widget.item.name, currentState === "ON" ? "OFF" : "ON")
 
             Row {
                 anchors.fill: parent
@@ -345,7 +353,6 @@ Page {
                 Label {
                     text: widget.label || ""
                     anchors.verticalCenter: parent.verticalCenter
-                    // Dynamische Breite ohne Layout-Attached-Properties
                     width: parent.width - (iconLoader.visible ? iconLoader.width + parent.spacing : 0)
                                         - statusLabel.width - parent.spacing
                     color: switchListItem.highlighted ? Theme.highlightColor : Theme.primaryColor
@@ -355,8 +362,8 @@ Page {
                 Label {
                     id: statusLabel
                     anchors.verticalCenter: parent.verticalCenter
-                    text: widget.state ? widget.state.toUpperCase() : "N/A"
-                    color: widget.state === "ON" ? Theme.highlightColor : Theme.secondaryColor
+                    text: currentState ? currentState.toUpperCase() : "N/A"
+                    color: currentState === "ON" ? Theme.highlightColor : Theme.secondaryColor
                     font.bold: true
                 }
             }
@@ -379,8 +386,8 @@ Page {
                 running: true
 
                 onTriggered: {
-                    if (!slider.pressed && widget && widget.state) {
-                        var newValue = Number(widget.state) || 0;
+                    if (!slider.pressed && currentState !== undefined && currentState !== "") {
+                        var newValue = Number(currentState) || 0;
                         if (slider.value !== newValue) {
                             slider.value = newValue;
                         }
@@ -394,14 +401,14 @@ Page {
                 y: (parent.height - height) / 2
                 width: parent.width - (Theme.horizontalPageMargin * 2)
 
-                label: widget.label || ""
+                label: widget.label.replace(/\s*\[.*\]/, "") || ""
                 minimumValue: 0
                 maximumValue: 100
                 value: 0
                 valueText: Math.round(value) + "%"
 
                 Component.onCompleted: {
-                    value = Number(widget.state) || 0;
+                    value = Number(currentState) || 0;
                 }
 
                 onReleased: {
@@ -551,7 +558,7 @@ Page {
 
                 Label {
                     id: stateVal
-                    text: widget.state ? widget.state.toString() : "N/A"
+                    text: currentState ? currentState.toString() : "N/A"
                     color: Theme.secondaryColor
                     anchors.verticalCenter: parent.verticalCenter
                 }
