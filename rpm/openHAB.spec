@@ -1,6 +1,6 @@
 Name:       openHAB
 
-Summary:    openHAB
+Summary:    openHAB client for Sailfish OS
 Version:    0.1
 Release:    1
 License:    LICENSE

@@ -2,13 +2,6 @@
 <!DOCTYPE TS>
 <TS version="2.1">
 <context>
-    <name>CoverPage</name>
-    <message>
-        <source>openHAB</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>MainUiPage</name>
     <message>
         <source>Scroll to top</source>
@@ -51,6 +44,42 @@
     </message>
     <message>
         <source>Scroll to top</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source></source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Cover Action - Left Button</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Item-Id from OpenHAB for left cover action. If empty, no action will be shown.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cover Action Command - Left Button</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Command for the item, which is linked to Cover Action Left Button. If empty, no action will be shown.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cover Action - Right Button</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Item-Id from OpenHAB for right cover action. If empty, no action will be shown.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cover Action Command - Right Button</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Command for the item, which is linked to Cover Action right Button. If empty, no action will be shown.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

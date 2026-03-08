@@ -22,6 +22,7 @@ int main(int argc, char *argv[])
     // To display the view, call "show()" (will show fullscreen on device).
     qRegisterMetaType<QNetworkAccessManager::NetworkAccessibility>("QNetworkAccessManager::NetworkAccessibility");
     QGuiApplication *app = SailfishApp::application(argc, argv);
+    app->setApplicationVersion(APP_VERSION);
     //QQmlApplicationEngine engine;
     QQuickView* view = SailfishApp::createView(); // Erstellt die View
 

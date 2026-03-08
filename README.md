@@ -1,6 +1,6 @@
 <p align="center">
    <br>
-    <img alt="Logo" src="icons/icon.png" width="100">
+    <img alt="Logo" src="icons/openHAB.svg" width="100">
     <br>
     <b>openHAB client for Sailfish-OS</b>
 </p>
@@ -13,6 +13,7 @@ The documentation is available at [www.openhab.org/docs/](https://www.openhab.or
 
 ## Features
 * Display your sitemaps and widgets and control your devices from your mobile device
+* Customizable CoverActions via Settings
 
 ## Roadmap
 * Version 0.0.1 (under development):

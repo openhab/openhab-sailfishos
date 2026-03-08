@@ -18,6 +18,9 @@ CONFIG += link_pkgconfig
 SOURCES += src/openHAB.cpp\
     src/ssemanager.cpp
 
+RESOURCES += \
+    ressources.qrc
+
 HEADERS += src/ssemanager.h
 
 DISTFILES += qml/openHAB.qml \
@@ -32,6 +35,9 @@ DISTFILES += qml/openHAB.qml \
     openHAB.desktop
 
 SAILFISHAPP_ICONS = 86x86 108x108 128x128 172x172
+
+VERSION = 0.1
+DEFINES += APP_VERSION=\\\"$$VERSION\\\"
 
 # to disable building translations every time, comment out the
 # following CONFIG line

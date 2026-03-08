@@ -7,8 +7,11 @@ ConfigurationGroup {
     path: "/apps/harbour-openHAB"
 
     property bool demoMode: true
-    property string lastVisitedPage: "Stein"
-    property string base_url: "http://10.10.0.20:8080"
-    property bool openhab_cloud_service: true
-    property string access_token: "oh.SailfishOSApp.tiKG9BK5xduN6fSIWrvy1WcmKJ87gFAW7ogk2NhmvT2CjTIcGpkxK0ldfXE2cQhhqbxnTZeZj1OwAbjTGLg"
+    property string lastVisitedPage: ""
+    property string base_url: "https://demo.openhab.org"
+    property bool openhab_cloud_service: false
+    property string coverAction1: ""
+    property string coverAction1_command: ""
+    property string coverAction2: ""
+    property string coverAction2_command: ""
 }
