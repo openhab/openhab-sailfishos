@@ -5,6 +5,7 @@ import "../base"
 import "../components"
 import "../base/utilities/SitemapLoader.js" as SitemapLoader
 import "../base/utilities/SseEvents.js" as SseEvents
+import "../base/utilities/PatternFormatter.js" as PatternFormatter
 
 Page {
     id: page
@@ -76,6 +77,7 @@ Page {
                     "type": "dummy",
                     "itemName": "",
                     "itemState": "",
+                    "widgetPattern": "",
                     "itemData": { "label": "", "state": "", "item": { "name": "" } }
                 });
                 sitemapModel.clear();
@@ -88,12 +90,15 @@ Page {
                         // Extract item name and state as top-level roles for reliable access
                         var name = (widget.item && widget.item.name) ? widget.item.name : "";
                         var state = (widget.state !== undefined && widget.state !== null) ? widget.state.toString() : "";
+                        // Extract pattern: widget-level pattern takes priority, then stateDescription
+                        var pat = widget.pattern || (widget.item && widget.item.stateDescription && widget.item.stateDescription.pattern) || "";
 
                         if (widget.type === "Frame" && widget.widgets) {
                             sitemapModel.append({
                                 "type": "Header",
                                 "itemName": "",
                                 "itemState": "",
+                                "widgetPattern": "",
                                 "itemData": { "label": (widget.label ? widget.label.toUpperCase() : ""), "state": "" }
                             });
                             unpackWidgets(widget.widgets);
@@ -103,6 +108,7 @@ Page {
                                 "type": widget.type || "Unknown",
                                 "itemName": name,
                                 "itemState": state,
+                                "widgetPattern": pat,
                                 "itemData": widget
                             });
                         }
@@ -111,6 +117,7 @@ Page {
                                 "type": "Rollershutter",
                                 "itemName": name,
                                 "itemState": state,
+                                "widgetPattern": pat,
                                 "itemData": widget
                             });
                         }
@@ -119,6 +126,7 @@ Page {
                                 "type": widget.type,
                                 "itemName": name,
                                 "itemState": state,
+                                "widgetPattern": pat,
                                 "itemData": widget
                             });
                         }
@@ -294,6 +302,7 @@ Page {
                 anchors.fill: parent
                 property var widget: itemData
                 property string currentState: model.itemState || ""
+                property string pattern: model.widgetPattern || ""
                 sourceComponent: {
                     switch(type) {
                         case "Header": return headerComp;
@@ -541,12 +550,20 @@ Page {
             contentHeight: Theme.itemSizeMedium
             enabled: false
 
-            // Text zwischen [...] aus label extrahieren, Fallback auf currentState
+            // SSE-Updates liefern den rohen State in currentState.
+            // Wenn ein Pattern vorhanden ist, wird der State damit formatiert.
+            // Fallback: Text in [...] aus label parsen (initial vom Sitemap-REST-Call).
             readonly property string displayState: {
+                if (currentState && currentState !== "") {
+                    if (pattern && pattern !== "") {
+                        return PatternFormatter.formatState(pattern, currentState);
+                    }
+                    return currentState;
+                }
                 var lbl = widget.label || "";
                 var match = lbl.match(/\[([^[]*)\]/);
                 if (match) return match[1];
-                return currentState ? currentState.toString() : "N/A";
+                return "N/A";
             }
 
             // Label-Text ohne [...]-Teil

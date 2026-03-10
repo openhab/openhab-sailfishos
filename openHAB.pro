@@ -28,6 +28,9 @@ DISTFILES += qml/openHAB.qml \
     qml/pages/MainUiPage.qml \
     qml/pages/SettingsPage.qml \
     qml/pages/SitemapPage.qml \
+    qml/base/utilities/SitemapLoader.js \
+    qml/base/utilities/SseEvents.js \
+    qml/base/utilities/PatternFormatter.js \
     rpm/openHAB.changes.in \
     rpm/openHAB.changes.run.in \
     rpm/openHAB.spec \
