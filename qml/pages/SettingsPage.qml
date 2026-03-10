@@ -26,11 +26,22 @@ Dialog {
     SilicaFlickable {
         id: settingsPage
         anchors.fill: parent
+        contentHeight: contentColumn.height
+
         Column {
-            anchors.fill: parent
+            id: contentColumn
+            width: parent.width
+
             DialogHeader {
                 acceptText: qsTr("Save")
+                title: qsTr("Settings")
             }
+
+            // ── General ──────────────────────────────────
+            SectionHeader {
+                text: qsTr("General")
+            }
+
             TextSwitch {
                 id: demoModeField
                 checked: settings.demoMode
@@ -38,74 +49,117 @@ Dialog {
                 description: qsTr("If selected, Demo SiteMaps and DemoPages will be shown.")
             }
 
+            // ── Local Server ─────────────────────────────
+            SectionHeader {
+                text: qsTr("Local server")
+            }
+
             TextField {
                 id: baseUrlField
                 width: parent.width
-                label: qsTr("OpenHAB base URL")
+                label: qsTr("URL")
                 placeholderText: qsTr("http://example.com:8080")
                 text: settings.base_url
-                focus: true
                 inputMethodHints: Qt.ImhUrlCharactersOnly
 
                 EnterKey.enabled: text.length > 0
                 EnterKey.iconSource: "image://theme/icon-m-enter-next"
                 EnterKey.onClicked: focus = false
             }
-            TextSwitch {
-                id: openhabCloudServiceField
-                checked: settings.openhab_cloud_service
-                text: qsTr("openHAB Cloud Service")
-                description: qsTr("If selected, Notifications from openHAB Cloud Service can be received.")
+
+            // ── Cloud Service ────────────────────────────
+            //SectionHeader {
+            //    text: qsTr("Remote server")
+            //}
+
+            //TextSwitch {
+            //    id: openhabCloudServiceField
+            //    checked: settings.openhab_cloud_service
+            //    text: qsTr("openHAB Cloud Service")
+            //    description: qsTr("If selected, Notifications from openHAB Cloud Service can be received.")
+            //}
+
+            // ── Cover Actions ────────────────────────────
+            SectionHeader {
+                text: qsTr("Cover actions")
             }
+
+            Label {
+                x: Theme.horizontalPageMargin
+                width: parent.width - 2 * Theme.horizontalPageMargin
+                font.pixelSize: Theme.fontSizeSmall
+                color: Theme.secondaryHighlightColor
+                wrapMode: Text.Wrap
+                text: qsTr("Configure Item-IDs and commands for the app cover quick actions. Leave empty to hide an action.")
+            }
+
+            // Left cover action
+            SectionHeader {
+                text: qsTr("Left button")
+                font.pixelSize: Theme.fontSizeSmall
+            }
+
             TextField {
                 id: coverAction1Field
                 width: parent.width
-                label: qsTr("Cover Action - Left Button")
-                placeholderText: qsTr("")
+                label: qsTr("Item-ID")
+                placeholderText: qsTr("e.g. Shelly_buero_lampe")
                 text: settings.coverAction1
-                description: qsTr("Item-Id from OpenHAB for left cover action. If empty, no action will be shown.")
-                focus: true
+
                 EnterKey.enabled: text.length > 0
                 EnterKey.iconSource: "image://theme/icon-m-enter-next"
-                EnterKey.onClicked: focus = false
+                EnterKey.onClicked: coverAction1CommandField.focus = true
             }
+
             TextField {
                 id: coverAction1CommandField
                 width: parent.width
-                label: qsTr("Cover Action Command - Left Button")
-                placeholderText: qsTr("")
+                label: qsTr("Command")
+                placeholderText: qsTr("e.g. ON, OFF, TOGGLE")
                 text: settings.coverAction1_command
-                description: qsTr("Command for the item, which is linked to Cover Action Left Button. If empty, no action will be shown.")
-                focus: true
+
                 EnterKey.enabled: text.length > 0
                 EnterKey.iconSource: "image://theme/icon-m-enter-next"
-                EnterKey.onClicked: focus = false
+                EnterKey.onClicked: coverAction2Field.focus = true
             }
+
+            // Right cover action
+            SectionHeader {
+                text: qsTr("Right button")
+                font.pixelSize: Theme.fontSizeSmall
+            }
+
             TextField {
                 id: coverAction2Field
                 width: parent.width
-                label: qsTr("Cover Action - Right Button")
-                placeholderText: qsTr("")
+                label: qsTr("Item-ID")
+                placeholderText: qsTr("e.g. Shelly_buero_lampe")
                 text: settings.coverAction2
-                description: qsTr("Item-Id from OpenHAB for right cover action. If empty, no action will be shown.")
-                focus: true
+
                 EnterKey.enabled: text.length > 0
                 EnterKey.iconSource: "image://theme/icon-m-enter-next"
-                EnterKey.onClicked: focus = false
+                EnterKey.onClicked: coverAction2CommandField.focus = true
             }
+
             TextField {
                 id: coverAction2CommandField
                 width: parent.width
-                label: qsTr("Cover Action Command - Right Button")
-                placeholderText: qsTr("")
+                label: qsTr("Command")
+                placeholderText: qsTr("e.g. ON, OFF, TOGGLE")
                 text: settings.coverAction2_command
-                description: qsTr("Command for the item, which is linked to Cover Action right Button. If empty, no action will be shown.")
-                focus: true
+
                 EnterKey.enabled: text.length > 0
-                EnterKey.iconSource: "image://theme/icon-m-enter-next"
+                EnterKey.iconSource: "image://theme/icon-m-enter-close"
                 EnterKey.onClicked: focus = false
             }
+
+            // Bottom spacer
+            Item {
+                width: 1
+                height: Theme.paddingLarge
+            }
         }
+
         VerticalScrollDecorator {}
 
         PushUpMenu {

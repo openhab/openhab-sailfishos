@@ -27,19 +27,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>OpenHAB base URL</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>http://example.com:8080</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>openHAB Cloud Service</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>If selected, Notifications from openHAB Cloud Service can be received.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -51,35 +39,51 @@
         <translation></translation>
     </message>
     <message>
-        <source>Cover Action - Left Button</source>
+        <source>Settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Item-Id from OpenHAB for left cover action. If empty, no action will be shown.</source>
+        <source>General</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Cover Action Command - Left Button</source>
+        <source>Local server</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Command for the item, which is linked to Cover Action Left Button. If empty, no action will be shown.</source>
+        <source>URL</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Cover Action - Right Button</source>
+        <source>Cover actions</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Item-Id from OpenHAB for right cover action. If empty, no action will be shown.</source>
+        <source>Configure Item-IDs and commands for the app cover quick actions. Leave empty to hide an action.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Cover Action Command - Right Button</source>
+        <source>Left button</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Command for the item, which is linked to Cover Action right Button. If empty, no action will be shown.</source>
+        <source>Item-ID</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>e.g. Shelly_buero_lampe</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Command</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>e.g. ON, OFF, TOGGLE</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Right button</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
