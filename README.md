@@ -10,13 +10,15 @@
 This app is a native client for openHAB which allows easy access to your sitemaps.
 The documentation is available at [www.openhab.org/docs/](https://www.openhab.org/docs/).
 
-<a href="https://f-droid.org/app/org.openhab.sailfishos"><img src="docs/images/get-it-on-jollaStore.png" alt="Get it on Jolla Store" height="80"></a>
+<a href="https://github.com/openhab/openhab-sailfishos/releases"><img src="docs/images/get-it-on-jollaStore.png" alt="Get it on Jolla Store" height="80"></a>
+<a href="https://github.com/openhab/openhab-sailfishos/releases"><img src="docs/images/get-it-on-openrepos.png" alt="Get it on OpenRepos" height="55"></a>
 <a href="https://github.com/openhab/openhab-sailfishos/releases"><img src="docs/images/direct-apk-download.png" alt="Get it on GitHub" height="80"></a>
 
 
 ## Features
 * Display your sitemaps and widgets and control your devices from your mobile device
 * Customizable CoverActions via Settings
+* QT-Version 5.6.3
 
 ## Roadmap
 * Version 0.0.1 (under development):
@@ -25,7 +27,6 @@ The documentation is available at [www.openhab.org/docs/](https://www.openhab.or
   * Add support for remote access (via openHAB cloud)
   * Add App Notifications (via openHAB cloud)
 * Version 0.0.3 (planned):
-  * Migration to Qt6
   * Management of translations via CrowdIn
 
 ## Localization

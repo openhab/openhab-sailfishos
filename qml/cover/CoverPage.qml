@@ -82,6 +82,8 @@ CoverBackground {
             text: "Left Action:  " + label1 + " - " + settings.coverAction1_command
             font.pixelSize: Theme.fontSizeExtraSmall
             color: Theme.primaryColor
+            visible: settings.coverAction1 !== "" && settings.coverAction1_command !== ""
+            height: visible ? implicitHeight : 0
         }
 
         Label {
@@ -91,17 +93,36 @@ CoverBackground {
             text: "Right Action: " + label2  + " - " + settings.coverAction2_command
             font.pixelSize: Theme.fontSizeExtraSmall
             color: Theme.primaryColor
+            visible: settings.coverAction2 !== "" && settings.coverAction2_command !== ""
+            height: visible ? implicitHeight : 0
         }
     }
 
     CoverActionList {
-        id: coverAction
-
+        enabled: settings.coverAction1 !== "" && settings.coverAction1_command !== ""
+                 && settings.coverAction2 !== "" && settings.coverAction2_command !== ""
         CoverAction {
             iconSource: "image://theme/icon-cover-previous"
             onTriggered: sendCommand(settings.coverAction1, settings.coverAction1_command)
         }
+        CoverAction {
+            iconSource: "image://theme/icon-cover-next"
+            onTriggered: sendCommand(settings.coverAction2, settings.coverAction2_command)
+        }
+    }
 
+    CoverActionList {
+        enabled: settings.coverAction1 !== "" && settings.coverAction1_command !== ""
+                 && (settings.coverAction2 === "" || settings.coverAction2_command === "")
+        CoverAction {
+            iconSource: "image://theme/icon-cover-previous"
+            onTriggered: sendCommand(settings.coverAction1, settings.coverAction1_command)
+        }
+    }
+
+    CoverActionList {
+        enabled: (settings.coverAction1 === "" || settings.coverAction1_command === "")
+                 && settings.coverAction2 !== "" && settings.coverAction2_command !== ""
         CoverAction {
             iconSource: "image://theme/icon-cover-next"
             onTriggered: sendCommand(settings.coverAction2, settings.coverAction2_command)
