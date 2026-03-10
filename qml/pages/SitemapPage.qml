@@ -540,6 +540,18 @@ Page {
             width: listView.width
             contentHeight: Theme.itemSizeMedium
             enabled: false
+
+            // Text zwischen [...] aus label extrahieren, Fallback auf currentState
+            readonly property string displayState: {
+                var lbl = widget.label || "";
+                var match = lbl.match(/\[([^[]*)\]/);
+                if (match) return match[1];
+                return currentState ? currentState.toString() : "N/A";
+            }
+
+            // Label-Text ohne [...]-Teil
+            readonly property string displayLabel: (widget.label || "").replace(/\s*\[.*\]/, "")
+
             Row {
                 anchors.fill: parent; anchors.leftMargin: Theme.horizontalPageMargin; anchors.rightMargin: Theme.horizontalPageMargin; spacing: Theme.paddingMedium
 
@@ -550,7 +562,7 @@ Page {
                 }
 
                 Label {
-                    text: widget.item.label || ""
+                    text: displayLabel
                     width: parent.width - (Theme.iconSizeSmall + Theme.paddingMedium * 2) - stateVal.width
                     anchors.verticalCenter: parent.verticalCenter
                     truncationMode: TruncationMode.Fade
@@ -558,7 +570,7 @@ Page {
 
                 Label {
                     id: stateVal
-                    text: currentState ? currentState.toString() : "N/A"
+                    text: displayState
                     color: Theme.secondaryColor
                     anchors.verticalCenter: parent.verticalCenter
                 }
