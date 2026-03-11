@@ -397,8 +397,8 @@ Page {
 
             Slider {
                 id: slider
-                x: Theme.horizontalPageMargin
-                y: (parent.height - height) / 2
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.verticalCenter: parent.verticalCenter
                 width: parent.width - (Theme.horizontalPageMargin * 2)
 
                 label: widget.label.replace(/\s*\[.*\]/, "") || ""
