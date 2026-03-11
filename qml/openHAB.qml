@@ -5,6 +5,7 @@ import "base"
 import "base/utilities/SitemapLoader.js" as SitemapLoader
 
 ApplicationWindow {
+    id: appWindow
 
     Settings { id: settings }
 
@@ -16,34 +17,45 @@ ApplicationWindow {
         SitemapLoader.loadAvailableSitemaps(settings.base_url, availableSitemapModel)
     }
 
+    // Track whether sitemaps were already loaded by a base_url change
+    property bool _sitemapsLoaded: false
+
+    // Reload sitemaps when base_url changes
+    Connections {
+        target: settings
+        onBase_urlChanged: {
+            console.log("[App] base_url changed to: " + settings.base_url + ", reloading sitemaps...")
+            loadAvailableSitemaps()
+            _sitemapsLoaded = true
+        }
+    }
+
     initialPage: {
         console.log("[Start] settings.demoMode = " + settings.demoMode)
         console.log("[Start] settings.lastVisitedPage = " + settings.lastVisitedPage)
-        loadAvailableSitemaps()
         if (settings.demoMode) {
             console.log("[Start] - demoMode == ON")
             settings.base_url = "https://demo.openhab.org"
-            loadAvailableSitemaps()
+            // loadAvailableSitemaps will be triggered by onBase_urlChanged
+        }
+
+        if (settings.lastVisitedPage === "Sitemap") {
             return mainUiPageComponent
         }
+        else if (settings.lastVisitedPage === "MainUiPage") {
+            return mainUiPageComponent
+        }
+        else if (settings.lastVisitedPage !== "") {
+            return sitemapPageComponent
+        }
         else {
-            if (settings.lastVisitedPage === "Sitemap") {
-                //console.log("[Start] route - Sitemap")
-                return mainUiPageComponent
-            }
-            else if (settings.lastVisitedPage === "MainUiPage") {
-                //console.log("[Start] route - MainUiPage")
-                return mainUiPageComponent
-            }
-            else if (settings.lastVisitedPage !== "") {
-                //console.log("[Start] route - lastVisitedPage ist befüllt.")
-                return sitemapPageComponent
-            }
-            else {
-                // Fallback: load DemoSitemap if nothing else is available
-                //console.log("[Start] route - fallback")
-                return mainUiPageComponent
-            }
+            return mainUiPageComponent
+        }
+    }
+
+    Component.onCompleted: {
+        if (!_sitemapsLoaded) {
+            loadAvailableSitemaps()
         }
     }
 

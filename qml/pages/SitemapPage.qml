@@ -3,7 +3,6 @@ import QtQuick.Layouts 1.1
 import Sailfish.Silica 1.0
 import "../base"
 import "../components"
-import "../base/utilities/SitemapLoader.js" as SitemapLoader
 import "../base/utilities/SseEvents.js" as SseEvents
 import "../base/utilities/PatternFormatter.js" as PatternFormatter
 
@@ -39,15 +38,8 @@ Page {
         dynamicRoles: true
     }
 
-    ListModel {
-        id: availableSitemapModel
-    }
-
     // --- Logik ---
 
-    function loadAvailableSitemaps() {
-        SitemapLoader.loadAvailableSitemaps(settings.base_url, availableSitemapModel)
-    }
 
     function sendCommand(itemName, command) {
         // itemName ist jetzt garantiert ein String (dank .name Zugriff in den Komponenten)
@@ -191,8 +183,7 @@ Page {
    }
 
    Component.onCompleted: {
-      fetchSitemap();
-      loadAvailableSitemaps()
+      fetchSitemap()
 
       if (!isSubPage && sseManager) {
           // Top-level sitemap: start SSE connection and bind to our model

@@ -3,7 +3,6 @@ import Sailfish.Silica 1.0
 import Sailfish.WebView 1.0
 import "../base"
 import "../components"
-import "../base/utilities/SitemapLoader.js" as SitemapLoader
 
 Page {
     id: mainUiPage
@@ -11,18 +10,9 @@ Page {
 
     Settings { id: settings }
 
-    ListModel {
-        id: availableSitemapModel
-    }
-
-    function loadAvailableSitemaps() {
-        SitemapLoader.loadAvailableSitemaps(settings.base_url, availableSitemapModel)
-    }
-
     Component.onCompleted: {
         console.log("[MainUiPage] loaded")
         settings.lastVisitedPage = "MainUiPage"
-        loadAvailableSitemaps()
     }
 
     SilicaFlickable {

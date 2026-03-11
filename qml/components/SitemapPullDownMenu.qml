@@ -1,7 +1,6 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
 import "../base"
-import "../base/utilities/SitemapLoader.js" as SitemapLoader
 
 Item {
     id: root
@@ -9,23 +8,11 @@ Item {
     property PullDownMenu pullDownMenu
     property alias menuItems: menuContainer.children
 
+    // The shared sitemap model from the ApplicationWindow
+    property var sitemapModel: availableSitemapModel
+
     // Signal, das andere Components verbinden können
     signal sitemapSelected(string name, string label)
-
-    Settings { id: settings }
-    ListModel { id: availableSitemapModel }
-
-    function loadAvailableSitemaps() {
-        SitemapLoader.loadAvailableSitemaps(settings.base_url, availableSitemapModel)
-    }
-
-    // Automatisch laden, wenn die Component sichtbar wird
-    onVisibleChanged: {
-        if (visible && availableSitemapModel.count === 0) {
-            console.log("[SitemapPullDownMenu] Loading sitemaps...")
-            loadAvailableSitemaps()
-        }
-    }
 
     // Der eigentliche PullDownMenu mit allen Items
     PullDownMenu {
@@ -38,8 +25,8 @@ Item {
         MenuItem {
             text: qsTr("Refresh Sitemaps")
             onClicked: {
-                availableSitemapModel.clear()
-                loadAvailableSitemaps()
+                // Call the central loadAvailableSitemaps from ApplicationWindow
+                appWindow.loadAvailableSitemaps()
             }
         }
 
@@ -59,15 +46,12 @@ Item {
         }
 
         Repeater {
-            model: availableSitemapModel
+            model: root.sitemapModel
 
             MenuItem {
                 text: model.label || model.name
                 onClicked: {
-                    //console.log("[SitemapPullDownMenu] Selected: " + model.name)
                     root.sitemapSelected(model.name, model.label || model.name)
-
-                    settings.lastVisitedPage = model.name
                 }
             }
         }
