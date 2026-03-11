@@ -17,12 +17,12 @@ The documentation is available at [www.openhab.org/docs/](https://www.openhab.or
 
 ## Features
 * Display your sitemaps and widgets and control your devices from your mobile device
-* supported widgets: Switch, Rollershutter, Slider, Text
+* supported widgets: Switch, Rollershutter, Slider, Text, Group
 * Customizable CoverActions via Settings
 
 ## Technical Informations
 * QT-Version 5.6.3
-* Tested on Sailfish OS 5.0.63
+* Tested on Sailfish OS 5.0.0.62
 
 ## Roadmap
 * Version 0.0.1 (under development):

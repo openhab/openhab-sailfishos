@@ -240,11 +240,10 @@ Page {
                 sourceSize.width: width
                 sourceSize.height: height
                 visible: parent.iconName !== "" && parent.iconName !== "none"
-                source: parent.iconName ? settings.base_url + "/icon/" + parent.iconName + "?format=svg" : ""
+                source: parent.iconName ? settings.base_url + "/icon/" + parent.iconName + "?format=png&anyFormat=true" : ""
                 onStatusChanged: {
-                    //console.log("[IconLoader] icon: " + parent.iconName)
-                    if (status === Image.Error && source.toString().indexOf("format=svg") !== -1) {
-                        source = settings.base_url + "/icon/" + parent.iconName + "?format=png";
+                    if (status === Image.Error && source.toString().indexOf("format=png") !== -1) {
+                        source = settings.base_url + "/icon/" + parent.iconName + "?format=svg";
                     }
                 }
             }
@@ -397,11 +396,12 @@ Page {
 
             Slider {
                 id: slider
-                anchors.horizontalCenter: parent.horizontalCenter
+                x: Theme.horizontalPageMargin
                 anchors.verticalCenter: parent.verticalCenter
-                width: parent.width - (Theme.horizontalPageMargin * 2)
+                width: sliderItem.width - (Theme.horizontalPageMargin * 2)
 
-                label: widget.label.replace(/\s*\[.*\]/, "") || ""
+                property string _sliderLabel: widget.label ? widget.label.replace(/\s*\[.*\]/, "") : ""
+                label: _sliderLabel
                 minimumValue: 0
                 maximumValue: 100
                 value: 0
