@@ -48,12 +48,13 @@ CoverBackground {
             horizontalCenter: parent.horizontalCenter
         }
         width: parent.width
-        spacing: Theme.paddingSmall
+        spacing: 16
 
         Image {
             anchors.horizontalCenter: parent.horizontalCenter
             width: parent.width * 0.8
-            height: sourceSize.height * width / sourceSize.width
+            height: width
+            fillMode: Image.PreserveAspectFit
             smooth: true
             source: "qrc:///cover/cover-background"
         }
@@ -61,7 +62,7 @@ CoverBackground {
         Label {
             anchors.horizontalCenter: parent.horizontalCenter
             text: Qt.application.version !== "" ? "v " + Qt.application.version : "v?.?.?"
-            font.pixelSize: Theme.fontSizeExtraSmall
+            font.pixelSize: 20
             color: Theme.secondaryColor
         }
     }
@@ -73,14 +74,14 @@ CoverBackground {
             horizontalCenter: parent.horizontalCenter
         }
         width: parent.width
-        spacing: Theme.paddingTiny
+        spacing: 8
 
         Label {
             anchors.horizontalCenter: parent.horizontalCenter
             width: parent.width * 0.9
             wrapMode: Text.WordWrap
             text: "Left Action:  " + label1 + " - " + settings.coverAction1_command
-            font.pixelSize: Theme.fontSizeExtraSmall
+            font.pixelSize: 20
             color: Theme.primaryColor
             visible: settings.coverAction1 !== "" && settings.coverAction1_command !== ""
             height: visible ? implicitHeight : 0
@@ -91,7 +92,7 @@ CoverBackground {
             width: parent.width * 0.9
             wrapMode: Text.WordWrap
             text: "Right Action: " + label2  + " - " + settings.coverAction2_command
-            font.pixelSize: Theme.fontSizeExtraSmall
+            font.pixelSize: 20
             color: Theme.primaryColor
             visible: settings.coverAction2 !== "" && settings.coverAction2_command !== ""
             height: visible ? implicitHeight : 0
