@@ -70,6 +70,7 @@ Page {
                     "itemName": "",
                     "itemState": "",
                     "widgetPattern": "",
+                    "mappingsJson": "",
                     "itemData": { "label": "", "state": "", "item": { "name": "" } }
                 });
                 sitemapModel.clear();
@@ -91,6 +92,7 @@ Page {
                                 "itemName": "",
                                 "itemState": "",
                                 "widgetPattern": "",
+                                "mappingsJson": "",
                                 "itemData": { "label": (widget.label ? widget.label.toUpperCase() : ""), "state": "" }
                             });
                             unpackWidgets(widget.widgets);
@@ -101,6 +103,7 @@ Page {
                                 "itemName": name,
                                 "itemState": state,
                                 "widgetPattern": pat,
+                                "mappingsJson": "",
                                 "itemData": widget
                             });
                         }
@@ -110,6 +113,17 @@ Page {
                                 "itemName": name,
                                 "itemState": state,
                                 "widgetPattern": pat,
+                                "mappingsJson": "",
+                                "itemData": widget
+                            });
+                        }
+                        else if (widget.type === "Switch" && widget.mappings && widget.mappings.length > 0) {
+                            sitemapModel.append({
+                                "type": "SwitchWithMappings",
+                                "itemName": name,
+                                "itemState": state,
+                                "widgetPattern": pat,
+                                "mappingsJson": JSON.stringify(widget.mappings),
                                 "itemData": widget
                             });
                         }
@@ -119,6 +133,7 @@ Page {
                                 "itemName": name,
                                 "itemState": state,
                                 "widgetPattern": pat,
+                                "mappingsJson": "",
                                 "itemData": widget
                             });
                         }
@@ -293,15 +308,17 @@ Page {
                 property var widget: itemData
                 property string currentState: model.itemState || ""
                 property string pattern: model.widgetPattern || ""
+                property string mappingsJson: model.mappingsJson || ""
                 sourceComponent: {
                     switch(type) {
-                        case "Header": return headerComp;
-                        case "Switch": return switchComp;
-                        case "Rollershutter":   return rollershutterButtonsComp;
-                        case "Slider": return sliderComp;
-                        case "Group":  return groupComp;
-                        case "Text":   return widget.linkedPage ? groupComp : textComp;
-                        default:       return textComp;
+                        case "Header":              return headerComp;
+                        case "Switch":              return switchComp;
+                        case "SwitchWithMappings":  return switchWithMappingsComp;
+                        case "Rollershutter":       return rollershutterButtonsComp;
+                        case "Slider":              return sliderComp;
+                        case "Group":               return groupComp;
+                        case "Text":                return widget.linkedPage ? groupComp : textComp;
+                        default:                    return textComp;
                     }
                 }
             }
@@ -489,8 +506,121 @@ Page {
         }
     }
 
+    Component {
+        id: switchWithMappingsComp
+        ListItem {
+            id: mappingsItem
+            width: listView.width
+            contentHeight: Theme.itemSizeMedium
+            highlighted: false
 
+            // Parse mappings from the JSON string passed via the model
+            readonly property var mappings: {
+                if (mappingsJson && mappingsJson !== "") {
+                    try {
+                        return JSON.parse(mappingsJson);
+                    } catch (e) {
+                        console.warn("[switchWithMappingsComp] Failed to parse mappingsJson:", e);
+                        return [];
+                    }
+                }
+                return [];
+            }
 
+            // Label text without [...] part
+            readonly property string displayLabel: (widget.label || "").replace(/\s*\[.*\]/, "")
+
+            Row {
+                anchors.fill: parent
+                anchors.leftMargin: Theme.horizontalPageMargin
+                anchors.rightMargin: Theme.horizontalPageMargin
+                spacing: Theme.paddingMedium
+
+                Loader {
+                    id: mappingsIconLoader
+                    sourceComponent: smartIcon
+                    anchors.verticalCenter: parent.verticalCenter
+                    onLoaded: if (item) item.iconName = widget.icon || ""
+                    visible: widget.icon !== undefined && widget.icon !== "" && widget.icon !== "none"
+                    width: visible ? Theme.iconSizeSmall : 0
+                }
+
+                Label {
+                    id: mappingsLabel
+                    text: displayLabel
+                    anchors.verticalCenter: parent.verticalCenter
+                    width: parent.width
+                           - (mappingsIconLoader.visible ? mappingsIconLoader.width + parent.spacing : 0)
+                           - buttonRow.width - parent.spacing
+                    truncationMode: TruncationMode.Fade
+                    color: Theme.primaryColor
+                }
+
+                Row {
+                    id: buttonRow
+                    anchors.verticalCenter: parent.verticalCenter
+                    spacing: Theme.paddingSmall
+
+                    // Calculate uniform button width from widest label
+                    property real uniformWidth: {
+                        var maxW = 0;
+                        for (var i = 0; i < mappingsSizer.count; i++) {
+                            var w = mappingsSizer.itemAt(i).implicitWidth;
+                            if (w > maxW) maxW = w;
+                        }
+                        return maxW + Theme.paddingLarge * 2;
+                    }
+
+                    // Hidden labels to measure text widths
+                    Repeater {
+                        id: mappingsSizer
+                        model: mappings.length
+                        Label {
+                            visible: false
+                            text: mappings[index].label || mappings[index].command || ""
+                            font.pixelSize: Theme.fontSizeExtraSmall
+                        }
+                    }
+
+                    Repeater {
+                        model: mappings.length
+
+                        Rectangle {
+                            id: mappingBtn
+                            property var mapping: mappings[index]
+                            property bool isActive: currentState === mapping.command
+
+                            width: buttonRow.uniformWidth
+                            height: Theme.itemSizeExtraSmall * 0.7
+                            radius: Theme.paddingSmall
+                            color: isActive
+                                   ? Qt.rgba(Theme.highlightColor.r, Theme.highlightColor.g, Theme.highlightColor.b, 0.5)
+                                   : Qt.rgba(Theme.highlightColor.r, Theme.highlightColor.g, Theme.highlightColor.b, 0.25)
+                            border.width: 1
+                            border.color: Theme.highlightColor
+
+                            Label {
+                                anchors.centerIn: parent
+                                text: mappingBtn.mapping.label || mappingBtn.mapping.command || ""
+                                font.pixelSize: Theme.fontSizeExtraSmall
+                                font.bold: true
+                                color: Theme.highlightColor
+                            }
+
+                            MouseArea {
+                                anchors.fill: parent
+                                onClicked: {
+                                    if (widget.item && widget.item.name) {
+                                        sendCommand(widget.item.name, mappingBtn.mapping.command);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     Component {
         id: groupComp
