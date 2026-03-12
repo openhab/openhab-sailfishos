@@ -17,7 +17,7 @@ The documentation is available at [www.openhab.org/docs/](https://www.openhab.or
 
 ## Features
 * Display your sitemaps and widgets and control your devices from your mobile device
-* supported widgets: Switch, Switches with Button-Mappings, Rollershutter, Slider, Selections, Text, Group
+* supported widgets/element types: Frame, Text, Group, Switch, Switches with Button-Mappings, Selections, Slider, Rollershutter
 * Customizable CoverActions via Settings
 
 ## Technical Informations
@@ -28,6 +28,7 @@ The documentation is available at [www.openhab.org/docs/](https://www.openhab.or
 * Version 0.0.1 (under development):
   * see features above
 * Version 0.0.2 (planned):
+  * Enhance supported element types
   * Add support for remote access (via openHAB cloud)
   * Add App Notifications (via openHAB cloud)
 * Version 0.0.3 (planned):

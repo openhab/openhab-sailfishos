@@ -341,7 +341,6 @@ Page {
     Component {
         id: headerComp
         BackgroundItem {
-            // FIX: Benutze feste Höhe oder anchors, nicht beides mischen
             height: Theme.itemSizeSmall
             width: parent.width
             Label {
@@ -778,9 +777,9 @@ Page {
             contentHeight: Theme.itemSizeMedium
             enabled: false
 
-            // SSE-Updates liefern den rohen State in currentState.
-            // Wenn ein Pattern vorhanden ist, wird der State damit formatiert.
-            // Fallback: Text in [...] aus label parsen (initial vom Sitemap-REST-Call).
+            // SSE updates provide the raw state in currentState.
+            // If a pattern is present, the state is formatted with it.
+            // Fallback: Parse text from [...] in label (initially from Sitemap REST call).
             readonly property string displayState: {
                 if (currentState && currentState !== "") {
                     if (pattern && pattern !== "") {
@@ -794,7 +793,7 @@ Page {
                 return "N/A";
             }
 
-            // Label-Text ohne [...]-Teil
+            // Label text and remove [...] after label description
             readonly property string displayLabel: (widget.label || "").replace(/\s*\[.*\]/, "")
 
             Row {

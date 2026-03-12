@@ -11,10 +11,10 @@ Item {
     // The shared sitemap model from the ApplicationWindow
     property var sitemapModel: availableSitemapModel
 
-    // Signal, das andere Components verbinden können
+    // Signal that other components can connect to
     signal sitemapSelected(string name, string label)
 
-    // Der eigentliche PullDownMenu mit allen Items
+    // The actual PullDownMenu with all items
     PullDownMenu {
         id: actualMenu
 
@@ -57,7 +57,7 @@ Item {
         }
     }
 
-    // Container für zusätzliche Items (falls nötig)
+    // Container for additional items (if needed)
     Item {
         id: menuContainer
     }

@@ -57,7 +57,7 @@ TRANSLATIONS += translations/openHAB-de.ts
 PKGCONFIG += qt5embedwidget
 
 #CPP integration of Websockets
-QT += core gui qml websockets network
-QT += websockets
+#QT += core gui qml websockets network
+#QT += websockets
 
 LIBS += -lsailfishapp
