@@ -127,6 +127,16 @@ Page {
                                 "itemData": widget
                             });
                         }
+                        else if (widget.item && widget.type === "Selection") {
+                            sitemapModel.append({
+                                "type": widget.type,
+                                "itemName": name,
+                                "itemState": state,
+                                "widgetPattern": pat,
+                                "mappingsJson": JSON.stringify(widget.mappings),
+                                "itemData": widget
+                            });
+                        }
                         else {
                             sitemapModel.append({
                                 "type": widget.type,
@@ -316,6 +326,7 @@ Page {
                         case "SwitchWithMappings":  return switchWithMappingsComp;
                         case "Rollershutter":       return rollershutterButtonsComp;
                         case "Slider":              return sliderComp;
+                        case "Selection":           return selectionComp;
                         case "Group":               return groupComp;
                         case "Text":                return widget.linkedPage ? groupComp : textComp;
                         default:                    return textComp;
@@ -617,6 +628,102 @@ Page {
                             }
                         }
                     }
+                }
+            }
+        }
+    }
+
+    Component {
+        id: selectionComp
+        ListItem {
+            id: selectionItem
+            width: listView.width
+            contentHeight: Theme.itemSizeMedium
+
+            // Parse mappings from the JSON string passed via the model
+            readonly property var mappings: {
+                if (mappingsJson && mappingsJson !== "") {
+                    try {
+                        return JSON.parse(mappingsJson);
+                    } catch (e) {
+                        console.warn("[selectionComp] Failed to parse mappingsJson:", e);
+                        return [];
+                    }
+                }
+                return [];
+            }
+
+            // Label text without [...] part
+            readonly property string displayLabel: (widget.label || "").replace(/\s*\[.*\]/, "")
+
+            // Find the label of the currently selected mapping (match by command)
+            readonly property string selectedLabel: {
+                for (var i = 0; i < mappings.length; i++) {
+                    if (mappings[i].command === currentState) {
+                        return mappings[i].label || mappings[i].command || "";
+                    }
+                }
+                // Fallback: try to extract from widget label [...]
+                var lbl = widget.label || "";
+                var match = lbl.match(/\[([^\]]*)\]/);
+                if (match) return match[1];
+                return currentState || "";
+            }
+
+            onClicked: {
+                var props = {
+                    "title": displayLabel,
+                    "mappings": mappings,
+                    "currentCommand": currentState || "",
+                    "itemName": widget.item ? widget.item.name : ""
+                };
+                var selPage = pageStack.animatorPush(Qt.resolvedUrl("SelectionPage.qml"), props);
+                selPage.pageCompleted.connect(function(pg) {
+                    pg.commandSelected.connect(function(command) {
+                        if (widget.item && widget.item.name) {
+                            sendCommand(widget.item.name, command);
+                        }
+                    });
+                });
+            }
+
+            Row {
+                anchors.fill: parent
+                anchors.leftMargin: Theme.horizontalPageMargin
+                anchors.rightMargin: Theme.horizontalPageMargin
+                spacing: Theme.paddingMedium
+
+                Loader {
+                    id: selectionIconLoader
+                    sourceComponent: smartIcon
+                    anchors.verticalCenter: parent.verticalCenter
+                    onLoaded: if (item) item.iconName = widget.icon || ""
+                    visible: widget.icon !== undefined && widget.icon !== "" && widget.icon !== "none"
+                    width: visible ? Theme.iconSizeSmall : 0
+                }
+
+                Label {
+                    text: displayLabel
+                    anchors.verticalCenter: parent.verticalCenter
+                    width: parent.width
+                        - (selectionIconLoader.visible ? selectionIconLoader.width + parent.spacing : 0)
+                        - selectionStateLabel.width - parent.spacing
+                        - selectionArrow.width - parent.spacing
+                    truncationMode: TruncationMode.Fade
+                    color: selectionItem.highlighted ? Theme.highlightColor : Theme.primaryColor
+                }
+
+                Label {
+                    id: selectionStateLabel
+                    text: selectedLabel
+                    anchors.verticalCenter: parent.verticalCenter
+                    color: Theme.secondaryColor
+                }
+
+                Icon {
+                    id: selectionArrow
+                    source: "image://theme/icon-m-right"
+                    anchors.verticalCenter: parent.verticalCenter
                 }
             }
         }
