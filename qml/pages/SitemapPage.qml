@@ -127,6 +127,16 @@ Page {
                                 "itemData": widget
                             });
                         }
+                        else if (widget.item && widget.type === "Selection" && widget.mappings.length === 0) {
+                            sitemapModel.append({
+                                "type": widget.type,
+                                "itemName": name,
+                                "itemState": state,
+                                "widgetPattern": pat,
+                                "mappingsJson": JSON.stringify(widget.item.commandDescription.commandOptions),
+                                "itemData": widget
+                            });
+                        }
                         else if (widget.item && widget.type === "Selection") {
                             sitemapModel.append({
                                 "type": widget.type,
