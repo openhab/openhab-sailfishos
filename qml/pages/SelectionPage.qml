@@ -6,7 +6,7 @@ Page {
     allowedOrientations: Orientation.All
 
     property string title: ""
-    property var mappings: []        // Array of { command: "...", label: "..." }
+    property var mappings: []
     property string currentCommand: ""
     property string itemName: ""
 

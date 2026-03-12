@@ -19,9 +19,7 @@ Dialog {
         SitemapLoader.loadAvailableSitemaps(settings.base_url, availableSitemapModel)
     }
 
-    Component.onCompleted: {
-        //loadAvailableSitemaps()
-    }
+    Component.onCompleted: { }
 
     SilicaFlickable {
         id: settingsPage
@@ -182,13 +180,9 @@ Dialog {
             if (settings.demoMode && settings.base_url !== "https://demo.openhab.org") {
                 console.log("demoMode == ON -- change base-url")
                 settings.base_url = "https://demo.openhab.org"
-                //availableSitemapModel.clear()
-                //loadAvailableSitemaps()
             }
             else if (!settings.demoMode && settings.base_url !== "https://demo.openhab.org") {
                 console.log("demoMode == OFF -- base-url changed")
-                //availableSitemapModel.clear()
-                //loadAvailableSitemaps()
             }
         }
 

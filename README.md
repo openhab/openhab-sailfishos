@@ -2,7 +2,7 @@
    <br>
     <img alt="Logo" src="icons/openHAB.svg" width="100">
     <br>
-    <b>openHAB client for Sailfish-OS</b>
+    <b>openHAB client for Sailfish OS</b>
 </p>
 
 ## Introduction
@@ -61,7 +61,7 @@ Thanks for your consideration and contribution!
 
 ## Setting up development environment
 
-If you want to contribute to Sailfish-OS application we are here to help you to set up development environment. openHAB client for Sailfish-OS is developed using Sailfish IDE.
+If you want to contribute to Sailfish OS application we are here to help you to set up development environment. openHAB client for Sailfish OS is developed using Sailfish IDE.
 
 - Download and install [Sailfish IDE](https://docs.sailfishos.org/Tools/Sailfish_SDK/Installation/)
 
@@ -71,4 +71,4 @@ You are ready to contribute!
 
 Product names, logos, brands and other trademarks referred to within the openHAB website are the property of their respective trademark holders. These trademark holders are not affiliated with openHAB or our website. They do not sponsor or endorse our materials.
 
-Sailfish-OS and the Sailfish-OS logo are trademarks of Jolla Group Ltd.
+Sailfish OS and the Sailfish OS logo are trademarks of Jolla Group Ltd.

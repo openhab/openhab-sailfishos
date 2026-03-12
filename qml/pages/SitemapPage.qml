@@ -12,7 +12,7 @@ Page {
     property string sitemapName: ""
     property string pageTitle: sitemapName
 
-    // Unterseiten werden mit voller URL (http...) aufgerufen → kein eigener SSE-Start
+    // Subpages will be called with full URL (http...) → no own SSE start
     readonly property bool isSubPage: sitemapName.indexOf("http") === 0
 
     Settings { id: settings }
@@ -38,11 +38,9 @@ Page {
         dynamicRoles: true
     }
 
-    // --- Logik ---
-
+    // --- Logic ---
 
     function sendCommand(itemName, command) {
-        // itemName ist jetzt garantiert ein String (dank .name Zugriff in den Komponenten)
         if (!itemName) return;
         var xhr = new XMLHttpRequest();
         xhr.open("POST", settings.base_url + "/rest/items/" + itemName, true);
@@ -86,6 +84,7 @@ Page {
                         // Extract pattern: widget-level pattern takes priority, then stateDescription
                         var pat = widget.pattern || (widget.item && widget.item.stateDescription && widget.item.stateDescription.pattern) || "";
 
+                        // Handle different widget types and their specific data needs
                         if (widget.type === "Frame" && widget.widgets) {
                             sitemapModel.append({
                                 "type": "Header",
@@ -117,6 +116,7 @@ Page {
                                 "itemData": widget
                             });
                         }
+                        // For Switch widgets with mappings, use a special type to indicate the presence of mappings
                         else if (widget.type === "Switch" && widget.mappings && widget.mappings.length > 0) {
                             sitemapModel.append({
                                 "type": "SwitchWithMappings",
@@ -127,6 +127,7 @@ Page {
                                 "itemData": widget
                             });
                         }
+                        // For Selection widgets without explicit mappings, use command options from the linked item if available
                         else if (widget.item && widget.type === "Selection" && widget.mappings.length === 0) {
                             sitemapModel.append({
                                 "type": widget.type,
@@ -137,6 +138,7 @@ Page {
                                 "itemData": widget
                             });
                         }
+                        // For Selection widgets with mappings, use the provided mappings
                         else if (widget.item && widget.type === "Selection") {
                             sitemapModel.append({
                                 "type": widget.type,
@@ -147,6 +149,7 @@ Page {
                                 "itemData": widget
                             });
                         }
+                        // Default case for other widget types
                         else {
                             sitemapModel.append({
                                 "type": widget.type,
@@ -260,8 +263,10 @@ Page {
    }
 
 
-    // --- UI Komponenten ---
+    // --- UI Components ---
+    // Here you can define components per openHAB widget type to display them within the sitemap.
 
+    // Displays openHAB icons
     Component {
         id: smartIcon
         Item {
@@ -322,6 +327,7 @@ Page {
             height: type === "Header" ? Theme.itemSizeSmall :
                     (type === "Slider" ? Theme.itemSizeLarge : Theme.itemSizeMedium)
 
+            // If new widget types are added, add them as new cases in the switch statement below and create corresponding components
             Loader {
                 id: componentLoader
                 anchors.fill: parent
@@ -346,7 +352,7 @@ Page {
         }
     }
 
-    // --- Templates ---
+    // --- Templates and Components ---
 
     Component {
         id: headerComp
@@ -364,6 +370,7 @@ Page {
         }
     }
 
+    // Simple switch component for ON/OFF items without mappings
     Component {
         id: switchComp
         ListItem {
@@ -406,6 +413,7 @@ Page {
         }
     }
 
+    // Slider component for dimmers, rollershutters or items with percentage state, with periodic update when not being interacted with
     Component {
         id: sliderComp
         ListItem {
@@ -467,6 +475,7 @@ Page {
         }
     }
 
+    // Rollershutter component with UP/STOP/DOWN buttons
     Component {
         id: rollershutterButtonsComp
         ListItem {
@@ -526,6 +535,7 @@ Page {
         }
     }
 
+    // Custom switch component for items with mappings, displaying a button for each mapping and highlighting the active one
     Component {
         id: switchWithMappingsComp
         ListItem {
@@ -642,6 +652,7 @@ Page {
         }
     }
 
+    // Selection component for items with mappings, showing the currently active mapping and opening a selection page on click
     Component {
         id: selectionComp
         ListItem {
@@ -738,6 +749,7 @@ Page {
         }
     }
 
+    // Group component that navigates to a linked page if available, otherwise shows as disabled text
     Component {
         id: groupComp
         ListItem {
@@ -780,6 +792,7 @@ Page {
         }
     }
 
+    // Text component for items without a linked page, showing the state and optionally formatted with a pattern
     Component {
         id: textComp
         ListItem {
