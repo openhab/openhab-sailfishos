@@ -10,7 +10,9 @@
  *   DateTime:  %1$td (day), %1$tm (month), %1$tY (year 4-digit), %1$ty (year 2-digit),
  *              %1$tH (hour 24h), %1$tM (minute), %1$tS (second),
  *              %1$ta (short weekday), %1$tA (long weekday),
- *              %1$tb / %1$th (short month name), %1$tB (long month name)
+ *              %1$tb / %1$th (short month name), %1$tB (long month name),
+ *              %1$tF (ISO date: YYYY-MM-DD), %1$tD (US date: MM/DD/YY),
+ *              %1$tT (time: HH:MM:SS), %1$tR (time: HH:MM)
  *   Number:    %d (integer), %.Nf (float with N decimals), %s (string)
  *   Literal:   %% → %
  */
@@ -71,6 +73,16 @@ function formatDateTime(pattern, rawState) {
     // Replace %% with a temporary placeholder to avoid conflicts
     result = result.replace(/%%/g, "\x00PERCENT\x00");
 
+    // Composite date/time shortcuts (must be replaced BEFORE individual tokens)
+    // %1$tF → ISO date: YYYY-MM-DD  (e.g. "2026-03-12")
+    result = result.replace(/%1\$tF/g, d.getFullYear().toString() + "-" + zeroPad(d.getMonth() + 1, 2) + "-" + zeroPad(d.getDate(), 2));
+    // %1$tD → US date: MM/DD/YY  (e.g. "03/12/26")
+    result = result.replace(/%1\$tD/g, zeroPad(d.getMonth() + 1, 2) + "/" + zeroPad(d.getDate(), 2) + "/" + zeroPad(d.getFullYear() % 100, 2));
+    // %1$tT → time: HH:MM:SS
+    result = result.replace(/%1\$tT/g, zeroPad(d.getHours(), 2) + ":" + zeroPad(d.getMinutes(), 2) + ":" + zeroPad(d.getSeconds(), 2));
+    // %1$tR → time: HH:MM
+    result = result.replace(/%1\$tR/g, zeroPad(d.getHours(), 2) + ":" + zeroPad(d.getMinutes(), 2));
+
     // Date/time replacements (order matters: longer patterns first)
     result = result.replace(/%1\$tY/g, d.getFullYear().toString());
     result = result.replace(/%1\$ty/g, zeroPad(d.getFullYear() % 100, 2));
@@ -98,8 +110,6 @@ function formatDateTime(pattern, rawState) {
 
     // AM/PM
     result = result.replace(/%1\$tp/g, d.getHours() < 12 ? "am" : "pm");
-    result = result.replace(/%1\$tT/g, zeroPad(d.getHours(), 2) + ":" + zeroPad(d.getMinutes(), 2) + ":" + zeroPad(d.getSeconds(), 2));
-    result = result.replace(/%1\$tR/g, zeroPad(d.getHours(), 2) + ":" + zeroPad(d.getMinutes(), 2));
 
     // Restore literal %
     result = result.replace(/\x00PERCENT\x00/g, "%");

@@ -17,7 +17,7 @@ The documentation is available at [www.openhab.org/docs/](https://www.openhab.or
 
 ## Features
 * Display your sitemaps and widgets and control your devices from your mobile device
-* supported widgets: Switch, Rollershutter, Slider, Text, Group
+* supported widgets: Switch, Switches with Button-Mappings, Rollershutter, Slider, Text, Group
 * Customizable CoverActions via Settings
 
 ## Technical Informations
