@@ -17,17 +17,6 @@ Page {
 
     Settings { id: settings }
 
-    // Restart SSE when base_url changes
-    Connections {
-        target: settings
-        onBase_urlChanged: {
-            if (!isSubPage && sseManager) {
-                console.log("[SitemapPage] base_url changed, restarting SSE...");
-                SseEvents.restartSSE(sseManager, settings.base_url, sitemapModel);
-                fetchSitemap();
-            }
-        }
-    }
 
     readonly property string fullApiUrl: sitemapName.indexOf("http") === 0
         ? sitemapName

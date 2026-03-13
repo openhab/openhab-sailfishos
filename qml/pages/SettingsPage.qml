@@ -56,7 +56,7 @@ Dialog {
                 id: baseUrlField
                 width: parent.width
                 label: qsTr("URL")
-                placeholderText: qsTr("http://example.com:8080")
+                placeholderText: qsTr("https://demo.openhab.org")
                 text: settings.base_url
                 inputMethodHints: Qt.ImhUrlCharactersOnly
 
@@ -169,22 +169,22 @@ Dialog {
     }
     onDone: {
         if (result == DialogResult.Accepted) {
-            settings.base_url = baseUrlField.text
-            settings.openhab_cloud_service = openhabCloudServiceField.checked
+            // Save demoMode first – the onDemoModeChanged handler in
+            // Settings.qml will automatically set base_url to the demo
+            // server when demoMode is switched on.
             settings.demoMode = demoModeField.checked
+
+            // Only apply the manually entered URL when demoMode is off;
+            // otherwise the demo URL set by onDemoModeChanged must stay.
+            if (!settings.demoMode) {
+                settings.base_url = settings.normalizeUrl(baseUrlField.text)
+            }
+
+            //settings.openhab_cloud_service = openhabCloudServiceField.checked
             settings.coverAction1 = coverAction1Field.text
             settings.coverAction1_command = coverAction1CommandField.text
             settings.coverAction2 = coverAction2Field.text
             settings.coverAction2_command = coverAction2CommandField.text
-
-            if (settings.demoMode && settings.base_url !== "https://demo.openhab.org") {
-                console.log("demoMode == ON -- change base-url")
-                settings.base_url = "https://demo.openhab.org"
-            }
-            else if (!settings.demoMode && settings.base_url !== "https://demo.openhab.org") {
-                console.log("demoMode == OFF -- base-url changed")
-            }
         }
-
     }
 }

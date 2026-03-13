@@ -15,7 +15,19 @@
 <context>
     <name>SettingsPage</name>
     <message>
+        <source></source>
+        <translation></translation>
+    </message>
+    <message>
         <source>Save</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>General</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -27,31 +39,15 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>http://example.com:8080</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Scroll to top</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source></source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Settings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>General</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Local server</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>URL</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>https://demo.openhab.org</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -84,6 +80,10 @@
     </message>
     <message>
         <source>Right button</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Scroll to top</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
