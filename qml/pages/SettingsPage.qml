@@ -151,6 +151,91 @@ Dialog {
                 EnterKey.onClicked: focus = false
             }
 
+            // ── About ────────────────────────────────────
+            SectionHeader {
+                text: qsTr("About")
+            }
+
+            // App-Version Zeile (nicht anklickbar)
+            ListItem {
+                contentHeight: Theme.itemSizeMedium
+                _backgroundColor: "transparent"
+                highlighted: false
+
+                Label {
+                    anchors.left: parent.left
+                    anchors.leftMargin: Theme.horizontalPageMargin
+                    anchors.verticalCenter: parent.verticalCenter
+                    text: qsTr("App Version")
+                    color: Theme.primaryColor
+                }
+                Label {
+                    anchors.right: parent.right
+                    anchors.rightMargin: Theme.horizontalPageMargin
+                    anchors.verticalCenter: parent.verticalCenter
+                    text: Qt.application.version !== "" ? Qt.application.version : "?.?.?"
+                    color: Theme.secondaryColor
+                }
+            }
+
+            Separator {
+                width: parent.width
+                color: Theme.primaryColor
+                horizontalAlignment: Qt.AlignHCenter
+            }
+
+            // Legal Zeile – öffnet LegalPage
+            ListItem {
+                contentHeight: Theme.itemSizeMedium
+
+                onClicked: pageStack.push(Qt.resolvedUrl("LegalPage.qml"))
+
+                Label {
+                    anchors.left: parent.left
+                    anchors.leftMargin: Theme.horizontalPageMargin
+                    anchors.verticalCenter: parent.verticalCenter
+                    text: qsTr("Legal")
+                    color: Theme.primaryColor
+                }
+                Image {
+                    anchors.right: parent.right
+                    anchors.rightMargin: Theme.horizontalPageMargin
+                    anchors.verticalCenter: parent.verticalCenter
+                    source: "image://theme/icon-m-right"
+                    width: Theme.iconSizeSmall
+                    height: Theme.iconSizeSmall
+                }
+            }
+
+            Separator {
+                width: parent.width
+                color: Theme.primaryColor
+                horizontalAlignment: Qt.AlignHCenter
+            }
+
+            // Datenschutzerklärung Zeile – öffnet Website in-App
+            ListItem {
+                contentHeight: Theme.itemSizeMedium
+
+                onClicked: pageStack.push(Qt.resolvedUrl("PrivacyPolicyPage.qml"))
+
+                Label {
+                    anchors.left: parent.left
+                    anchors.leftMargin: Theme.horizontalPageMargin
+                    anchors.verticalCenter: parent.verticalCenter
+                    text: qsTr("Privacy Policy")
+                    color: Theme.highlightColor
+                }
+                Image {
+                    anchors.right: parent.right
+                    anchors.rightMargin: Theme.horizontalPageMargin
+                    anchors.verticalCenter: parent.verticalCenter
+                    source: "image://theme/icon-m-right"
+                    width: Theme.iconSizeSmall
+                    height: Theme.iconSizeSmall
+                }
+            }
+
             // Bottom spacer
             Item {
                 width: 1

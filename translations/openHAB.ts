@@ -2,6 +2,17 @@
 <!DOCTYPE TS>
 <TS version="2.1">
 <context>
+    <name>LegalPage</name>
+    <message>
+        <source>Legal</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Copyright © 2026, Contributors to the openHAB project</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>MainUiPage</name>
     <message>
         <source>Scroll to top</source>
@@ -9,6 +20,13 @@
     </message>
     <message>
         <source>openHAB Main UI</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>PrivacyPolicyPage</name>
+    <message>
+        <source>Privacy Policy</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -84,6 +102,22 @@
     </message>
     <message>
         <source>Scroll to top</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>About</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>App Version</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Legal</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Privacy Policy</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

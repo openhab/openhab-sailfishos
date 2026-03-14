@@ -15,6 +15,15 @@ Page {
         settings.lastVisitedPage = "MainUiPage"
     }
 
+    onStatusChanged: {
+        if (status === PageStatus.Active) {
+            webView.url = settings.base_url
+            webView.active = true
+        } else if (status === PageStatus.Deactivating) {
+            webView.active = false
+        }
+    }
+
     SilicaFlickable {
         id: flickableMenu
         anchors.fill: parent
@@ -54,7 +63,7 @@ Page {
                 width: parent.width
                 height: mainUiPage.height - header.height
                 url: settings.base_url
-                active: true
+                active: false
             }
         }
     }
