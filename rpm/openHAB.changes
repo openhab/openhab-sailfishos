@@ -12,7 +12,7 @@
 # * date Author's Name <author's email> version-release
 # - Summary of changes
 
-* Tue Mar 12 2026 Dominik Heidinger <dominikh@atomicmail.io> 0.0.1-1
+* Thu Mar 12 2026 Dominik Heidinger <dominikh@atomicmail.io> 0.1-1
 - initial creation of the openHAB client app
 - added widgets/element types: Frame, Text, Group, Switch, Switches with Button-Mappings, Selections, Slider, Rollershutter
 - added customizable CoverActions via settings

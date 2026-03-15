@@ -6,6 +6,7 @@
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
+#include <QQuickView>
 #include "ssemanager.h"
 #include <QNetworkAccessManager>
 

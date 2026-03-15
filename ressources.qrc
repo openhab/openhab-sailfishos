@@ -1,5 +1,5 @@
 <RCC>
     <qresource prefix="/cover">
-        <file alias="cover-background">icons/cover-background.svg</file>
+        <file alias="cover-background">icons/cover-background.png</file>
     </qresource>
 </RCC>

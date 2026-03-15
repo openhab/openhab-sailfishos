@@ -24,6 +24,9 @@ RESOURCES += \
 HEADERS += src/ssemanager.h
 
 DISTFILES += qml/openHAB.qml \
+    icons/cover-background.png \
+    icons/cover-background1.png \
+    icons/openHAB.svg \
     qml/cover/CoverPage.qml \
     qml/pages/MainUiPage.qml \
     qml/pages/SettingsPage.qml \
