@@ -20,6 +20,10 @@ The documentation is available at [www.openhab.org/docs/](https://www.openhab.or
 * Supported widgets/element-types: Frame, Text, Group, Switch, Switches with Button-Mappings, Selections, Slider, Rollershutter
 * Customizable CoverActions via Settings
 
+<img src="docs/images/main-ui.png" alt="Main UI" width=200px> <img src="docs/images/sitemap-1.png" alt="Settings" width=200px> <img src="docs/images/sitemap-2.png" alt="Sitemap view" width=200px>
+
+For more screenshots, see [docs/images/](docs/images/) in the GitHub repository. 
+
 ## Technical Informations
 * QT-Version 5.6.3
 * Tested on Sailfish OS 5.0.0.62

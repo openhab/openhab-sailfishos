@@ -101,7 +101,7 @@ Dialog {
                 id: coverAction1Field
                 width: parent.width
                 label: qsTr("Item-ID")
-                placeholderText: qsTr("e.g. Shelly_buero_lampe")
+                placeholderText: qsTr("e.g. item_id1")
                 text: settings.coverAction1
 
                 EnterKey.enabled: text.length > 0
@@ -131,7 +131,7 @@ Dialog {
                 id: coverAction2Field
                 width: parent.width
                 label: qsTr("Item-ID")
-                placeholderText: qsTr("e.g. Shelly_buero_lampe")
+                placeholderText: qsTr("e.g. item_id1")
                 text: settings.coverAction2
 
                 EnterKey.enabled: text.length > 0

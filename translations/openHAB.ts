@@ -85,10 +85,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>e.g. Shelly_buero_lampe</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Command</source>
         <translation type="unfinished"></translation>
     </message>
@@ -118,6 +114,10 @@
     </message>
     <message>
         <source>Privacy Policy</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>e.g. item_id1</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
