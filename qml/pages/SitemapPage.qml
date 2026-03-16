@@ -294,6 +294,7 @@ Page {
                 sitemapName = name
                 pageTitle = label
                 settings.lastVisitedPage = name
+                console.log("[SitemapPage] lastVisitedPage: " + settings.lastVisitedPage)
                 fetchSitemap()
 
                 // Restart SSE on sitemap switch

@@ -44,7 +44,9 @@ DISTFILES += qml/openHAB.qml \
 SAILFISHAPP_ICONS = 86x86 108x108 128x128 172x172
 
 VERSION = 0.1
+RELEASE = 1
 DEFINES += APP_VERSION=\\\"$$VERSION\\\"
+DEFINES += APP_RELEASE=\\\"$$RELEASE\\\"
 
 # to disable building translations every time, comment out the
 # following CONFIG line
