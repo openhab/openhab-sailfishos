@@ -120,6 +120,10 @@
         <source>e.g. item_id1</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Report a bug or request a feature</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>SitemapPage</name>

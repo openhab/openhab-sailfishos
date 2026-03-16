@@ -156,7 +156,6 @@ Dialog {
                 text: qsTr("About")
             }
 
-            // App-Version Zeile (nicht anklickbar)
             ListItem {
                 contentHeight: Theme.itemSizeMedium
                 _backgroundColor: "transparent"
@@ -184,7 +183,34 @@ Dialog {
                 horizontalAlignment: Qt.AlignHCenter
             }
 
-            // Legal Zeile – öffnet LegalPage
+            ListItem {
+                contentHeight: Theme.itemSizeMedium
+
+                onClicked: Qt.openUrlExternally("https://community.openhab.org/")
+
+                Label {
+                    anchors.left: parent.left
+                    anchors.leftMargin: Theme.horizontalPageMargin
+                    anchors.verticalCenter: parent.verticalCenter
+                    text: qsTr("Report a bug or request a feature")
+                    color: Theme.primaryColor
+                }
+                Image {
+                    anchors.right: parent.right
+                    anchors.rightMargin: Theme.horizontalPageMargin
+                    anchors.verticalCenter: parent.verticalCenter
+                    source: "image://theme/icon-m-right"
+                    width: Theme.iconSizeSmall
+                    height: Theme.iconSizeSmall
+                }
+            }
+
+            Separator {
+                width: parent.width
+                color: Theme.primaryColor
+                horizontalAlignment: Qt.AlignHCenter
+            }
+
             ListItem {
                 contentHeight: Theme.itemSizeMedium
 
@@ -213,7 +239,6 @@ Dialog {
                 horizontalAlignment: Qt.AlignHCenter
             }
 
-            // Datenschutzerklärung Zeile – öffnet Website in-App
             ListItem {
                 contentHeight: Theme.itemSizeMedium
 
