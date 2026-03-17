@@ -1,4 +1,4 @@
-Name:       openHAB
+Name:       harbour-openHAB
 
 Summary:    openHAB client for Sailfish OS
 Version:    0.1

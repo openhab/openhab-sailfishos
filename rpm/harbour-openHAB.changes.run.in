@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Rename this file as openHAB.changes.run to let sfdk automatically
+# Rename this file as harbour-openHAB.changes.run to let sfdk automatically
 # generate changelog from well formatted Git commit messages and tag
 # annotations. Note that 'sfdk changelog' must be invoked as 'sfdk-changelog' here.
 

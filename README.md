@@ -1,6 +1,6 @@
 <p align="center">
    <br>
-    <img alt="Logo" src="icons/openHAB.svg" width="100">
+    <img alt="Logo" src="icons/harbour-openHAB.svg" width="100">
     <br>
     <b>openHAB client for Sailfish OS</b>
 </p>
@@ -47,7 +47,7 @@ If you want to contribute translations, please submit them as pull requests agai
 - Go to folder translations.
 - If there is a file with your language code, click on it and select the edit icon 
 - If not:
-  - Click on openHAB.ts file
+  - Click on harbour-openHAB.ts file
   - Select copy icon (Copy raw file)
   - Go back, click Add file -> Create new file 
   - Enter openHAB-xx.ts replacing xx with your language code as the name. For example, de for german 

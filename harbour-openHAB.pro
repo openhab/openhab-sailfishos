@@ -10,12 +10,12 @@
 #   - translation filenames have to be changed
 
 # The name of your application
-TARGET = openHAB
+TARGET = harbour-openHAB
 
 CONFIG += sailfishapp
 CONFIG += link_pkgconfig
 
-SOURCES += src/openHAB.cpp\
+SOURCES += src/harbour-openHAB.cpp\
     src/ssemanager.cpp
 
 RESOURCES += \
@@ -23,23 +23,29 @@ RESOURCES += \
 
 HEADERS += src/ssemanager.h
 
-DISTFILES += qml/openHAB.qml \
+DISTFILES += qml/harbour-openHAB.qml \
+    harbour-openHAB.desktop \
+    icons/108x108/harbour-openHAB.png \
+    icons/128x128/harbour-openHAB.png \
+    icons/172x172/harbour-openHAB.png \
+    icons/86x86/harbour-openHAB.png \
     icons/cover-background.png \
     icons/cover-background1.png \
-    icons/openHAB.svg \
+    icons/harbour-openHAB.svg \
     qml/cover/CoverPage.qml \
+    qml/pages/LegalPage.qml \
     qml/pages/MainUiPage.qml \
+    qml/pages/PrivacyPolicyPage.qml \
     qml/pages/SettingsPage.qml \
     qml/pages/SitemapPage.qml \
     qml/pages/SelectionPage.qml \
     qml/base/utilities/SitemapLoader.js \
     qml/base/utilities/SseEvents.js \
     qml/base/utilities/PatternFormatter.js \
-    rpm/openHAB.changes.in \
-    rpm/openHAB.changes.run.in \
-    rpm/openHAB.spec \
-    translations/*.ts \
-    openHAB.desktop
+    rpm/harbour-openHAB.changes \
+    rpm/harbour-openHAB.changes.run.in \
+    rpm/harbour-openHAB.spec \
+    translations/*.ts
 
 SAILFISHAPP_ICONS = 86x86 108x108 128x128 172x172
 
@@ -56,7 +62,7 @@ CONFIG += sailfishapp_i18n
 # planning to localize your app, remember to comment out the
 # following TRANSLATIONS line. And also do not forget to
 # modify the localized app name in the the .desktop file.
-TRANSLATIONS += translations/openHAB-de.ts
+TRANSLATIONS += translations/harbour-openHAB-de.ts
 
 #support the browser engine
 PKGCONFIG += qt5embedwidget
