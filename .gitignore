@@ -1,6 +1,6 @@
 # IDE / Editor
 /.idea/
-harbour-openHAB.pro.user
+harbour-openhab.pro.user
 
 # sfdk Build-configurations
 /.sfdk/
