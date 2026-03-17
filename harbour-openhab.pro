@@ -71,4 +71,7 @@ PKGCONFIG += qt5embedwidget
 #QT += core gui qml websockets network
 #QT += websockets
 
+# Export main() symbol for mapplauncherd booster (dlsym)
+QMAKE_LFLAGS += -rdynamic
+
 LIBS += -lsailfishapp
