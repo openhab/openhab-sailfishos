@@ -4,7 +4,7 @@ import Nemo.Configuration 1.0
 ConfigurationGroup {
     id: openHAB
 
-    path: "/apps/harbour-openHAB"
+    path: "/apps/harbour-openhab"
 
     property bool demoMode: true
     property string lastVisitedPage: ""

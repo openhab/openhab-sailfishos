@@ -1,8 +1,8 @@
 [Desktop Entry]
 Type=Application
 X-Nemo-Application-Type=silica-qt5
-Icon=harbour-openHAB
-Exec=harbour-openHAB
+Icon=harbour-openhab
+Exec=harbour-openhab
 Name=openHAB
 # translation example:
 # your app name in German locale (de)
@@ -15,6 +15,6 @@ Name=openHAB
 # Replace with your organization as a reverse domain name
 OrganizationName=org.openhab
 # ApplicationName does not have to be identical to Name
-ApplicationName=openHAB
+ApplicationName=harbour-openhab
 # Add the required permissions here
 Permissions=Internet

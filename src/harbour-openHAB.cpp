@@ -10,7 +10,7 @@
 #include "ssemanager.h"
 #include <QNetworkAccessManager>
 
-int main(int argc, char *argv[])
+int Q_DECL_EXPORT main(int argc, char *argv[])
 {
     qRegisterMetaType<QNetworkAccessManager::NetworkAccessibility>("QNetworkAccessManager::NetworkAccessibility");
     QGuiApplication *app = SailfishApp::application(argc, argv);
