@@ -1,6 +1,6 @@
 <p align="center">
    <br>
-    <img alt="Logo" src="icons/harbour-openHAB.svg" width="100">
+    <img alt="Logo" src="icons/harbour-openhab.svg" width="100">
     <br>
     <b>openHAB client for Sailfish OS</b>
 </p>
