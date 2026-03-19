@@ -11,7 +11,7 @@ This app is a native client for openHAB which allows easy access to your sitemap
 The documentation is available at [www.openhab.org/docs/](https://www.openhab.org/docs/).
 
 <a href="https://github.com/openhab/openhab-sailfishos/releases"><img src="docs/images/get-it-on-jollaStore.png" alt="Get it on Jolla Store" height="80"></a>
-<a href="https://github.com/openhab/openhab-sailfishos/releases"><img src="docs/images/get-it-on-openrepos.png" alt="Get it on OpenRepos" height="55"></a>
+<a href="https://openrepos.net/content/openhabfoundationev/openhab-smart-home-automation"><img src="docs/images/get-it-on-openrepos.png" alt="Get it on OpenRepos" height="55"></a>
 <a href="https://github.com/openhab/openhab-sailfishos/releases"><img src="docs/images/direct-apk-download.png" alt="Get it on GitHub" height="80"></a>
 
 
@@ -29,8 +29,6 @@ For more screenshots, see [docs/images/](docs/images/) in the GitHub repository.
 * Tested on Sailfish OS 5.0.0.62
 
 ## Roadmap
-* Version 0.0.1 (under development):
-  * see features above
 * Version 0.0.2 (planned):
   * Add optional authentication for local servers
   * Enhance supported widgets/element-types
