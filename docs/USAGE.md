@@ -26,15 +26,15 @@ The app follows the basic principles of the other openHAB UIs, like Basic UI, an
 * Customizable CoverActions via Settings
 
 <div class="row">
-  <img src="docs/images/main-ui.png" alt="Main UI" width=200px> 
-  <img src="docs/images/sitemap-1.png" alt="Settings" width=200px> 
-  <img src="docs/images/sitemap-2.png" alt="Sitemap view" width=200px>
+  <img src="images/main-ui.png" alt="Main UI" width=200px> 
+  <img src="images/sitemap-1.png" alt="Settings" width=200px> 
+  <img src="images/sitemap-2.png" alt="Sitemap view" width=200px>
 </div>
 
 ## App Configuration
 
 <p float="left">
-<img src="docs/images/settings.png" alt="Settings" width=200px>
+<img src="images/settings.png" alt="Settings" width=200px>
 </p>
 
 ### Connection Settings
@@ -59,7 +59,7 @@ Example:
 Allows you to set custom App-Cover-Quick-Actions for the cover widget when you view all open applications.
 
 <p float="left">
-<img src="docs/images/cover-with-coveractions.png" alt="Cover with coveractions" width=200px>
+<img src="images/cover-with-coveractions.png" alt="Cover with coveractions" width=200px>
 </p>
 
 * Left button - Item-ID: The [Name](https://www.openhab.org/docs/configuration/items.html#name)  (Item-ID -- NOT the label) of the item you want to send a command to when the left button is pressed.
