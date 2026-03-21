@@ -1,0 +1,24 @@
+# IDE / Editor
+/.idea/
+harbour-openhab.pro.user
+
+# sfdk Build-configurations
+/.sfdk/
+
+# qmake generated files
+Makefile
+.qmake.stash
+*.list
+
+# MOC / RCC generated files
+moc_*.cpp
+qrc_*.cpp
+
+# compilation output
+*.o
+
+# Binary
+/openHAB
+
+# RPM output
+/RPMS/

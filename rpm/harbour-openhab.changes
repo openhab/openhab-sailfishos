@@ -1,0 +1,19 @@
+# Rename this file as harbour-openhab.changes to include changelog
+# entries in your RPM file.
+#
+# Add new changelog entries following the format below.
+# Add newest entries to the top of the list.
+# Separate entries from eachother with a blank line.
+#
+# Alternatively, if your changelog is automatically generated (e.g. with
+# the git-change-log command provided with Sailfish OS SDK), create a
+# openHAB.changes.run script to let mb2 run the required commands for you.
+
+# * date Author's Name <author's email> version-release
+# - Summary of changes
+
+* Tue Mar 17 2026 Dominik Heidinger <dominikh@atomicmail.io> 0.1-1
+- initial creation of the openHAB client app
+- added widgets/element types: Frame, Text, Group, Switch, Switches with Button-Mappings, Selections, Slider, Rollershutter
+- added customizable CoverActions via settings
+

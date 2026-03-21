@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/cover">
+        <file alias="cover-background">icons/cover-background.png</file>
+    </qresource>
+</RCC>
