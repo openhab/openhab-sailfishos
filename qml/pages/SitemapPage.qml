@@ -400,19 +400,11 @@ Page {
             highlighted: false
             implicitHeight: Theme.itemSizeLarge
 
-            Timer {
-                id: sliderUpdateTimer
-                interval: 200
-                repeat: true
-                running: true
-
-                onTriggered: {
-                    if (!slider.pressed && currentState !== undefined && currentState !== "") {
-                        var newValue = Number(currentState) || 0;
-                        if (slider.value !== newValue) {
-                            slider.value = newValue;
-                        }
-                    }
+            // React to SSE-driven state changes instead of polling with a Timer
+            property int _externalValue: (currentState !== undefined && currentState !== "") ? (Number(currentState) || 0) : 0
+            on_ExternalValueChanged: {
+                if (!slider.pressed) {
+                    slider.value = _externalValue;
                 }
             }
 
@@ -436,18 +428,6 @@ Page {
                 onReleased: {
                     sendCommand(widget.item.name, Math.round(value).toString());
                 }
-
-                onVisibleChanged: {
-                    if (visible) {
-                        sliderUpdateTimer.start();
-                    } else {
-                        sliderUpdateTimer.stop();
-                    }
-                }
-            }
-
-            Component.onDestruction: {
-                sliderUpdateTimer.stop();
             }
         }
     }
