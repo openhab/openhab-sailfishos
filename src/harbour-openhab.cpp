@@ -17,9 +17,9 @@ int Q_DECL_EXPORT main(int argc, char *argv[])
     app->setApplicationVersion(APP_VERSION "-" APP_RELEASE);
     QQuickView* view = SailfishApp::createView();
 
-    SSEManager SSEManager;
+    SSEManager sseManagerInstance;
     // Exposes the C++ instance as "sseManager" in QML
-    view->rootContext()->setContextProperty("sseManager", &SSEManager);
+    view->rootContext()->setContextProperty("sseManager", &sseManagerInstance);
     view->setSource(SailfishApp::pathToMainQml());
     view->show();
 
