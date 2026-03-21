@@ -35,15 +35,15 @@ void SSEManager::connectToOpenHAB(const QString &baseUrl)
 
     connect(m_reply, &QNetworkReply::readyRead, this, &SSEManager::onReadyRead);
     connect(m_reply, &QNetworkReply::finished, this, &SSEManager::onFinished);
+#if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
+    connect(m_reply, &QNetworkReply::errorOccurred, this, &SSEManager::onErrorOccurred);
+#else
+    connect(m_reply, SIGNAL(error(QNetworkReply::NetworkError)),
+            this, SLOT(onErrorOccurred(QNetworkReply::NetworkError)));
+#endif
 
-    if (!m_active) {
-        m_active = true;
-        emit activeChanged();
-    }
-
-    emit statusChanged("SSE Streaming...");
-    emit connected();
-    qDebug() << "SSE connected to:" << url.toString();
+    emit statusChanged("Connecting...");
+    qDebug() << "SSE connecting to:" << url.toString();
 }
 
 void SSEManager::disconnectFromOpenHAB()
@@ -67,6 +67,15 @@ void SSEManager::disconnectFromOpenHAB()
 
 void SSEManager::onReadyRead()
 {
+    // Transition to active on first successful data received
+    if (!m_active) {
+        m_active = true;
+        emit activeChanged();
+        emit statusChanged("SSE Streaming...");
+        emit connected();
+        qDebug() << "SSE stream established.";
+    }
+
     while (m_reply && m_reply->canReadLine()) {
         QByteArray line = m_reply->readLine().trimmed();
 
@@ -79,6 +88,12 @@ void SSEManager::onReadyRead()
 
 void SSEManager::onFinished()
 {
+    // Clean up the finished reply immediately
+    if (m_reply) {
+        m_reply->deleteLater();
+        m_reply = nullptr;
+    }
+
     if (!m_shouldReconnect) {
         qDebug() << "SSE Stream closed. No reconnect requested.";
         if (m_active) {
@@ -90,10 +105,35 @@ void SSEManager::onFinished()
     }
 
     qDebug() << "SSE Stream closed. Reconnecting in 5s...";
+    if (m_active) {
+        m_active = false;
+        emit activeChanged();
+    }
     emit statusChanged("Reconnecting...");
-    QTimer::singleShot(5000, this, [this]() {
+
+    // Capture baseUrl by value to avoid depending on stale member state
+    QString reconnectUrl = m_baseUrl;
+    QTimer::singleShot(5000, this, [this, reconnectUrl]() {
         if (m_shouldReconnect) {
-            connectToOpenHAB(m_baseUrl);
+            connectToOpenHAB(reconnectUrl);
         }
     });
 }
+
+void SSEManager::onErrorOccurred(QNetworkReply::NetworkError code)
+{
+    // OperationCanceledError is expected when we abort the reply ourselves
+    if (code == QNetworkReply::OperationCanceledError)
+        return;
+
+    qWarning() << "SSE network error:" << code
+               << (m_reply ? m_reply->errorString() : QString());
+
+    if (m_active) {
+        m_active = false;
+        emit activeChanged();
+    }
+
+    emit statusChanged("Error: " + (m_reply ? m_reply->errorString() : QStringLiteral("Unknown")));
+}
+

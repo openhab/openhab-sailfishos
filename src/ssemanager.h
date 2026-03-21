@@ -28,6 +28,7 @@ signals:
 private slots:
     void onReadyRead();
     void onFinished();
+    void onErrorOccurred(QNetworkReply::NetworkError code);
 
 private:
     QNetworkAccessManager m_nam;
