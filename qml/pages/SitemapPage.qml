@@ -50,19 +50,6 @@ Page {
 
                 sitemapModel.clear();
 
-                // --- TRAINING START ---
-                // Insert a dummy object to define the role types for dynamicRoles
-                sitemapModel.append({
-                    "type": "dummy",
-                    "itemName": "",
-                    "itemState": "",
-                    "widgetPattern": "",
-                    "mappingsJson": "",
-                    "itemData": { "label": "", "state": "", "item": { "name": "" } }
-                });
-                sitemapModel.clear();
-                // --- TRAINING END ---
-
                 var rootWidgets = (json.homepage && json.homepage.widgets) ? json.homepage.widgets : (json.widgets ? json.widgets : []);
 
                 function unpackWidgets(widgetList) {
