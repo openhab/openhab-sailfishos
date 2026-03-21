@@ -710,12 +710,18 @@ Page {
     Component {
         id: groupComp
         ListItem {
+            id: groupItem
             width: listView.width
             contentHeight: Theme.itemSizeMedium
-            onClicked: pageStack.animatorPush(Qt.resolvedUrl("SitemapPage.qml"), {
-                            "sitemapName": widget.linkedPage.link,
-                            "pageTitle": widget.label
-            })
+            enabled: !!(widget.linkedPage)
+            onClicked: {
+                if (widget.linkedPage) {
+                    pageStack.animatorPush(Qt.resolvedUrl("SitemapPage.qml"), {
+                        "sitemapName": widget.linkedPage.link,
+                        "pageTitle": widget.label
+                    });
+                }
+            }
 
             Row {
                 anchors.fill: parent
@@ -732,7 +738,7 @@ Page {
                 Label {
                     text: widget.label || ""
                     anchors.verticalCenter: parent.verticalCenter
-                    color: Theme.primaryColor
+                    color: groupItem.enabled ? Theme.primaryColor : Theme.secondaryColor
                     width: parent.width - (Theme.iconSizeSmall * 2 + Theme.paddingMedium * 4) - Theme.paddingLarge
                     truncationMode: TruncationMode.Fade
                 }
@@ -744,6 +750,7 @@ Page {
                 Icon {
                     source: "image://theme/icon-m-right"
                     anchors.verticalCenter: parent.verticalCenter
+                    visible: !!(widget.linkedPage)
                 }
             }
         }
