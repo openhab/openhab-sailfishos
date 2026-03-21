@@ -24,7 +24,7 @@ The documentation is available at [www.openhab.org/docs/](https://www.openhab.or
 
 For more screenshots, see [docs/images/](docs/images/) in the GitHub repository. 
 
-## Technical Informations
+## Technical Information
 * QT-Version 5.6.3
 * Tested on Sailfish OS 5.0.0.62
 
