@@ -74,7 +74,7 @@ Note: If you don't want to use App-Cover-Quick-Actions, please leave the fields 
 
 Pull-Down: Use the native [Pulley Menu](https://docs.sailfishos.org/Develop/Apps/UI/#pulley-menu) gesture:
 
-- Refresh Sitemaps: Klick here to refresh the list of available sitemaps.
+- Refresh Sitemaps: Click here to refresh the list of available sitemaps.
 - Settings: Opens the app settings.
 - Main: Opens the Main UI in an embedded browser.
 - Sitemap-Example: Opens the selected sitemap.
