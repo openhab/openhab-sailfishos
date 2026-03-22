@@ -50,19 +50,6 @@ Page {
 
                 sitemapModel.clear();
 
-                // --- TRAINING START ---
-                // Insert a dummy object to define the role types for dynamicRoles
-                sitemapModel.append({
-                    "type": "dummy",
-                    "itemName": "",
-                    "itemState": "",
-                    "widgetPattern": "",
-                    "mappingsJson": "",
-                    "itemData": { "label": "", "state": "", "item": { "name": "" } }
-                });
-                sitemapModel.clear();
-                // --- TRAINING END ---
-
                 var rootWidgets = (json.homepage && json.homepage.widgets) ? json.homepage.widgets : (json.widgets ? json.widgets : []);
 
                 function unpackWidgets(widgetList) {
@@ -413,19 +400,11 @@ Page {
             highlighted: false
             implicitHeight: Theme.itemSizeLarge
 
-            Timer {
-                id: sliderUpdateTimer
-                interval: 200
-                repeat: true
-                running: true
-
-                onTriggered: {
-                    if (!slider.pressed && currentState !== undefined && currentState !== "") {
-                        var newValue = Number(currentState) || 0;
-                        if (slider.value !== newValue) {
-                            slider.value = newValue;
-                        }
-                    }
+            // React to SSE-driven state changes instead of polling with a Timer
+            property int _externalValue: (currentState !== undefined && currentState !== "") ? (Number(currentState) || 0) : 0
+            on_ExternalValueChanged: {
+                if (!slider.pressed) {
+                    slider.value = _externalValue;
                 }
             }
 
@@ -449,18 +428,6 @@ Page {
                 onReleased: {
                     sendCommand(widget.item.name, Math.round(value).toString());
                 }
-
-                onVisibleChanged: {
-                    if (visible) {
-                        sliderUpdateTimer.start();
-                    } else {
-                        sliderUpdateTimer.stop();
-                    }
-                }
-            }
-
-            Component.onDestruction: {
-                sliderUpdateTimer.stop();
             }
         }
     }
@@ -743,12 +710,18 @@ Page {
     Component {
         id: groupComp
         ListItem {
+            id: groupItem
             width: listView.width
             contentHeight: Theme.itemSizeMedium
-            onClicked: pageStack.animatorPush(Qt.resolvedUrl("SitemapPage.qml"), {
-                            "sitemapName": widget.linkedPage.link,
-                            "pageTitle": widget.label
-            })
+            enabled: !!(widget.linkedPage)
+            onClicked: {
+                if (widget.linkedPage) {
+                    pageStack.animatorPush(Qt.resolvedUrl("SitemapPage.qml"), {
+                        "sitemapName": widget.linkedPage.link,
+                        "pageTitle": widget.label
+                    });
+                }
+            }
 
             Row {
                 anchors.fill: parent
@@ -765,7 +738,7 @@ Page {
                 Label {
                     text: widget.label || ""
                     anchors.verticalCenter: parent.verticalCenter
-                    color: Theme.primaryColor
+                    color: groupItem.enabled ? Theme.primaryColor : Theme.secondaryColor
                     width: parent.width - (Theme.iconSizeSmall * 2 + Theme.paddingMedium * 4) - Theme.paddingLarge
                     truncationMode: TruncationMode.Fade
                 }
@@ -777,6 +750,7 @@ Page {
                 Icon {
                     source: "image://theme/icon-m-right"
                     anchors.verticalCenter: parent.verticalCenter
+                    visible: !!(widget.linkedPage)
                 }
             }
         }

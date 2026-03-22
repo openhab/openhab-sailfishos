@@ -33,10 +33,6 @@
 <context>
     <name>SettingsPage</name>
     <message>
-        <source></source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Save</source>
         <translation>Speichern</translation>
     </message>
