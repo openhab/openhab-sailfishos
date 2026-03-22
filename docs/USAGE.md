@@ -67,7 +67,7 @@ Allows you to set custom App-Cover-Quick-Actions for the cover widget when you v
 * Right button - Item-ID: The [Name](https://www.openhab.org/docs/configuration/items.html#name)  (Item-ID -- NOT the label) of the item you want to send a command to when the right button is pressed.
 * Right button - Command: The command (eg. ON, OFF, UP, DOWN) you want to send to the item when the right button is pressed.
 
-Note: If you dont want to use App-Cover-Quick-Actions, please leave the fields empty. You can also use one button only, just leave the other button configuration empty. It will be deactivated if no Item-ID AND command is provided.
+Note: If you don't want to use App-Cover-Quick-Actions, please leave the fields empty. You can also use one button only, just leave the other button configuration empty. It will be deactivated if no Item-ID AND command is provided.
 
 
 ## Navigation, Main UI and Sitemap Usage
