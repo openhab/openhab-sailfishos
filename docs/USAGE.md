@@ -47,7 +47,7 @@ Disable this to use the app with your own openHAB instance.
 
 #### Local Server
 
-This is the primary connection to your openHAB instance, a fully qualified URL with a IP or host is required.
+This is the primary connection to your openHAB instance, a fully qualified URL with an IP address or hostname is required.
 
 Example:
 `http://192.168.0.10:8080`
