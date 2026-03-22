@@ -19,7 +19,7 @@
 - removed - sliderUpdateTimer with 200 ms polling
 - added - on_ExternalValueChanged to update slider when user is not using it only.
 - groupComp - Fixes errors when linkedPage is missing.
-- ssemanger.cpp onFinished() will be cleaned up now.
+- ssemanager.cpp onFinished() will be cleaned up now.
 - ssemanager.cpp connectToOpenHAB() will be set to ready, when events are comign in and not before.
 
 * Tue Mar 17 2026 Dominik Heidinger <dominikh@atomicmail.io> 0.1-1
