@@ -1,12 +1,9 @@
 ---
 layout: documentation
 title: Sailfish OS App
+description: native Sailfish OS client for openHAB - the vendor and technology agnostic open source automation software
 source: https://github.com/openhab/openhab-sailfishos/blob/main/docs/USAGE.md
 ---
-
-{% include base.html %}
-
-<!-- Attention authors: Do not edit directly. Please add your changes to the appropriate source repository -->
 
 # Sailfish OS App
 
@@ -62,12 +59,14 @@ Allows you to set custom App-Cover-Quick-Actions for the cover widget when you v
 <img src="images/cover-with-coveractions.png" alt="Cover with coveractions" width="200">
 </p>
 
-* Left button - Item-ID: The [Name](https://www.openhab.org/docs/configuration/items.html#name)  (Item-ID -- NOT the label) of the item you want to send a command to when the left button is pressed.
+* Left button - Item-ID: The [Name](https://www.openhab.org/docs/configuration/items.html#name) (Item-ID -- **not** the label) of the item you want to send a command to when the left button is pressed.
 * Left button - Command: The command (eg. ON, OFF, UP, DOWN) you want to send to the item when the left button is pressed.
-* Right button - Item-ID: The [Name](https://www.openhab.org/docs/configuration/items.html#name)  (Item-ID -- NOT the label) of the item you want to send a command to when the right button is pressed.
+* Right button - Item-ID: The [Name](https://www.openhab.org/docs/configuration/items.html#name) (Item-ID -- **not** the label) of the item you want to send a command to when the right button is pressed.
 * Right button - Command: The command (eg. ON, OFF, UP, DOWN) you want to send to the item when the right button is pressed.
 
-Note: If you don't want to use App-Cover-Quick-Actions, please leave the fields empty. You can also use one button only, just leave the other button configuration empty. It will be deactivated if no Item-ID AND command is provided.
+Note: If you don't want to use App-Cover-Quick-Actions, please leave the fields empty.
+You can also use one button only, just leave the other button configuration empty.
+It will be deactivated if no Item-ID AND command is provided.
 
 
 ## Navigation, Main UI and Sitemap Usage
@@ -85,7 +84,8 @@ Pull-Up: Use the native [Pulley Menu](https://docs.sailfishos.org/Develop/Apps/U
 
 ## Setting up development environment
 
-If you want to contribute to Sailfish OS application we are here to help you to set up development environment. openHAB client for Sailfish OS is developed using Sailfish IDE.
+If you want to contribute to Sailfish OS application we are here to help you to set up development environment.
+openHAB client for Sailfish OS is developed using Sailfish IDE.
 
 - Download and install [Sailfish IDE](https://docs.sailfishos.org/Tools/Sailfish_SDK/Installation/)
 
@@ -93,6 +93,8 @@ You are ready to contribute!
 
 ## Trademark Disclaimer
 
-Product names, logos, brands and other trademarks referred to within the openHAB website are the property of their respective trademark holders. These trademark holders are not affiliated with openHAB or our website. They do not sponsor or endorse our materials.
+Product names, logos, brands and other trademarks referred to within the openHAB website are the property of their respective trademark holders.
+These trademark holders are not affiliated with openHAB or our website.
+They do not sponsor or endorse our materials.
 
 Sailfish OS and the Sailfish OS logo are trademarks of Jolla Group Ltd.
