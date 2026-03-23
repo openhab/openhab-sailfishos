@@ -2,7 +2,7 @@ Name:       harbour-openhab
 
 Summary:    openHAB client for Sailfish OS
 Version:    0.1
-Release:    1
+Release:    2
 License:    EPL-2.0
 URL:        www.openhab.org
 Source0:    %{name}-%{version}.tar.bz2
