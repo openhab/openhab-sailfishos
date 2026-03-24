@@ -19,33 +19,44 @@ jobs:
     name: Build (${{ matrix.arch }})
     runs-on: ubuntu-latest
 
-    # Sailfish OS Platform SDK Docker image – provides mb2 build tool
+    # Sailfish OS Platform SDK Docker image – provides mb2 build tool.
     # mb2 is the CI-equivalent of the local "sfdk build" command.
+    # The build step runs inside the Docker container via "docker run",
+    # while checkout and upload actions run on the Ubuntu host
+    # (they need Node.js which is not available in the SDK image).
     # ⚠️  Verify the image tag matches your SFOS target version on Docker Hub:
     #     https://hub.docker.com/r/coderus/sailfishos-platform-sdk/tags
     # current 5.0.0.43
-    container:
-      image: coderus/sailfishos-platform-sdk:latest
 
     strategy:
       fail-fast: false
       matrix:
         arch: [aarch64, armv7hl, i486]
 
+    env:
+      SDK_IMAGE: coderus/sailfishos-platform-sdk:latest
+      SFOS_TARGET: SailfishOS-5.0.0.62-${{ matrix.arch }}
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
 
+      - name: Pull Sailfish SDK image
+        run: docker pull ${{ env.SDK_IMAGE }}
+
       - name: Build RPM package
         run: |
-          echo "::group::Building for SailfishOS-5.0.0.62-${{ matrix.arch }}"
-          mb2 -t SailfishOS-5.0.0.62-${{ matrix.arch }} build
+          echo "::group::Building for ${{ env.SFOS_TARGET }}"
+          docker run --rm \
+            -v "${{ github.workspace }}:/workspace" \
+            -w /workspace \
+            ${{ env.SDK_IMAGE }} \
+            bash -c "mb2 -t ${{ env.SFOS_TARGET }} build"
           echo "::endgroup::"
 
       - name: Validate build output
         run: |
           echo "Checking for RPM files..."
-          ls -la RPMS
           ls -la RPMS/ || { echo "::error::No RPMS directory found – build may have failed"; exit 1; }
           rpm_count=$(find RPMS/ -name "*.rpm" -not -name "*-debuginfo-*" -not -name "*-debugsource-*" | wc -l)
           if [ "$rpm_count" -eq 0 ]; then
