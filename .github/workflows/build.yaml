@@ -1,0 +1,168 @@
+name: Sailfish OS Build & Release
+
+on:
+  push:
+    branches:
+      - '**'
+    paths-ignore:
+      - '**/*.md'
+      - 'docs/**'
+      - '.github/markdownlint.yaml'
+      - '.github/mlc_config.json'
+      - '.github/workflows/markdownlint.yaml'
+
+jobs:
+  # ──────────────────────────────────────────────
+  # Build job – runs on EVERY push (feature branches + main)
+  # ──────────────────────────────────────────────
+  build:
+    name: Build (${{ matrix.arch }})
+    runs-on: ubuntu-latest
+
+    # Sailfish OS Platform SDK Docker image – provides mb2 build tool
+    # mb2 is the CI-equivalent of the local "sfdk build" command.
+    # ⚠️  Verify the image tag matches your SFOS target version on Docker Hub:
+    #     https://hub.docker.com/r/coderus/sailfishos-platform-sdk/tags
+    # current 5.0.0.43
+    container:
+      image: coderus/sailfishos-platform-sdk:latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        arch: [aarch64, armv7hl, i486]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Build RPM package
+        run: |
+          echo "::group::Building for SailfishOS-5.0.0.62-${{ matrix.arch }}"
+          mb2 -t SailfishOS-5.0.0.62-${{ matrix.arch }} build
+          echo "::endgroup::"
+
+      - name: Validate build output
+        run: |
+          echo "Checking for RPM files..."
+          ls -la RPMS
+          ls -la RPMS/ || { echo "::error::No RPMS directory found – build may have failed"; exit 1; }
+          rpm_count=$(find RPMS/ -name "*.rpm" -not -name "*-debuginfo-*" -not -name "*-debugsource-*" | wc -l)
+          if [ "$rpm_count" -eq 0 ]; then
+            echo "::error::No RPM files produced"
+            exit 1
+          fi
+          echo "✅ Build successful – $rpm_count RPM package(s) produced for ${{ matrix.arch }}"
+          find RPMS/ -name "*.rpm" -not -name "*-debuginfo-*" -not -name "*-debugsource-*"
+
+      - name: Upload RPM artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: rpms-${{ matrix.arch }}
+          path: |
+            RPMS/*.rpm
+            !RPMS/*-debuginfo-*.rpm
+            !RPMS/*-debugsource-*.rpm
+          retention-days: 30
+          if-no-files-found: error
+
+  # ──────────────────────────────────────────────
+  # Test job – runs on feature branch pushes only (not main)
+  # Add your test commands below once test infrastructure is in place.
+  # ──────────────────────────────────────────────
+  test:
+    name: Validate package
+    needs: build
+    if: github.ref != 'refs/heads/main'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download all RPM artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: rpms
+          pattern: rpms-*
+          merge-multiple: true
+
+      - name: Verify artifacts exist for all architectures
+        run: |
+          echo "Downloaded RPM packages:"
+          find rpms/ -name "*.rpm" -type f
+          for arch in aarch64 armv7hl i486; do
+            count=$(find rpms/ -name "*${arch}*.rpm" -type f | wc -l)
+            if [ "$count" -eq 0 ]; then
+              echo "::error::No RPM found for architecture ${arch}"
+              exit 1
+            fi
+            echo "✅ ${arch}: ${count} package(s)"
+          done
+
+      # TODO: Add additional test steps here, for example:
+      # - RPM lint checks:  rpm -qip rpms/*.rpm
+      # - Install tests in emulator target
+      # - QML / unit tests
+
+  # ──────────────────────────────────────────────
+  # Release job – runs ONLY on push to main (i.e., merged Pull Requests)
+  # ──────────────────────────────────────────────
+  release:
+    name: Create GitHub Release
+    needs: build
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Extract version from spec file
+        id: version
+        run: |
+          VERSION=$(grep '^Version:' rpm/harbour-openhab.spec | awk '{print $2}')
+          RELEASE_NUM=$(grep '^Release:' rpm/harbour-openhab.spec | awk '{print $2}')
+          TAG="v${VERSION}-${RELEASE_NUM}-release"
+          echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
+          echo "name=${TAG}" >> "$GITHUB_OUTPUT"
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+          echo "release=${RELEASE_NUM}" >> "$GITHUB_OUTPUT"
+          echo "📦 Release version: ${TAG}"
+
+      - name: Download all RPM artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: release-rpms
+          pattern: rpms-*
+          merge-multiple: true
+
+      - name: List release artifacts
+        run: |
+          echo "Release artifacts:"
+          find release-rpms/ -name "*.rpm" -type f -exec ls -lh {} \;
+
+      # pinning to SHA to mitigate possible supply chain attack
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@c95fe4860a8b36aef4e9e74bcb092bf597ec500b # v2.2.2
+        with:
+          tag_name: ${{ steps.version.outputs.tag }}
+          name: ${{ steps.version.outputs.name }}
+          body: |
+            ## openHAB Sailfish OS Client ${{ steps.version.outputs.name }}
+
+            ### 📱 Packages
+
+            | Architecture | Description |
+            |---|---|
+            | **aarch64** | 64-bit ARM devices (e.g. Sony Xperia 10 III+) |
+            | **armv7hl** | 32-bit ARM devices (e.g. Sony Xperia 10) |
+            | **i486** | Emulator / x86 devices |
+
+            ### 📋 Changelog
+
+            See [harbour-openhab.changes](https://github.com/${{ github.repository }}/blob/main/rpm/harbour-openhab.changes) for details.
+          files: release-rpms/**/*.rpm
+          fail_on_unmatched_files: true
+          draft: false
+          prerelease: false
+

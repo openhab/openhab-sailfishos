@@ -1,3 +1,4 @@
+<!-- markdownlint-disable MD041 -->
 # Development and Contribution Guide
 
 ## Contribution guidelines
@@ -55,6 +56,47 @@ If you want to contribute translations, please submit them as pull requests agai
   ```
 
 Thanks for your consideration and contribution!
+
+## CI/CD Pipeline
+
+The project uses GitHub Actions to automate builds and releases. The workflow is defined in [`.github/workflows/build.yaml`](/.github/workflows/build.yaml).
+
+### Feature branch (every push)
+
+On every push to a feature branch, the pipeline automatically:
+
+1. **Builds** RPM packages for all three architectures (aarch64, armv7hl, i486)
+2. **Validates** the build output
+3. Build artifacts (RPM files) are available for download from the workflow run for 30 days
+
+No release is created for feature branch commits.
+
+### Pull Request merge to main
+
+When a Pull Request is merged into `main`, the pipeline additionally:
+
+1. **Creates a GitHub Release** with the version tag from `harbour-openhab.spec` (e.g. `v0.1-2-release`)
+2. **Attaches all RPM packages** for the three architectures as release assets
+
+### Build targets
+
+| Architecture | Target | Description |
+|---|---|---|
+| aarch64 | `SailfishOS-5.0.0.62-aarch64` | 64-bit ARM devices |
+| armv7hl | `SailfishOS-5.0.0.62-armv7hl` | 32-bit ARM devices |
+| i486 | `SailfishOS-5.0.0.62-i486` | Emulator / x86 devices |
+
+### Local build (sfdk)
+
+To build locally with the Sailfish SDK, run the following commands for each target:
+
+```shell
+sfdk config target=SailfishOS-5.0.0.62-aarch64
+sfdk config --show
+sfdk build
+```
+
+Repeat with `armv7hl` and `i486` targets to produce all three packages.
 
 ## Checks to be done before submitting a pull request
 * Decide on the next version number for the app. Please follow [Semantic Versioning](https://rpm.org/docs/6.0.x/man/rpm-version.7) and update the VERSION and RELEASE in the `harbour-openhab.spec` and `harbour-openhab.pro` files.
