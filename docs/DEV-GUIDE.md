@@ -58,8 +58,8 @@ Thanks for your consideration and contribution!
 
 ## Checks to be done before submitting a pull request
 * Decide on the next version number for the app. Please follow [Semantic Versioning](https://rpm.org/docs/6.0.x/man/rpm-version.7) and update the VERSION and RELEASE in the `harbour-openhab.spec` and `harbour-openhab.pro` files.
-* Update the [CHANGELOG](/rpm/harbour-openhab.changes) with a description of the changes you have made.
-* Check folder [translations](/translations/) for missing translations and add them if needed.
+* Update the [harbour-openhab.changes](/rpm/harbour-openhab.changes) with a description of the changes you have made.
+* Check folder [translations/*](/translations/) for missing translations and add them if needed.
 * Are new permissions needed for the app? If so, please add them to the `harbour-openhab.desktop`.
 * If you have added new features, please update:
   * [USAGE.md](/docs/USAGE.md) documentation
