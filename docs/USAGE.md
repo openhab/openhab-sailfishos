@@ -80,14 +80,10 @@ Pull-Up: Use the native [Pulley Menu](https://docs.sailfishos.org/Develop/Apps/U
 
 - Scroll to top: Scrolls to the top of the current view.
 
-## Setting up development environment
+## Contributing to the project / Localization
+We are happy about any contribution to the project, whether it's bug fixes, new features, translations or documentation.
 
-If you want to contribute to Sailfish OS application we are here to help you to set up development environment.
-openHAB client for Sailfish OS is developed using Sailfish IDE.
-
-- Download and install [Sailfish IDE](https://docs.sailfishos.org/Tools/Sailfish_SDK/Installation/)
-
-You are ready to contribute!
+Please check out our [Developer Guide](docs/DEV-GUIDE.md) for more information on how to contribute.
 
 ## Trademark Disclaimer
 
