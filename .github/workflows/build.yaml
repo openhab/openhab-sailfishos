@@ -14,48 +14,28 @@ on:
 jobs:
   # ──────────────────────────────────────────────
   # Build job – runs on EVERY push (feature branches + main)
+  # Uses the CODeRUS Buildfish action for Sailfish OS 5.x
+  # https://github.com/CODeRUS/github-sfos-build
+  # Available SDK releases: https://hub.docker.com/r/coderus/sailfishos-platform-sdk/tags
   # ──────────────────────────────────────────────
   build:
     name: Build (${{ matrix.arch }})
     runs-on: ubuntu-latest
-
-    # Sailfish OS Platform SDK Docker image – provides mb2 build tool.
-    # mb2 is the CI-equivalent of the local "sfdk build" command.
-    # The build step runs inside the Docker container via "docker run",
-    # while checkout and upload actions run on the Ubuntu host
-    # (they need Node.js which is not available in the SDK image).
-    # ⚠️  Verify the image tag matches your SFOS target version on Docker Hub:
-    #     https://hub.docker.com/r/coderus/sailfishos-platform-sdk/tags
-    # current 5.0.0.43
 
     strategy:
       fail-fast: false
       matrix:
         arch: [aarch64, armv7hl, i486]
 
-    env:
-      SDK_IMAGE: coderus/sailfishos-platform-sdk:latest
-      SFOS_TARGET: SailfishOS-5.0.0.43-${{ matrix.arch }}
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
 
-      - name: Pull Sailfish SDK image
-        run: docker pull ${{ env.SDK_IMAGE }}
-
       - name: Build RPM package
-        run: |
-          echo "::group::Building for ${{ env.SFOS_TARGET }}"
-          # Make workspace writable for any UID inside the container
-          chmod -R a+w "${{ github.workspace }}"
-          docker run --rm \
-            -v "${{ github.workspace }}:/workspace" \
-            -w /workspace \
-            -e HOME=/workspace \
-            ${{ env.SDK_IMAGE }} \
-            bash -c "mb2 -t ${{ env.SFOS_TARGET }} build"
-          echo "::endgroup::"
+        uses: coderus/github-sfos-build@sfos5
+        with:
+          release: 5.0.0.43
+          arch: ${{ matrix.arch }}
 
       - name: Validate build output
         run: |
