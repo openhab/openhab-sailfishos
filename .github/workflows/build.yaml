@@ -49,6 +49,28 @@ jobs:
           echo "✅ Build successful – $rpm_count RPM package(s) produced for ${{ matrix.arch }}"
           find RPMS/ -name "*.rpm" -not -name "*-debuginfo-*" -not -name "*-debugsource-*"
 
+      - name: Harbour compliance check (sfdk check)
+        run: |
+          docker run --rm \
+            -v "${{ github.workspace }}/RPMS:/RPMS" \
+            coderus/sailfishos-platform-sdk:5.0.0.43 \
+            bash -c '
+              failed=0
+              for rpm in $(find /RPMS -name "*.rpm" \
+                            -not -name "*-debuginfo-*" \
+                            -not -name "*-debugsource-*"); do
+                echo "::group::sfdk check – $(basename $rpm)"
+                if sfdk check -s harbour "$rpm"; then
+                  echo "✅ $(basename $rpm) passed harbour validation"
+                else
+                  echo "::error::$(basename $rpm) FAILED harbour validation"
+                  failed=1
+                fi
+                echo "::endgroup::"
+              done
+              exit $failed
+            '
+
       - name: Upload RPM artifacts
         uses: actions/upload-artifact@v4
         with:
