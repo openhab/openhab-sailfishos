@@ -35,7 +35,7 @@ jobs:
 
     env:
       SDK_IMAGE: coderus/sailfishos-platform-sdk:latest
-      SFOS_TARGET: SailfishOS-5.0.0.62-${{ matrix.arch }}
+      SFOS_TARGET: SailfishOS-5.0.0.43-${{ matrix.arch }}
 
     steps:
       - name: Checkout repository
