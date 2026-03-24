@@ -17,4 +17,5 @@ OrganizationName=org.openhab
 # ApplicationName does not have to be identical to Name
 ApplicationName=harbour-openhab
 # Add the required permissions here
+# see https://docs.sailfishos.org/Develop/Apps/Application_Permissions/ for more details
 Permissions=Internet
