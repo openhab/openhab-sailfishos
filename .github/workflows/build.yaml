@@ -47,9 +47,12 @@ jobs:
       - name: Build RPM package
         run: |
           echo "::group::Building for ${{ env.SFOS_TARGET }}"
+          # Make workspace writable for any UID inside the container
+          chmod -R a+w "${{ github.workspace }}"
           docker run --rm \
             -v "${{ github.workspace }}:/workspace" \
             -w /workspace \
+            -e HOME=/workspace \
             ${{ env.SDK_IMAGE }} \
             bash -c "mb2 -t ${{ env.SFOS_TARGET }} build"
           echo "::endgroup::"
