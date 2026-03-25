@@ -15,6 +15,7 @@ BuildRequires:  pkgconfig(Qt5Quick)
 BuildRequires:  desktop-file-utils
 BuildRequires:  pkgconfig(Qt5WebSockets)
 BuildRequires: pkgconfig(qt5embedwidget)
+BuildRequires:  pkgconfig(Qt5Test)
 Requires: sailfish-components-webview-qt5
 
 %description
@@ -36,6 +37,51 @@ This app is a native client for openHAB which allows easy access to your sitemap
 
 
 desktop-file-install --delete-original         --dir %{buildroot}%{_datadir}/applications                %{buildroot}%{_datadir}/applications/*.desktop
+
+%check
+# ── Run automated tests (also executed by sfdk build) ──
+export QT_QPA_PLATFORM=offscreen
+export HOME=%{_builddir}
+
+# ── Locate the source tree ──
+# 1) Standard rpmbuild (GitHub Actions): source extracted to %{_builddir}/%{name}-%{version}
+# 2) CWD already contains tests/ (in-tree build)
+# 3) sfdk shadow build: extract project root from qmake-generated Makefile
+SRCDIR=""
+if [ -d "%{_builddir}/%{name}-%{version}/tests" ]; then
+    SRCDIR="%{_builddir}/%{name}-%{version}"
+elif [ -d tests ]; then
+    SRCDIR="$(pwd)"
+elif [ -f Makefile ]; then
+    _pro=$(grep -oE '[^ ]+harbour-openhab\.pro' Makefile | head -1)
+    [ -n "$_pro" ] && SRCDIR=$(dirname "$_pro")
+fi
+
+if [ -z "$SRCDIR" ] || [ ! -d "$SRCDIR/tests" ]; then
+    echo "ERROR: tests/ directory not found"
+    echo "  CWD:       $(pwd)"
+    echo "  _builddir: %{_builddir}"
+    echo "  tried:     $SRCDIR"
+    ls -la
+    exit 1
+fi
+
+cd "$SRCDIR"
+echo "── Source directory: $(pwd) ──"
+
+echo "── Building & running C++ unit tests ──"
+pushd tests/unittest
+%qmake5
+%make_build
+./tst_ssemanager || exit 1
+popd
+
+echo "── Building & running QML / JS tests ──"
+pushd tests/qmltest
+%qmake5
+%make_build
+./tst_qml || exit 1
+popd
 
 %files
 %defattr(-,root,root,-)
