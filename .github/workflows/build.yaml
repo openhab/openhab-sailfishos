@@ -52,43 +52,27 @@ jobs:
 
       - name: Harbour compliance check
         run: |
-          SFOS_TARGET="SailfishOS-5.0.0.43-${{ matrix.arch }}"
-          echo "Using target: $SFOS_TARGET"
           docker run --rm \
-            -e "SFOS_TARGET=$SFOS_TARGET" \
             -v "${{ github.workspace }}/RPMS:/RPMS" \
             coderus/sailfishos-platform-sdk:5.0.0.43 \
             bash -c '
               set -euo pipefail
 
-              # ── list available targets ──
-              echo "::group::Available SDK targets"
-              if [ -d /srv/mer/targets ]; then
-                ls -1 /srv/mer/targets/ 2>/dev/null || echo "(none found)"
-              fi
-              echo "::endgroup::"
-
-              # ── discover available validation tools ──
-              echo "::group::Discovering validation tools"
+              # ── locate the real validation script ──
               VALIDATOR=""
-              for cmd in sdk-harbour-rpmvalidation rpmvalidation; do
-                if command -v "$cmd" &>/dev/null; then
-                  VALIDATOR="$cmd"
-                  echo "Found: $VALIDATOR ($(which $VALIDATOR))"
+              for path in \
+                /usr/libexec/sdk-harbour-rpmvalidator/rpmvalidation.sh \
+                /usr/share/sdk-harbour-rpmvalidator/rpmvalidation.sh; do
+                if [ -x "$path" ]; then
+                  VALIDATOR="$path"
+                  echo "Found validator: $VALIDATOR"
                   break
                 fi
               done
 
               if [ -z "$VALIDATOR" ]; then
-                echo "No validator found – attempting zypper install..."
-                if zypper -n install sdk-harbour-rpmvalidation 2>&1; then
-                  VALIDATOR="sdk-harbour-rpmvalidation"
-                  echo "Installed: $VALIDATOR"
-                else
-                  echo "::warning::sdk-harbour-rpmvalidation not available – falling back to basic RPM check"
-                fi
+                echo "::warning::Harbour validation script not found – falling back to basic RPM check"
               fi
-              echo "::endgroup::"
 
               # ── run validation on each RPM ──
               failed=0
@@ -99,8 +83,8 @@ jobs:
                 echo "::group::Checking $name"
 
                 if [ -n "$VALIDATOR" ]; then
-                  echo "Running: $VALIDATOR -t $SFOS_TARGET $rpm"
-                  if "$VALIDATOR" -t "$SFOS_TARGET" "$rpm"; then
+                  echo "Running: $VALIDATOR $rpm"
+                  if "$VALIDATOR" "$rpm"; then
                     echo "✅ $name passed harbour validation"
                   else
                     echo "::error::$name FAILED harbour validation"
