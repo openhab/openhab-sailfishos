@@ -190,18 +190,22 @@ jobs:
           echo "📦 Release version: ${TAG}"
 
       - name: Check for duplicate release tag
+        id: tag-check
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           TAG="${{ steps.version.outputs.tag }}"
           echo "Checking if release tag '${TAG}' already exists..."
           if gh release view "$TAG" --repo "${{ github.repository }}" &>/dev/null; then
-            echo "::error::❌ Release '${TAG}' already exists! Please adjust VERSION and/or RELEASE in file: rpm/harbour-openhab.spec (Current: Version=${{ steps.version.outputs.version }}, Release=${{ steps.version.outputs.release }})."
-            exit 1
+            echo "::warning::⚠️ Release '${TAG}' already exists! Please adjust VERSION and/or RELEASE in file: rpm/harbour-openhab.spec (Current: Version=${{ steps.version.outputs.version }}, Release=${{ steps.version.outputs.release }}). Skipping release."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "✅ Tag '${TAG}' not used yet – Release can be created."
+            echo "skip=false" >> "$GITHUB_OUTPUT"
           fi
-          echo "✅ Tag '${TAG}' not used yet – Release can be created."
 
       - name: Download all RPM artifacts
+        if: steps.tag-check.outputs.skip != 'true'
         uses: actions/download-artifact@v4
         with:
           path: release-rpms
@@ -209,12 +213,14 @@ jobs:
           merge-multiple: true
 
       - name: List release artifacts
+        if: steps.tag-check.outputs.skip != 'true'
         run: |
           echo "Release artifacts:"
           find release-rpms/ -name "*.rpm" -type f -exec ls -lh {} \;
 
       # pinning to SHA to mitigate possible supply chain attack
       - name: Create GitHub Release
+        if: steps.tag-check.outputs.skip != 'true'
         uses: softprops/action-gh-release@c95fe4860a8b36aef4e9e74bcb092bf597ec500b # v2.2.2
         with:
           tag_name: ${{ steps.version.outputs.tag }}
