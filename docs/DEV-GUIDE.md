@@ -2,9 +2,11 @@
 # Development and Contribution Guide
 
 ## Contribution guidelines
-We welcome contributions to the openHAB client for Sailfish OS! Whether it's bug fixes, new features, or improvements to documentation, your contributions are valuable. 
+
+We welcome contributions to the openHAB client for Sailfish OS! Whether it's bug fixes, new features, or improvements to documentation, your contributions are valuable.
 
 Please follow these guidelines to ensure a smooth contribution process:
+
 - Please read and agree to the [openHAB Contribution](https://next.openhab.org/docs/developer/contributing.html) Guidelines before submitting a pull request.
 - Especially, each commit needs to be **signed-off** by the contributor, which is a declaration that the contribution is made in accordance with the Developer Certificate of Origin (DCO). This is a requirement for all contributions to openHAB. You can find more information about signing your work in the [contribution guidelines](https://next.openhab.org/docs/developer/contributing.html#sign-your-work).
 
@@ -19,6 +21,7 @@ If you want to contribute to Sailfish OS application we are here to help you to 
 You are ready to contribute!
 
 ### Running the app in the emulator
+
 To run the app in the emulator, follow these steps:
 1. Open Sailfish IDE, klick on "File", "open File or Project" and select the `harbour-openhab.pro` file.
 2. Adjust on the left sidebar the mode to "Debug" and select the emulator "Sailfishos-XXXXXX-i486"
@@ -99,6 +102,7 @@ sfdk build
 Repeat with `armv7hl` and `i486` targets to produce all three packages.
 
 ## Checks to be done before submitting a pull request
+
 * Decide on the next version number for the app. Please follow [Semantic Versioning](https://rpm.org/docs/6.0.x/man/rpm-version.7) and update the VERSION and RELEASE in the `harbour-openhab.spec` and `harbour-openhab.pro` files.
 * Update the [harbour-openhab.changes](/rpm/harbour-openhab.changes) with a description of the changes you have made.
 * Check folder [translations/*](/translations/) for missing translations and add them if needed.
