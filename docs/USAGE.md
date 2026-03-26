@@ -81,6 +81,7 @@ Pull-Up: Use the native [Pulley Menu](https://docs.sailfishos.org/Develop/Apps/U
 - Scroll to top: Scrolls to the top of the current view.
 
 ## Contributing to the project
+
 We are happy about any contribution to the project, whether it's bug fixes, new features, translations or documentation.
 
 Please check out our [Developer Guide](DEV-GUIDE.md) for more information on how to contribute.

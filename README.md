@@ -42,7 +42,8 @@ For more screenshots, see [docs/images/](docs/images/) in the GitHub repository.
   - Add App Notifications (via openHAB cloud)
 
 ## Contributing to the project
-We are happy about any contribution to the project, whether it's bug fixes, new features, translations or documentation. 
+
+We are happy about any contribution to the project, whether it's bug fixes, new features, translations or documentation.
 
 Please check out our [Developer Guide](docs/DEV-GUIDE.md) for more information on how to contribute.
 

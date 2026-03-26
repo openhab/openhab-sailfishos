@@ -23,6 +23,7 @@ You are ready to contribute!
 ### Running the app in the emulator
 
 To run the app in the emulator, follow these steps:
+
 1. Open Sailfish IDE, klick on "File", "open File or Project" and select the `harbour-openhab.pro` file.
 2. Adjust on the left sidebar the mode to "Debug" and select the emulator "Sailfishos-XXXXXX-i486"
 3. Klick on Build the project
@@ -39,11 +40,11 @@ If you want to contribute translations, please submit them as pull requests agai
 - Go to folder translations.
 - If there is a file with your language code, click on it and select the edit icon
 - If not:
-    - Click on harbour-openHAB.ts file
-    - Select copy icon (Copy raw file)
-    - Go back, click Add file -> Create new file
-    - Enter openHAB-xx.ts replacing xx with your language code as the name. For example, de for german
-    - Paste the copied file in the new file's contents
+  - Click on harbour-openHAB.ts file
+  - Select copy icon (Copy raw file)
+  - Go back, click Add file -> Create new file
+  - Enter openHAB-xx.ts replacing xx with your language code as the name. For example, de for german
+  - Paste the copied file in the new file's contents
 - replace:
 
   ```xml
@@ -103,12 +104,12 @@ Repeat with `armv7hl` and `i486` targets to produce all three packages.
 
 ## Checks to be done before submitting a pull request
 
-* Decide on the next version number for the app. Please follow [Semantic Versioning](https://rpm.org/docs/6.0.x/man/rpm-version.7) and update the VERSION and RELEASE in the `harbour-openhab.spec` and `harbour-openhab.pro` files.
-* Update the [harbour-openhab.changes](/rpm/harbour-openhab.changes) with a description of the changes you have made.
-* Check folder [translations/*](/translations/) for missing translations and add them if needed.
-* Are new permissions needed for the app? If so, please add them to the `harbour-openhab.desktop`.
-* If you have added new features, please update:
-  * [USAGE.md](/docs/USAGE.md) documentation
-  * [README.md](/docs/README.md) documentation
-  * add new screenshots - if needed - to the [images](/docs/images/) folder and update the screenshots in the documentation accordingly.
-* Do we need to update our privacy policy? If so, please update the [PRIVACY_POLICY](https://github.com/openhabfoundation/openhabfoundation.github.io/blob/main/privacy.md) documentation and raise a Pull Request.
+- Decide on the next version number for the app. Please follow [Semantic Versioning](https://rpm.org/docs/6.0.x/man/rpm-version.7) and update the VERSION and RELEASE in the `harbour-openhab.spec` and `harbour-openhab.pro` files.
+- Update the [harbour-openhab.changes](/rpm/harbour-openhab.changes) with a description of the changes you have made.
+- Check folder [translations/*](/translations/) for missing translations and add them if needed.
+- Are new permissions needed for the app? If so, please add them to the `harbour-openhab.desktop`.
+- If you have added new features, please update:
+  - [USAGE.md](/docs/USAGE.md) documentation
+  - [README.md](/docs/README.md) documentation
+  - add new screenshots - if needed - to the [images](/docs/images/) folder and update the screenshots in the documentation accordingly.
+- Do we need to update our privacy policy? If so, please update the [PRIVACY_POLICY](https://github.com/openhabfoundation/openhabfoundation.github.io/blob/main/privacy.md) documentation and raise a Pull Request.
