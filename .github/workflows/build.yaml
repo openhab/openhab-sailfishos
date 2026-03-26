@@ -161,9 +161,6 @@ jobs:
       # NOTE: Unit tests (C++ / QML) run automatically in the build job
       # via the %check section in harbour-openhab.spec.
       # This job only validates that RPM artifacts were produced for all architectures.
-      # TODO: Add additional post-build checks here, for example:
-      # - RPM lint checks:  rpm -qip rpms/*.rpm
-      # - Install tests in emulator target
 
   # ──────────────────────────────────────────────
   # Release job – runs ONLY on push to main (i.e., merged Pull Requests)

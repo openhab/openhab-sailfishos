@@ -90,17 +90,41 @@ if [ -z "$QMAKE" ]; then
 fi
 echo "── Using qmake: $QMAKE ──"
 
-echo "── Building & running C++ unit tests ──"
+# Cross-compilation check: the sfdk build engine is x86 – ARM binaries
+# (aarch64, armv7hl) cannot be executed there.  We still *compile* the tests
+# to verify the code builds, but only *run* them for the native i486 target.
+_can_execute=1
+case "%{_arch}" in
+    i?86|x86_64) ;;
+    *)
+        _can_execute=0
+        echo "── Cross-compiling for %{_arch} – tests will be compiled but not executed ──"
+        ;;
+esac
+
+echo "── Building C++ unit tests ──"
 cd "$SRCDIR/tests/unittest"
 "$QMAKE" unittest.pro
+make clean
 make %{?_smp_mflags}
-./tst_ssemanager || exit 1
+if [ "$_can_execute" -eq 1 ]; then
+    echo "── Running tst_ssemanager ──"
+    ./tst_ssemanager || exit 1
+else
+    echo "── Skipping tst_ssemanager execution (cross-compiled for %{_arch}) ──"
+fi
 
-echo "── Building & running QML / JS tests ──"
+echo "── Building QML / JS tests ──"
 cd "$SRCDIR/tests/qmltest"
 "$QMAKE" qmltest.pro
+make clean
 make %{?_smp_mflags}
-./tst_qml || exit 1
+if [ "$_can_execute" -eq 1 ]; then
+    echo "── Running tst_qml ──"
+    ./tst_qml || exit 1
+else
+    echo "── Skipping tst_qml execution (cross-compiled for %{_arch}) ──"
+fi
 
 %files
 %defattr(-,root,root,-)
