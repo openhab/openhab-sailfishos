@@ -10,6 +10,16 @@ on:
       - '.github/markdownlint.yaml'
       - '.github/mlc_config.json'
       - '.github/workflows/markdownlint.yaml'
+  pull_request:
+    branches:
+      - '**'
+    paths-ignore:
+      - '**/*.md'
+      - 'docs/**'
+      - '.github/markdownlint.yaml'
+      - '.github/mlc_config.json'
+      - '.github/workflows/markdownlint.yaml'
+  workflow_dispatch:
 
 jobs:
   # ──────────────────────────────────────────────

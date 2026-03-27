@@ -68,7 +68,7 @@ void tst_SSEManager::connect_emitsStatusChangedConnecting()
     QCOMPARE(spy.first().first().toString(), QStringLiteral("Connecting..."));
 }
 
-void tst_SSEManager::connect_replyIsCreated()
+void tst_SSEManager::connect_isActive()
 {
     SSEManager mgr;
     // Before connect – no crash, no active state
@@ -109,7 +109,7 @@ void tst_SSEManager::disconnect_setsInactive()
     QVERIFY(!mgr.isActive());
 }
 
-void tst_SSEManager::disconnect_nullifiesReply()
+void tst_SSEManager::disconnect_checkIsActive()
 {
     SSEManager mgr;
     mgr.connectToOpenHAB("http://localhost:9999");
