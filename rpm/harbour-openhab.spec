@@ -61,11 +61,11 @@ elif [ -f Makefile ]; then
 fi
 
 if [ -z "$SRCDIR" ] || [ ! -d "$SRCDIR/tests" ]; then
-    echo "WARNING: tests/ directory not found – skipping tests"
+    echo "ERROR: tests/ directory not found – failing build"
     echo "  CWD:       $(pwd)"
     echo "  _builddir: %{_builddir}"
     echo "  tried:     $SRCDIR"
-    exit 0
+    exit 1
 fi
 
 echo "── Source directory: $SRCDIR ──"
