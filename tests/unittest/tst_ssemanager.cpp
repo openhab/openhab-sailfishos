@@ -27,12 +27,12 @@ private slots:
 
     // ── connect behaviour ──
     void connect_emitsStatusChangedConnecting();
-    void connect_replyIsCreated();
+    void connect_isActive();
 
     // ── disconnect behaviour ──
     void disconnect_emitsStatusChangedDisconnected();
     void disconnect_setsInactive();
-    void disconnect_nullifiesReply();
+    void disconnect_checkIsActive();
     void disconnect_doubleCallIsSafe();
 
     // ── reconnect behaviour ──

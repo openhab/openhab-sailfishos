@@ -70,7 +70,8 @@ fi
 
 echo "── Source directory: $SRCDIR ──"
 
-# Build & run tests out-of-tree so shadow builds and in-tree builds both work.
+# Build & run tests in dedicated out-of-tree directories under %%{_builddir}
+# so generated files (Makefiles, .o, binaries) never pollute the source tree.
 # Using qmake directly (not %%qmake5 macro) with an explicit .pro path avoids
 # the path-concatenation issue that the macro can cause in shadow builds.
 
@@ -102,10 +103,11 @@ case "%{_arch}" in
         ;;
 esac
 
-echo "── Building C++ unit tests ──"
-cd "$SRCDIR/tests/unittest"
-"$QMAKE" unittest.pro
-make clean
+echo "── Building C++ unit tests (out-of-tree) ──"
+UNITTEST_BUILDDIR="%{_builddir}/test-build-unittest"
+mkdir -p "$UNITTEST_BUILDDIR"
+cd "$UNITTEST_BUILDDIR"
+"$QMAKE" "$SRCDIR/tests/unittest/unittest.pro"
 make %{?_smp_mflags}
 if [ "$_can_execute" -eq 1 ]; then
     echo "── Running tst_ssemanager ──"
@@ -114,10 +116,11 @@ else
     echo "── Skipping tst_ssemanager execution (cross-compiled for %{_arch}) ──"
 fi
 
-echo "── Building QML / JS tests ──"
-cd "$SRCDIR/tests/qmltest"
-"$QMAKE" qmltest.pro
-make clean
+echo "── Building QML / JS tests (out-of-tree) ──"
+QMLTEST_BUILDDIR="%{_builddir}/test-build-qmltest"
+mkdir -p "$QMLTEST_BUILDDIR"
+cd "$QMLTEST_BUILDDIR"
+"$QMAKE" "$SRCDIR/tests/qmltest/qmltest.pro"
 make %{?_smp_mflags}
 if [ "$_can_execute" -eq 1 ]; then
     echo "── Running tst_qml ──"
