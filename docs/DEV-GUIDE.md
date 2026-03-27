@@ -25,10 +25,10 @@ You are ready to contribute!
 To run the app in the emulator, follow these steps:
 
 1. Open Sailfish IDE, klick on "File", "open File or Project" and select the `harbour-openhab.pro` file.
-2. Adjust on the left sidebar the mode to "Debug" and select the emulator "Sailfishos-XXXXXX-i486"
-3. Klick on Build the project
-4. Klick on Run the project
-5. Now the Emulator should start and you are ready to debug.
+1. Adjust on the left sidebar the mode to "Debug" and select the emulator "Sailfishos-XXXXXX-i486"
+1. Klick on Build the project
+1. Klick on Run the project
+1. Now the Emulator should start and you are ready to debug.
 
 Please checkout also official documentation on [Sailfishos - Your first app](https://docs.sailfishos.org/Develop/Apps/Your_First_App/) for more information.
 
@@ -70,8 +70,8 @@ The project uses GitHub Actions to automate builds and releases. The workflow is
 On every push to a feature branch, the pipeline automatically:
 
 1. **Builds** RPM packages for all three architectures (aarch64, armv7hl, i486)
-2. **Validates** the build output
-3. Build artifacts (RPM files) are available for download from the workflow run for 30 days
+1. **Validates** the build output
+1. Build artifacts (RPM files) are available for download from the workflow run for 30 days
 
 No release is created for feature branch commits.
 
