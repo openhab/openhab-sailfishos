@@ -75,12 +75,14 @@ On every push to a feature branch, the pipeline automatically:
 
 No release is created for feature branch commits.
 
+> **Note:** When a Pull Request is opened from an internal feature branch, the build runs only once (triggered by `push`). The `pull_request` trigger is reserved for PRs from **forks**, avoiding duplicate builds. A manual build can always be started via `workflow_dispatch`.
+
 ### Pull Request merge to main
 
 When a Pull Request is merged into `main`, the pipeline additionally:
 
 1. **Creates a GitHub Release** with the version tag from `harbour-openhab.spec` (e.g. `v0.1-2-release`)
-2. **Attaches all RPM packages** for the three architectures as release assets
+1. **Attaches all RPM packages** for the three architectures as release assets
 
 ### Build targets
 
