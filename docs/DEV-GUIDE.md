@@ -24,13 +24,13 @@ You are ready to contribute!
 
 To run the app in the emulator, follow these steps:
 
-1. Open Sailfish IDE, klick on "File", "open File or Project" and select the `harbour-openhab.pro` file.
+1. Open Sailfish IDE, click on "File", "open File or Project" and select the `harbour-openhab.pro` file.
 1. Adjust on the left sidebar the mode to "Debug" and select the emulator "Sailfishos-XXXXXX-i486"
-1. Klick on Build the project
-1. Klick on Run the project
+1. Click on Build the project
+1. Click on Run the project
 1. Now the Emulator should start and you are ready to debug.
 
-Please checkout also official documentation on [Sailfishos - Your first app](https://docs.sailfishos.org/Develop/Apps/Your_First_App/) for more information.
+Please check out also official documentation on [Sailfishos - Your first app](https://docs.sailfishos.org/Develop/Apps/Your_First_App/) for more information.
 
 ## Localization
 
@@ -84,11 +84,11 @@ When a Pull Request is merged into `main`, the pipeline additionally:
 
 ### Build targets
 
-| Architecture | Target | Description |
-|---|---|---|
-| aarch64 | `SailfishOS-5.0.0.62-aarch64` | 64-bit ARM devices |
-| armv7hl | `SailfishOS-5.0.0.62-armv7hl` | 32-bit ARM devices |
-| i486 | `SailfishOS-5.0.0.62-i486` | Emulator / x86 devices |
+| Architecture | Description |
+|---|---|
+| aarch64 | 64-bit ARM devices |
+| armv7hl | 32-bit ARM devices |
+| i486 | Emulator / x86 devices |
 
 ### Local build (sfdk)
 
