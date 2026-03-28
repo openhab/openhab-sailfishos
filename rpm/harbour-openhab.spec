@@ -7,20 +7,16 @@ License:    EPL-2.0
 URL:        www.openhab.org
 Source0:    %{name}-%{version}.tar.bz2
 Requires:   sailfishsilica-qt5 >= 0.10.9
-Requires:   qt5-qtcore
-Requires:   qt5-qtqml
-Requires:   qt5-qtquick
+Requires:   qt5-qtdeclarative
 Requires:   qt5-qtwebsockets
 Requires:   sailfish-components-webview-qt5
-Requires:   qt5-plugin-platform-minimal
 BuildRequires:  pkgconfig(sailfishapp) >= 1.0.2
 BuildRequires:  pkgconfig(Qt5Core)
 BuildRequires:  pkgconfig(Qt5Qml)
 BuildRequires:  pkgconfig(Qt5Quick)
 BuildRequires:  desktop-file-utils
 BuildRequires:  pkgconfig(Qt5WebSockets)
-BuildRequires: pkgconfig(qt5embedwidget)
-Requires: sailfish-components-webview-qt5
+BuildRequires:  pkgconfig(qt5embedwidget)
 
 %description
 This app is a native client for openHAB which allows easy access to your sitemaps. The documentation is available at www.openhab.org/docs/.
