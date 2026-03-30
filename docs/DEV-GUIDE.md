@@ -10,7 +10,7 @@ Please follow these guidelines to ensure a smooth contribution process:
 
 - Please read and agree to the [openHAB Contribution](https://next.openhab.org/docs/developer/contributing.html) Guidelines before submitting a pull request.
 - Especially, each commit needs to be **signed-off** by the contributor, which is a declaration that the contribution is made in accordance with the Developer Certificate of Origin (DCO).
-- This is a requirement for all contributions to openHAB. You can find more information about signing your work in the [contribution guidelines](https://next.openhab.org/docs/developer/contributing.html#sign-your-work).
+This is a requirement for all contributions to openHAB. You can find more information about signing your work in the [contribution guidelines](https://next.openhab.org/docs/developer/contributing.html#sign-your-work).
 
 ## Getting Started
 
@@ -87,10 +87,10 @@ No release is created. This is a pure CI check.
 
 Releases are triggered by pushing a **git tag** with a specific naming convention:
 
-| Tag format | Example | Result |
-|---|---|---|
+| Tag format                     | Example          | Result                                  |
+|--------------------------------|------------------|-----------------------------------------|
 | `v<Version>-<Release>-release` | `v0.1-3-release` | Full GitHub Release (must be on `main`) |
-| `v<Version>-<Release>-beta` | `v0.1-4-beta` | GitHub Pre-Release (any branch) |
+| `v<Version>-<Release>-beta`    | `v0.1-4-beta`    | GitHub Pre-Release (any branch)         |
 
 #### Release workflow
 
