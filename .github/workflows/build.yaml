@@ -1,9 +1,9 @@
-name: Sailfish OS Build & Release
+name: Build App
 
 on:
   push:
-    branches:
-      - '**'
+    branches-ignore:
+      - 'main'
     paths-ignore:
       - '**/*.md'
       - 'docs/**'
@@ -11,8 +11,6 @@ on:
       - '.github/mlc_config.json'
       - '.github/workflows/markdownlint.yaml'
   pull_request:
-    branches:
-      - '**'
     paths-ignore:
       - '**/*.md'
       - 'docs/**'
@@ -23,7 +21,8 @@ on:
 
 jobs:
   # ──────────────────────────────────────────────
-  # Build job – runs on EVERY push (feature branches + main)
+  # Build job – CI only, runs on feature branch pushes and PRs
+  # Never runs on direct pushes to main (releases are handled by release.yaml)
   # Uses the CODeRUS Buildfish action for Sailfish OS 5.x
   # Coderepo for target releases: https://github.com/CODeRUS/docker-sailfishos-platform-sdk
   # https://github.com/CODeRUS/github-sfos-build
@@ -119,12 +118,7 @@ jobs:
         run: |
           VERSION=$(grep '^Version:' rpm/harbour-openhab.spec | awk '{print $2}')
           RELEASE_NUM=$(grep '^Release:' rpm/harbour-openhab.spec | awk '{print $2}')
-          if [ "${{ github.ref }}" = "refs/heads/main" ]; then
-            SUFFIX=""
-          else
-            SUFFIX="-SNAPSHOT"
-          fi
-          NAME="harbour-openhab-${VERSION}-${RELEASE_NUM}${SUFFIX}.${{ matrix.arch }}.rpm"
+          NAME="harbour-openhab-${VERSION}-${RELEASE_NUM}-SNAPSHOT.${{ matrix.arch }}.rpm"
           echo "name=${NAME}" >> "$GITHUB_OUTPUT"
           echo "📦 Artifact name: ${NAME}"
 
@@ -138,121 +132,3 @@ jobs:
             !RPMS/*-debugsource-*.rpm
           retention-days: 30
           if-no-files-found: error
-
-  # ──────────────────────────────────────────────
-  # Test job – runs on feature branch pushes only (not main)
-  # Add your test commands below once test infrastructure is in place.
-  # ──────────────────────────────────────────────
-  test:
-    name: Validate package
-    needs: build
-    if: github.ref != 'refs/heads/main'
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Download all RPM artifacts
-        uses: actions/download-artifact@v4
-        with:
-          path: rpms
-          pattern: harbour-openhab-*
-          merge-multiple: true
-
-      - name: Verify artifacts exist for all architectures
-        run: |
-          echo "Downloaded RPM packages:"
-          find rpms/ -name "*.rpm" -type f
-          for arch in aarch64 armv7hl i486; do
-            count=$(find rpms/ -name "*${arch}*.rpm" -type f | wc -l)
-            if [ "$count" -eq 0 ]; then
-              echo "::error::No RPM found for architecture ${arch}"
-              exit 1
-            fi
-            echo "✅ ${arch}: ${count} package(s)"
-          done
-
-      # NOTE: Unit tests (C++ / QML) run automatically in the build job
-      # via the %check section in harbour-openhab.spec.
-      # This job only validates that RPM artifacts were produced for all architectures.
-
-  # ──────────────────────────────────────────────
-  # Release job – runs ONLY on push to main (i.e., merged Pull Requests)
-  # ──────────────────────────────────────────────
-  release:
-    name: Create GitHub Release
-    needs: build
-    if: github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v6
-
-      - name: Extract version from spec file
-        id: version
-        run: |
-          VERSION=$(grep '^Version:' rpm/harbour-openhab.spec | awk '{print $2}')
-          RELEASE_NUM=$(grep '^Release:' rpm/harbour-openhab.spec | awk '{print $2}')
-          TAG="v${VERSION}-${RELEASE_NUM}-release"
-          echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
-          echo "name=${TAG}" >> "$GITHUB_OUTPUT"
-          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
-          echo "release=${RELEASE_NUM}" >> "$GITHUB_OUTPUT"
-          echo "📦 Release version: ${TAG}"
-
-      - name: Check for duplicate release tag
-        id: tag-check
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          TAG="${{ steps.version.outputs.tag }}"
-          echo "Checking if release tag '${TAG}' already exists..."
-          if gh release view "$TAG" --repo "${{ github.repository }}" &>/dev/null; then
-            echo "::warning::⚠️ Release '${TAG}' already exists! Please adjust VERSION and/or RELEASE in file: rpm/harbour-openhab.spec (Current: Version=${{ steps.version.outputs.version }}, Release=${{ steps.version.outputs.release }}). Skipping release."
-            echo "skip=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "✅ Tag '${TAG}' not used yet – Release can be created."
-            echo "skip=false" >> "$GITHUB_OUTPUT"
-          fi
-
-      - name: Download all RPM artifacts
-        if: steps.tag-check.outputs.skip != 'true'
-        uses: actions/download-artifact@v4
-        with:
-          path: release-rpms
-          pattern: harbour-openhab-*
-          merge-multiple: true
-
-      - name: List release artifacts
-        if: steps.tag-check.outputs.skip != 'true'
-        run: |
-          echo "Release artifacts:"
-          find release-rpms/ -name "*.rpm" -type f -exec ls -lh {} \;
-
-      # pinning to SHA to mitigate possible supply chain attack
-      - name: Create GitHub Release
-        if: steps.tag-check.outputs.skip != 'true'
-        uses: softprops/action-gh-release@c95fe4860a8b36aef4e9e74bcb092bf597ec500b # v2.2.2
-        with:
-          tag_name: ${{ steps.version.outputs.tag }}
-          name: ${{ steps.version.outputs.name }}
-          body: |
-            ## openHAB Sailfish OS Client ${{ steps.version.outputs.name }}
-
-            ### 📱 Packages
-
-            | Architecture | Description |
-            |---|---|
-            | **aarch64** | 64-bit ARM devices (e.g. Sony Xperia 10 III+) |
-            | **armv7hl** | 32-bit ARM devices (e.g. Sony Xperia 10) |
-            | **i486** | Emulator / x86 devices |
-
-            ### 📋 Changelog
-
-            See [harbour-openhab.changes](https://github.com/${{ github.repository }}/blob/main/rpm/harbour-openhab.changes) for details.
-          files: release-rpms/**/*.rpm
-          fail_on_unmatched_files: true
-          draft: false
-          prerelease: false
-
