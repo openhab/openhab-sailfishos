@@ -1,8 +1,10 @@
+%define __requires_exclude ^libQt5Core.*$
+
 Name:       harbour-openhab
 
 Summary:    openHAB client for Sailfish OS
 Version:    0.1
-Release:    3
+Release:    4
 License:    EPL-2.0
 URL:        www.openhab.org
 Source0:    %{name}-%{version}.tar.bz2
@@ -19,7 +21,6 @@ BuildRequires:  pkgconfig(qt5embedwidget)
 %description
 This app is a native client for openHAB which allows easy access to your sitemaps. The documentation is available at www.openhab.org/docs/.
 
-
 %prep
 %setup -q -n %{name}-%{version}
 
@@ -28,7 +29,6 @@ This app is a native client for openHAB which allows easy access to your sitemap
 %qmake5 
 
 %make_build
-
 
 %install
 %qmake5_install
