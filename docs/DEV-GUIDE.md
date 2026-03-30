@@ -33,7 +33,7 @@ To run the app in the emulator, follow these steps:
 1. Click on Run the project
 1. Now the Emulator should start and you are ready to debug.
 
-Please check out also official documentation on [Sailfishos - Your first app](https://docs.sailfishos.org/Develop/Apps/Your_First_App/) for more information.
+Please also check out the official documentation on [Sailfish OS - Your first app](https://docs.sailfishos.org/Develop/Apps/Your_First_App/) for more information.
 
 ## Localization
 
@@ -125,7 +125,7 @@ The release pipeline will build all architectures, verify tag ↔ spec consisten
 To build locally with the Sailfish SDK, run the following commands for each target:
 
 ```shell
-sfdk config target=SailfishOS-5.0.0.62-aarch64
+sfdk config target=SailfishOS-5.0.0.43-aarch64
 sfdk config --show
 sfdk build
 ```

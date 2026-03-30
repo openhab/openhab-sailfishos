@@ -1,6 +1,6 @@
 <!-- markdownlint-disable MD041 -->
 <p align="center">
-    <a href="https://github.com/openhab/openhab-sailfishos/actions?query=Sailfish+OS+Build+%26+Release"><img alt="GitHub Action" src="https://github.com/openhab/openhab-sailfishos/actions/workflows/build.yaml/badge.svg"></a>
+    <a href="https://github.com/openhab/openhab-sailfishos/actions/workflows/build.yaml"><img alt="GitHub Action" src="https://github.com/openhab/openhab-sailfishos/actions/workflows/build.yaml/badge.svg"></a>
     <br>
     <img alt="Logo" src="icons/harbour-openhab.svg" width="100">
     <br>
