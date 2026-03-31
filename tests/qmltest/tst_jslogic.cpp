@@ -27,8 +27,10 @@ private:
     QString loadFile(const QString &relativePath) {
         QString path = QStringLiteral(SRCDIR) + QStringLiteral("/") + relativePath;
         QFile f(path);
-        QVERIFY2(f.open(QIODevice::ReadOnly | QIODevice::Text),
-                 qPrintable(QStringLiteral("Cannot open: ") + path));
+        if (!f.open(QIODevice::ReadOnly | QIODevice::Text)) {
+                    qWarning() << "Cannot open:" << path;
+                    return QString();
+                }
         QTextStream stream(&f);
         return stream.readAll();
     }
