@@ -15,6 +15,7 @@ BuildRequires:  pkgconfig(Qt5Qml)
 BuildRequires:  pkgconfig(Qt5Quick)
 BuildRequires:  desktop-file-utils
 BuildRequires:  pkgconfig(qt5embedwidget)
+BuildRequires:  pkgconfig(Qt5Test)
 
 %description
 This app is a native client for openHAB which allows easy access to your sitemaps. The documentation is available at www.openhab.org/docs/.
