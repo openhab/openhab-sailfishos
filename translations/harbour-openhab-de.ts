@@ -15,10 +15,6 @@
 <context>
     <name>MainUiPage</name>
     <message>
-        <source>Scroll to top</source>
-        <translation>Nach oben scrollen</translation>
-    </message>
-    <message>
         <source>openHAB Main UI</source>
         <translation>openHAB Main UI</translation>
     </message>
@@ -145,6 +141,37 @@
     <message>
         <source>Main</source>
         <translation>Hauptseite</translation>
+    </message>
+</context>
+<context>
+    <name>SitemapSelectionPage</name>
+    <message>
+        <source>Navigation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sitemaps</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Settings</source>
+        <translation type="unfinished">Einstellungen</translation>
+    </message>
+    <message>
+        <source>Refresh Sitemaps</source>
+        <translation type="unfinished">Sitemaps aktualisieren</translation>
+    </message>
+    <message>
+        <source>Home</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Main</source>
+        <translation type="unfinished">Hauptseite</translation>
+    </message>
+    <message>
+        <source>System</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

@@ -2,7 +2,6 @@ import QtQuick 2.0
 import Sailfish.Silica 1.0
 import Sailfish.WebView 1.0
 import "../base"
-import "../components"
 
 Page {
     id: mainUiPage
@@ -24,47 +23,67 @@ Page {
         }
     }
 
-    SilicaFlickable {
-        id: flickableMenu
-        anchors.fill: parent
+    // Toolbar header with navigation icons
+    Item {
+        id: toolbar
+        anchors.top: parent.top
+        anchors.left: parent.left
+        anchors.right: parent.right
+        height: Theme.itemSizeMedium
 
-        SitemapPullDownMenu {
-            id: sitemapMenu
-            visible: parent.visible
+        Rectangle {
+            anchors.fill: parent
+            color: Theme.rgba(Theme.highlightBackgroundColor, 0.15)
+        }
 
-            onSitemapSelected: {
-                console.log("[MainUiPage] Sitemap selected: " + name)
-                pageStack.animatorPush(Qt.resolvedUrl("SitemapPage.qml"), {
-                    "sitemapName": name,
-                    "pageTitle": label
+        Label {
+            id: titleLabel
+            text: qsTr("openHAB Main UI")
+            color: Theme.highlightColor
+            font.pixelSize: Theme.fontSizeLarge
+            anchors {
+                verticalCenter: parent.verticalCenter
+                left: parent.left
+                leftMargin: Theme.horizontalPageMargin
+                right: menuButton.left
+                rightMargin: Theme.paddingMedium
+            }
+            horizontalAlignment: Text.AlignLeft
+            truncationMode: TruncationMode.Fade
+        }
+
+        // Sitemap/Navigation menu button
+        IconButton {
+            id: menuButton
+            icon.source: "image://theme/icon-m-menu"
+            anchors {
+                verticalCenter: parent.verticalCenter
+                right: parent.right
+                rightMargin: Theme.horizontalPageMargin
+            }
+            onClicked: {
+                var page = pageStack.animatorPush(Qt.resolvedUrl("SitemapSelectionPage.qml"))
+                page.pageCompleted.connect(function(selPage) {
+                    selPage.sitemapSelected.connect(function(name, label) {
+                        settings.lastVisitedPage = name
+                        console.log("[MainUiPage] Sitemap selected: " + settings.lastVisitedPage)
+                        pageStack.animatorPush(Qt.resolvedUrl("SitemapPage.qml"), {
+                            "sitemapName": name,
+                            "pageTitle": label
+                        })
+                    })
                 })
             }
         }
+    }
 
-        PushUpMenu {
-            MenuItem {
-                text: qsTr("Scroll to top")
-                onClicked: flickableMenu.scrollToTop()
-            }
-        }
-
-        Column {
-            id: column
-            width: mainUiPage.width
-            height: mainUiPage.height
-
-            PageHeader {
-                id: header
-                title: qsTr("openHAB Main UI")
-            }
-
-            WebView {
-                id: webView
-                width: parent.width
-                height: mainUiPage.height - header.height
-                url: settings.base_url
-                active: false
-            }
-        }
+    WebView {
+        id: webView
+        anchors.top: toolbar.bottom
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.bottom: parent.bottom
+        url: settings.base_url
+        active: false
     }
 }

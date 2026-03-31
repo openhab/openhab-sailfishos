@@ -266,31 +266,68 @@ Page {
          }
     }
 
-    SilicaListView {
-        id: listView
-        anchors.fill: parent
-        model: sitemapModel
-        header: PageHeader { title: qsTr(pageTitle) }
+    // Toolbar header with navigation icons
+    Item {
+        id: toolbar
+        anchors.top: parent.top
+        anchors.left: parent.left
+        anchors.right: parent.right
+        height: Theme.itemSizeMedium
 
-        SitemapPullDownMenu {
-            id: sitemapMenu
-            visible: listView.visible
+        Rectangle {
+            anchors.fill: parent
+            color: Theme.rgba(Theme.highlightBackgroundColor, 0.15)
+        }
 
-            onSitemapSelected: {
-                console.log("[SitemapPage] Sitemap selected: " + name)
-                sitemapName = name
-                pageTitle = label
-                settings.lastVisitedPage = name
-                console.log("[SitemapPage] lastVisitedPage: " + settings.lastVisitedPage)
-                fetchSitemap()
+        Label {
+            id: titleLabel
+            text: qsTr(pageTitle)
+            color: Theme.highlightColor
+            font.pixelSize: Theme.fontSizeLarge
+            anchors {
+                verticalCenter: parent.verticalCenter
+                left: parent.left
+                leftMargin: Theme.horizontalPageMargin
+                right: menuButton.left
+                rightMargin: Theme.paddingMedium
+            }
+            horizontalAlignment: Text.AlignLeft
+            truncationMode: TruncationMode.Fade
+        }
 
-                // Restart SSE on sitemap switch
-                if (sseManager) {
-                    SseEvents.restartSSE(sseManager, settings.base_url, sitemapModel);
-                    console.log("[SitemapPage] SSE restarted after sitemap switch");
-                }
+        // Sitemap/Navigation menu button
+        IconButton {
+            id: menuButton
+            icon.source: "image://theme/icon-m-menu"
+            anchors {
+                verticalCenter: parent.verticalCenter
+                right: parent.right
+                rightMargin: Theme.horizontalPageMargin
+            }
+            onClicked: {
+                var page = pageStack.animatorPush(Qt.resolvedUrl("SitemapSelectionPage.qml"))
+                page.pageCompleted.connect(function(selPage) {
+                    selPage.sitemapSelected.connect(function(name, label) {
+                        settings.lastVisitedPage = name
+                        console.log("[SitemapPage] Sitemap selected: " + settings.lastVisitedPage)
+                        pageStack.animatorPush(Qt.resolvedUrl("SitemapPage.qml"), {
+                            "sitemapName": name,
+                            "pageTitle": label
+                        })
+                    })
+                })
             }
         }
+    }
+
+    SilicaListView {
+        id: listView
+        anchors.top: toolbar.bottom
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.bottom: parent.bottom
+        model: sitemapModel
+        //header: PageHeader { title: qsTr(pageTitle) }
 
         PushUpMenu {
             MenuItem {

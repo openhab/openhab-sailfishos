@@ -12,6 +12,11 @@
 # * date Author's Name <author's email> version-release
 # - Summary of changes
 
+* Tue Mar 31 2026 Dominik Heidinger <dominikh@atomicmail.io> 0.2-1
+- FIX: Scrolling in MainUI was not possible due to silica ScrollDown Menu.
+- REMOVED: Scroll Down Menu for MainUI, Sitemaps and Settings.
+- ADDED: Toolbar for MainUI, Sitemaps and Settings via new SitemapSelectionPage.
+
 * Sat Mar 28 2026 Dominik Heidinger <dominikh@atomicmail.io> 0.1-4
 - FIX: Added filter to filter out not needed dependencies from the RPM spec file, which caused deploy errors on some platforms.
 
