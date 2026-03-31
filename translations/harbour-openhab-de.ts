@@ -147,31 +147,31 @@
     <name>SitemapSelectionPage</name>
     <message>
         <source>Navigation</source>
-        <translation type="unfinished"></translation>
+        <translation>Navigation</translation>
     </message>
     <message>
         <source>Sitemaps</source>
-        <translation type="unfinished"></translation>
+        <translation>Sitemaps</translation>
     </message>
     <message>
         <source>Settings</source>
-        <translation type="unfinished">Einstellungen</translation>
+        <translation>Einstellungen</translation>
     </message>
     <message>
         <source>Refresh Sitemaps</source>
-        <translation type="unfinished">Sitemaps aktualisieren</translation>
+        <translation>Sitemaps aktualisieren</translation>
     </message>
     <message>
         <source>Home</source>
-        <translation type="unfinished"></translation>
+        <translation>Home</translation>
     </message>
     <message>
         <source>Main</source>
-        <translation type="unfinished">Hauptseite</translation>
+        <translation>Hauptseite</translation>
     </message>
     <message>
         <source>System</source>
-        <translation type="unfinished"></translation>
+        <translation>System</translation>
     </message>
 </context>
 </TS>
