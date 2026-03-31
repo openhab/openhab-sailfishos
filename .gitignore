@@ -13,6 +13,12 @@ Makefile
 # MOC / RCC generated files
 moc_*.cpp
 qrc_*.cpp
+*.moc
+
+# Generated testfiles
+tst_qml
+target_wrapper.sh
+tst_ssemanager
 
 # compilation output
 *.o

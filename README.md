@@ -1,6 +1,7 @@
 <!-- markdownlint-disable MD041 -->
 <p align="center">
-   <br>
+    <a href="https://github.com/openhab/openhab-sailfishos/actions/workflows/build.yaml"><img alt="GitHub Action" src="https://github.com/openhab/openhab-sailfishos/actions/workflows/build.yaml/badge.svg"></a>
+    <br>
     <img alt="Logo" src="icons/harbour-openhab.svg" width="100">
     <br>
     <b>openHAB client for Sailfish OS</b>
@@ -40,6 +41,12 @@ For more screenshots, see [docs/images/](docs/images/) in the GitHub repository.
   - Add support for remote access (via openHAB cloud)
   - Add App Notifications (via openHAB cloud)
 
+## Contributing to the project
+
+We are happy about any contribution to the project, whether it's bug fixes, new features, translations or documentation.
+
+Please check out our [Developer Guide](docs/DEV-GUIDE.md) for more information on how to contribute.
+
 ## Localization
 
 All language/regional translations are managed here [translations/*](translations/) in the GitHub repository.
@@ -60,7 +67,7 @@ If you want to contribute translations, please submit them as pull requests agai
   <translation type="unfinished"></translation>
   ```
 
-    with the correct translation for your language (remove "type="unfinished" and add the translation in between the <translation> tags). For example, for german:
+  with the correct translation for your language (remove "type="unfinished" and add the translation in between the <translation> tags). For example, for german:
 
   ```xml
   <source>Save</source>
@@ -68,14 +75,6 @@ If you want to contribute translations, please submit them as pull requests agai
   ```
 
 Thanks for your consideration and contribution!
-
-## Setting up development environment
-
-If you want to contribute to Sailfish OS application we are here to help you to set up development environment. openHAB client for Sailfish OS is developed using Sailfish IDE.
-
-- Download and install [Sailfish IDE](https://docs.sailfishos.org/Tools/Sailfish_SDK/Installation/)
-
-You are ready to contribute!
 
 ## Trademark Disclaimer
 
