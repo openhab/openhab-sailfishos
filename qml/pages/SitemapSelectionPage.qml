@@ -33,9 +33,9 @@ Page {
 
             onClicked: {
                 if (model.action === "main") {
-                    pageStack.animatorPush(Qt.resolvedUrl("MainUiPage.qml"))
+                    pageStack.animatorReplace(Qt.resolvedUrl("MainUiPage.qml"))
                 } else if (model.action === "settings") {
-                    pageStack.animatorPush(Qt.resolvedUrl("SettingsPage.qml"))
+                    pageStack.animatorReplace(Qt.resolvedUrl("SettingsPage.qml"))
                 } else if (model.action === "refresh") {
                     appWindow.loadAvailableSitemaps()
                     rebuildModel()
