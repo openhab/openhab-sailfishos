@@ -305,15 +305,24 @@ Page {
                 rightMargin: Theme.horizontalPageMargin
             }
             onClicked: {
-                var page = pageStack.animatorPush(Qt.resolvedUrl("SitemapSelectionPage.qml"))
-                page.pageCompleted.connect(function(selPage) {
+                // Open the sitemap selection page
+                var selectionPage = pageStack.animatorPush(Qt.resolvedUrl("SitemapSelectionPage.qml"))
+                selectionPage.pageCompleted.connect(function(selPage) {
                     selPage.sitemapSelected.connect(function(name, label) {
                         settings.lastVisitedPage = name
                         console.log("[SitemapPage] Sitemap selected: " + settings.lastVisitedPage)
-                        pageStack.animatorPush(Qt.resolvedUrl("SitemapPage.qml"), {
-                            "sitemapName": name,
-                            "pageTitle": label
-                        })
+
+                        // Update the current SitemapPage in-place instead of pushing a new one
+                        page.sitemapName = name
+                        page.pageTitle = label
+
+                        // Reuse existing sitemap fetch / SSE restart logic if available
+                        if (typeof page.fetchSitemap === "function") {
+                            page.fetchSitemap()
+                        }
+                        if (typeof page.restartSse === "function") {
+                            page.restartSse()
+                        }
                     })
                 })
             }
