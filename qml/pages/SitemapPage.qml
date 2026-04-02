@@ -229,9 +229,16 @@ Page {
    property bool _wasActive: false
    onStatusChanged: {
        if (status === PageStatus.Active && _wasActive) {
-           // Returning from a sub-page - rebind SSE to our model
-           SseEvents.rebindModel(sitemapModel);
-           console.log("[SitemapPage] SSE model rebound after returning from sub-page");
+           // Returning from a sub-page or overlay
+           if (!isSubPage && sseManager && !sseManager.active) {
+               // SSE was stopped (e.g. by navigating to MainUiPage) – restart it
+               SseEvents.startSSE(sseManager, settings.base_url, sitemapModel);
+               console.log("[SitemapPage] SSE restarted after returning to top-level sitemap");
+           } else {
+               // SSE still running – just rebind to our model
+               SseEvents.rebindModel(sitemapModel);
+               console.log("[SitemapPage] SSE model rebound after returning from sub-page");
+           }
        }
        if (status === PageStatus.Active) {
            _wasActive = true;

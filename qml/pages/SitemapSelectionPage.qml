@@ -1,6 +1,7 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
 import "../base"
+import "../base/utilities/SseEvents.js" as SseEvents
 
 Page {
     id: sitemapSelectionPage
@@ -33,12 +34,12 @@ Page {
 
             onClicked: {
                 if (model.action === "main") {
+                    SseEvents.stopSSE(sseManager)
                     pageStack.animatorReplace(Qt.resolvedUrl("MainUiPage.qml"))
                 } else if (model.action === "settings") {
                     pageStack.animatorReplace(Qt.resolvedUrl("SettingsPage.qml"))
                 } else if (model.action === "refresh") {
                     appWindow.loadAvailableSitemaps()
-                    rebuildModel()
                 } else if (model.action === "sitemap") {
                     sitemapSelectionPage.sitemapSelected(model.name, model.label)
                     pageStack.pop()
@@ -120,6 +121,11 @@ Page {
             "name": "",
             "section": qsTr("System")
         })
+    }
+
+    Connections {
+        target: sitemapModel
+        onCountChanged: rebuildModel()
     }
 
     Component.onCompleted: {
