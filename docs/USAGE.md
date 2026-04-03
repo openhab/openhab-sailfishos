@@ -18,8 +18,10 @@ The app follows the basic principles of the other openHAB UIs, like Basic UI, an
 
 ## Features
 
+- Demo Mode: Explore the app without connecting to an openHAB server
+- Display your Main UI Webview
 - Display your sitemaps and widgets and control your devices from your mobile device
-- Supported widgets/element-types: Frame, Text, Group, Switch, Switches with Button-Mappings, Selections, Slider, Rollershutter
+- Supported widgets/element-types within sitemap: Frame, Text, Group, Switch, Switches with Button-Mappings, Selections, Slider, Rollershutter
 - Customizable CoverActions via Settings
 
 <div class="row">

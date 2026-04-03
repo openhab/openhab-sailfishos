@@ -38,6 +38,7 @@ For more screenshots, see [docs/images/](docs/images/) in the GitHub repository.
   - Add optional authentication for local servers
   - Enhance supported widgets/element-types
   - Management of translations via CrowdIn
+  - Customiable Text Items on CoverPage
 - Version 0.0.4 (planned):
   - Add support for remote access (via openHAB cloud)
   - Add App Notifications (via openHAB cloud)
