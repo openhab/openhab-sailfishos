@@ -319,17 +319,16 @@ Page {
                         settings.lastVisitedPage = name
                         console.log("[SitemapPage] Sitemap selected: " + settings.lastVisitedPage)
 
+                        // Pop the selection page first to return to this SitemapPage
+                        pageStack.pop()
+
                         // Update the current SitemapPage in-place instead of pushing a new one
                         page.sitemapName = name
                         page.pageTitle = label
 
-                        // Reuse existing sitemap fetch / SSE restart logic if available
-                        if (typeof page.fetchSitemap === "function") {
-                            page.fetchSitemap()
-                        }
-                        if (typeof page.restartSse === "function") {
-                            page.restartSse()
-                        }
+                        // Restart SSE and re-fetch sitemap for the newly selected sitemap
+                        SseEvents.restartSSE(sseManager, settings.base_url, sitemapModel)
+                        fetchSitemap()
                     })
                 })
             }

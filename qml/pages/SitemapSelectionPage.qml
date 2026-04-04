@@ -76,7 +76,7 @@ Page {
 
                     onClicked: {
                         sitemapSelectionPage.sitemapSelected(model.name, model.label || model.name)
-                        pageStack.pop()
+                        //pageStack.pop()
                     }
 
                     Row {

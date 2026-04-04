@@ -67,7 +67,7 @@ Page {
                     selPage.sitemapSelected.connect(function(name, label) {
                         settings.lastVisitedPage = name
                         console.log("[MainUiPage] Sitemap selected: " + settings.lastVisitedPage)
-                        pageStack.animatorPush(Qt.resolvedUrl("SitemapPage.qml"), {
+                        pageStack.animatorReplace(Qt.resolvedUrl("SitemapPage.qml"), {
                             "sitemapName": name,
                             "pageTitle": label
                         })
