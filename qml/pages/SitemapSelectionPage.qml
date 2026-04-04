@@ -11,125 +11,170 @@ Page {
 
     property var sitemapModel: availableSitemapModel
 
-    SilicaListView {
-        id: listView
+    SilicaFlickable {
+        id: flickableSelectionPage
         anchors.fill: parent
+        contentHeight: contentColumn.height
 
-        header: Column {
+        Column {
+            id: contentColumn
             width: parent.width
 
             PageHeader {
                 title: qsTr("Navigation")
             }
-        }
 
-        model: ListModel {
-            id: combinedModel
-        }
+            // ── Main ────────────────────────────────────
+            SectionHeader {
+                text: qsTr("Main")
+            }
 
-        delegate: ListItem {
-            id: listItem
-            contentHeight: Theme.itemSizeMedium
-            width: listView.width
+            ListItem {
+                id: homeItem
+                contentHeight: Theme.itemSizeMedium
 
-            onClicked: {
-                if (model.action === "main") {
+                onClicked: {
                     SseEvents.stopSSE(sseManager)
                     pageStack.animatorReplace(Qt.resolvedUrl("MainUiPage.qml"))
-                } else if (model.action === "settings") {
-                    pageStack.animatorReplace(Qt.resolvedUrl("SettingsPage.qml"))
-                } else if (model.action === "refresh") {
-                    appWindow.loadAvailableSitemaps()
-                } else if (model.action === "sitemap") {
-                    sitemapSelectionPage.sitemapSelected(model.name, model.label)
-                    pageStack.pop()
+                }
+
+                Row {
+                    anchors {
+                        fill: parent
+                        leftMargin: Theme.horizontalPageMargin
+                        rightMargin: Theme.horizontalPageMargin
+                    }
+                    spacing: Theme.paddingMedium
+
+                    Icon {
+                        anchors.verticalCenter: parent.verticalCenter
+                        source: "image://theme/icon-m-home"
+                        color: homeItem.highlighted ? Theme.highlightColor : Theme.primaryColor
+                    }
+
+                    Label {
+                        anchors.verticalCenter: parent.verticalCenter
+                        text: qsTr("Home")
+                        color: homeItem.highlighted ? Theme.highlightColor : Theme.primaryColor
+                        font.pixelSize: Theme.fontSizeMedium
+                    }
                 }
             }
 
-            Row {
-                anchors {
-                    fill: parent
-                    leftMargin: Theme.horizontalPageMargin
-                    rightMargin: Theme.horizontalPageMargin
-                }
-                spacing: Theme.paddingMedium
+            // ── Sitemaps ────────────────────────────────
+            SectionHeader {
+                text: qsTr("Sitemaps")
+                visible: sitemapModel.count > 0
+            }
 
-                Icon {
-                    id: itemIcon
-                    anchors.verticalCenter: parent.verticalCenter
-                    source: model.icon || ""
-                    color: listItem.highlighted ? Theme.highlightColor : Theme.primaryColor
-                    visible: source != ""
-                }
+            Repeater {
+                model: sitemapModel
 
-                Label {
-                    anchors.verticalCenter: parent.verticalCenter
-                    width: parent.width - (itemIcon.visible ? itemIcon.width + parent.spacing : 0)
-                    text: model.label || ""
-                    color: listItem.highlighted ? Theme.highlightColor : Theme.primaryColor
-                    font.pixelSize: Theme.fontSizeMedium
-                    truncationMode: TruncationMode.Fade
+                ListItem {
+                    id: sitemapItem
+                    contentHeight: Theme.itemSizeMedium
+
+                    onClicked: {
+                        sitemapSelectionPage.sitemapSelected(model.name, model.label || model.name)
+                        pageStack.pop()
+                    }
+
+                    Row {
+                        anchors {
+                            fill: parent
+                            leftMargin: Theme.horizontalPageMargin
+                            rightMargin: Theme.horizontalPageMargin
+                        }
+                        spacing: Theme.paddingMedium
+
+                        Icon {
+                            anchors.verticalCenter: parent.verticalCenter
+                            source: "image://theme/icon-m-levels"
+                            color: sitemapItem.highlighted ? Theme.highlightColor : Theme.primaryColor
+                        }
+
+                        Label {
+                            anchors.verticalCenter: parent.verticalCenter
+                            text: model.label || model.name
+                            color: sitemapItem.highlighted ? Theme.highlightColor : Theme.primaryColor
+                            font.pixelSize: Theme.fontSizeMedium
+                            truncationMode: TruncationMode.Fade
+                        }
+                    }
                 }
+            }
+
+            // ── System ──────────────────────────────────
+            SectionHeader {
+                text: qsTr("System")
+            }
+
+            ListItem {
+                id: settingsItem
+                contentHeight: Theme.itemSizeMedium
+
+                onClicked: pageStack.animatorReplace(Qt.resolvedUrl("SettingsPage.qml"))
+
+                Row {
+                    anchors {
+                        fill: parent
+                        leftMargin: Theme.horizontalPageMargin
+                        rightMargin: Theme.horizontalPageMargin
+                    }
+                    spacing: Theme.paddingMedium
+
+                    Icon {
+                        anchors.verticalCenter: parent.verticalCenter
+                        source: "image://theme/icon-m-setting"
+                        color: settingsItem.highlighted ? Theme.highlightColor : Theme.primaryColor
+                    }
+
+                    Label {
+                        anchors.verticalCenter: parent.verticalCenter
+                        text: qsTr("Settings")
+                        color: settingsItem.highlighted ? Theme.highlightColor : Theme.primaryColor
+                        font.pixelSize: Theme.fontSizeMedium
+                    }
+                }
+            }
+
+            ListItem {
+                id: refreshItem
+                contentHeight: Theme.itemSizeMedium
+
+                onClicked: appWindow.loadAvailableSitemaps()
+
+                Row {
+                    anchors {
+                        fill: parent
+                        leftMargin: Theme.horizontalPageMargin
+                        rightMargin: Theme.horizontalPageMargin
+                    }
+                    spacing: Theme.paddingMedium
+
+                    Icon {
+                        anchors.verticalCenter: parent.verticalCenter
+                        source: "image://theme/icon-m-refresh"
+                        color: refreshItem.highlighted ? Theme.highlightColor : Theme.primaryColor
+                    }
+
+                    Label {
+                        anchors.verticalCenter: parent.verticalCenter
+                        text: qsTr("Refresh Sitemaps")
+                        color: refreshItem.highlighted ? Theme.highlightColor : Theme.primaryColor
+                        font.pixelSize: Theme.fontSizeMedium
+                    }
+                }
+            }
+
+            // Bottom spacer
+            Item {
+                width: 1
+                height: Theme.paddingLarge
             }
         }
 
-        section {
-            property: "section"
-            delegate: SectionHeader {
-                text: section
-            }
-        }
-    }
-
-    function rebuildModel() {
-        combinedModel.clear()
-
-        // Navigation section
-        combinedModel.append({
-            "label": qsTr("Home"),
-            "icon": "image://theme/icon-m-home",
-            "action": "main",
-            "name": "",
-            "section": qsTr("Main")
-        })
-
-        // Sitemaps section
-        for (var i = 0; i < sitemapModel.count; i++) {
-            var item = sitemapModel.get(i)
-            combinedModel.append({
-                "label": item.label || item.name,
-                "icon": "image://theme/icon-m-levels",
-                "action": "sitemap",
-                "name": item.name,
-                "section": qsTr("Sitemaps")
-            })
-        }
-
-        // Actions section
-        combinedModel.append({
-            "label": qsTr("Settings"),
-            "icon": "image://theme/icon-m-setting",
-            "action": "settings",
-            "name": "",
-            "section": qsTr("System")
-        })
-
-        combinedModel.append({
-            "label": qsTr("Refresh Sitemaps"),
-            "icon": "image://theme/icon-m-refresh",
-            "action": "refresh",
-            "name": "",
-            "section": qsTr("System")
-        })
-    }
-
-    Connections {
-        target: sitemapModel
-        onCountChanged: rebuildModel()
-    }
-
-    Component.onCompleted: {
-        rebuildModel()
+        VerticalScrollDecorator {}
     }
 }
 

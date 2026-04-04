@@ -71,12 +71,12 @@ It will be deactivated if no Item-ID AND command is provided.
 
 ## Navigation, Main UI and Sitemap Usage
 
-Pull-Down: Use the native [Pulley Menu](https://docs.sailfishos.org/Develop/Apps/UI/#pulley-menu) gesture:
+Tap the hamburger menu at the top right to open the menu and navigate to the Main UI, sitemaps or settings.
 
-- Refresh Sitemaps: Click here to refresh the list of available sitemaps.
-- Settings: Opens the app settings.
-- Main: Opens the Main UI in an embedded browser.
-- Sitemap-Example: Opens the selected sitemap.
+<div class="row">
+  <img src="images/main-ui.png" alt="Main UI" width="200">
+  <img src="images/navigation-page.png" alt="Navigation" width="200">
+</div>
 
 Pull-Up: Use the native [Pulley Menu](https://docs.sailfishos.org/Develop/Apps/UI/#gestures-for-navigation-and-actions) gesture:
 
