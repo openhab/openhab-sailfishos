@@ -12,6 +12,9 @@
 # * date Author's Name <author's email> version-release
 # - Summary of changes
 
+* Tue Apr 7 2026 Dominik Heidinger <dominikh@atomicmail.io> 0.3-1
+- ADDED: Switch translations from local to Crowdin.
+
 * Tue Mar 31 2026 Dominik Heidinger <dominikh@atomicmail.io> 0.2-1
 - FIX: Scrolling in MainUI was not possible due to silica ScrollDown Menu.
 - REMOVED: Scroll Down Menu for MainUI, Sitemaps and Settings.
