@@ -12,7 +12,8 @@
 # * date Author's Name <author's email> version-release
 # - Summary of changes
 
-* Tue Apr 7 2026 Dominik Heidinger <dominikh@atomicmail.io> 0.3-1
+* Sun Apr 12 2026 Dominik Heidinger <dominikh@atomicmail.io> 0.3-1
+- New supported sitemap widgets: Colorpicker
 - ADDED: Switch translations from local to Crowdin.
 
 * Tue Mar 31 2026 Dominik Heidinger <dominikh@atomicmail.io> 0.2-1

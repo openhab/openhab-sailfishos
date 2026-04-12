@@ -5,6 +5,7 @@ import "../base"
 import "../components"
 import "../base/utilities/SseEvents.js" as SseEvents
 import "../base/utilities/PatternFormatter.js" as PatternFormatter
+import "../base/utilities/ColorUtils.js" as ColorUtils
 
 Page {
     id: page
@@ -372,6 +373,7 @@ Page {
                         case "Rollershutter":       return rollershutterButtonsComp;
                         case "Slider":              return sliderComp;
                         case "Selection":           return selectionComp;
+                        case "Colorpicker":         return colorpickerComp;
                         case "Group":               return groupComp;
                         case "Text":                return widget.linkedPage ? groupComp : textComp;
                         default:                    return textComp;
@@ -751,6 +753,75 @@ Page {
 
                 Icon {
                     id: selectionArrow
+                    source: "image://theme/icon-m-right"
+                    anchors.verticalCenter: parent.verticalCenter
+                }
+            }
+        }
+    }
+
+    // Colorpicker component – shows current color as circle, opens ColorPickerPage on tap
+    Component {
+        id: colorpickerComp
+        ListItem {
+            id: colorpickerListItem
+            width: listView.width
+            contentHeight: Theme.itemSizeMedium
+
+            readonly property string displayLabel: (widget.label || "").replace(/\s*\[.*\]/, "")
+            readonly property var hsb: ColorUtils.parseHsb(currentState)
+            readonly property color displayColor: ColorUtils.hsbToColor(hsb.h, hsb.s, hsb.b)
+
+            onClicked: {
+                pageStack.animatorPush(Qt.resolvedUrl("ColorPickerPage.qml"), {
+                    "itemName":           widget.item ? widget.item.name : "",
+                    "itemLabel":          displayLabel,
+                    "initialHue":         hsb.h,
+                    "initialSaturation":  hsb.s,
+                    "initialBrightness":  hsb.b,
+                    "baseUrl":            settings.base_url
+                });
+            }
+
+            Row {
+                anchors.fill: parent
+                anchors.leftMargin: Theme.horizontalPageMargin
+                anchors.rightMargin: Theme.horizontalPageMargin
+                spacing: Theme.paddingMedium
+
+                Loader {
+                    id: iconLoader
+                    sourceComponent: smartIcon
+                    anchors.verticalCenter: parent.verticalCenter
+                    onLoaded: if (item) item.iconName = widget.icon || ""
+                    visible: widget.icon !== undefined && widget.icon !== "" && widget.icon !== "none"
+                    width: visible ? Theme.iconSizeSmall : 0
+                }
+
+                Label {
+                    text: displayLabel
+                    anchors.verticalCenter: parent.verticalCenter
+                    width: parent.width
+                        - (iconLoader.visible ? iconLoader.width + parent.spacing : 0)
+                        - colorIndicator.width - parent.spacing
+                        - navArrow.width - parent.spacing
+                    color: colorpickerListItem.highlighted ? Theme.highlightColor : Theme.primaryColor
+                    truncationMode: TruncationMode.Fade
+                }
+
+                Rectangle {
+                    id: colorIndicator
+                    width: Theme.iconSizeMedium
+                    height: width
+                    radius: width / 2
+                    color: displayColor
+                    border.width: 2
+                    border.color: Theme.rgba(Theme.primaryColor, 0.3)
+                    anchors.verticalCenter: parent.verticalCenter
+                }
+
+                Icon {
+                    id: navArrow
                     source: "image://theme/icon-m-right"
                     anchors.verticalCenter: parent.verticalCenter
                 }

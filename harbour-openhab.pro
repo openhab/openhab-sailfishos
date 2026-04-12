@@ -39,9 +39,11 @@ DISTFILES += qml/harbour-openhab.qml \
     qml/pages/SettingsPage.qml \
     qml/pages/SitemapPage.qml \
     qml/pages/SelectionPage.qml \
+    qml/pages/ColorPickerPage.qml \
     qml/base/utilities/SitemapLoader.js \
     qml/base/utilities/SseEvents.js \
     qml/base/utilities/PatternFormatter.js \
+    qml/base/utilities/ColorUtils.js \
     rpm/harbour-openhab.changes \
     rpm/harbour-openhab.changes.run.in \
     rpm/harbour-openhab.spec \

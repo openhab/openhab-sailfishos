@@ -2,6 +2,29 @@
 <!DOCTYPE TS>
 <TS version="2.1">
 <context>
+    <name>ColorPickerPage</name>
+    <message>
+        <source>Color Picker</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hue</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Saturation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Brightness</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Preset Colors</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>LegalPage</name>
     <message>
         <source>Legal</source>
