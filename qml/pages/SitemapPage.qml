@@ -374,6 +374,7 @@ Page {
                         case "Slider":              return sliderComp;
                         case "Selection":           return selectionComp;
                         case "Colorpicker":         return colorpickerComp;
+                        case "Setpoint":            return setpointComp;
                         case "Group":               return groupComp;
                         case "Text":                return widget.linkedPage ? groupComp : textComp;
                         default:                    return textComp;
@@ -824,6 +825,123 @@ Page {
                     id: navArrow
                     source: "image://theme/icon-m-right"
                     anchors.verticalCenter: parent.verticalCenter
+                }
+            }
+        }
+    }
+
+    // Setpoint component with MINUS/PLUS buttons for numeric items (e.g. temperature)
+    // Respects minValue, maxValue and step from the openHAB widget definition.
+    Component {
+        id: setpointComp
+        ListItem {
+            id: setpointItem
+            width: listView.width
+            contentHeight: Theme.itemSizeMedium
+            implicitHeight: Theme.itemSizeMedium
+            highlighted: false
+
+            // Parse the numeric value from state (e.g. "21.5 °C" → 21.5)
+            readonly property real numericValue: {
+                var s = currentState || "";
+                var num = parseFloat(s);
+                return isNaN(num) ? 0 : num;
+            }
+
+            // Widget boundaries and step from REST API
+            readonly property real minValue: (widget.minValue !== undefined && widget.minValue !== null) ? widget.minValue : 0
+            readonly property real maxValue: (widget.maxValue !== undefined && widget.maxValue !== null) ? widget.maxValue : 100
+            readonly property real stepValue: (widget.step !== undefined && widget.step !== null) ? widget.step : 1
+
+            // Label text without [...] part
+            readonly property string displayLabel: (widget.label || "").replace(/\s*\[.*\]/, "")
+
+            // Formatted display value using pattern or raw state
+            readonly property string displayState: {
+                if (currentState && currentState !== "") {
+                    if (pattern && pattern !== "") {
+                        return PatternFormatter.formatState(pattern, currentState);
+                    }
+                    return currentState;
+                }
+                var lbl = widget.label || "";
+                var match = lbl.match(/\[([^[]*)\]/);
+                if (match) return match[1];
+                return "N/A";
+            }
+
+            Row {
+                x: Theme.horizontalPageMargin
+                y: 0
+                width: parent.width - (Theme.horizontalPageMargin * 2)
+                height: parent.height
+                spacing: Theme.paddingMedium
+
+                Loader {
+                    id: iconLoader
+                    sourceComponent: smartIcon
+                    anchors.verticalCenter: parent.verticalCenter
+                    onLoaded: if (item) item.iconName = widget.icon || ""
+                    visible: widget.icon !== "" && widget.icon !== "none" && widget.icon !== undefined
+                    width: visible ? Theme.iconSizeSmall : 0
+                }
+
+                Label {
+                    id: setpointLabel
+                    text: displayLabel
+                    width: parent.width
+                        - (iconLoader.visible ? iconLoader.width + parent.spacing : 0)
+                        - minusBtn.width - parent.spacing
+                        - valueLabel.width - parent.spacing
+                        - plusBtn.width
+                    height: parent.height
+                    verticalAlignment: Text.AlignVCenter
+                    truncationMode: TruncationMode.Fade
+                }
+
+                IconButton {
+                    id: minusBtn
+                    width: Theme.iconSizeMedium
+                    anchors.verticalCenter: parent.verticalCenter
+                    icon.source: "image://theme/icon-m-remove"
+                    enabled: numericValue > minValue
+                    opacity: enabled ? 1.0 : 0.4
+                    onClicked: {
+                        if (widget.item && widget.item.name) {
+                            var newVal = numericValue - stepValue;
+                            if (newVal < minValue) newVal = minValue;
+                            // Round to avoid floating-point precision issues
+                            var decimals = (stepValue.toString().split('.')[1] || '').length;
+                            newVal = parseFloat(newVal.toFixed(decimals));
+                            sendCommand(widget.item.name, newVal.toString());
+                        }
+                    }
+                }
+
+                Label {
+                    id: valueLabel
+                    text: displayState
+                    anchors.verticalCenter: parent.verticalCenter
+                    color: Theme.highlightColor
+                    font.pixelSize: Theme.fontSizeMedium
+                }
+
+                IconButton {
+                    id: plusBtn
+                    width: Theme.iconSizeMedium
+                    anchors.verticalCenter: parent.verticalCenter
+                    icon.source: "image://theme/icon-m-add"
+                    enabled: numericValue < maxValue
+                    opacity: enabled ? 1.0 : 0.4
+                    onClicked: {
+                        if (widget.item && widget.item.name) {
+                            var newVal = numericValue + stepValue;
+                            if (newVal > maxValue) newVal = maxValue;
+                            var decimals = (stepValue.toString().split('.')[1] || '').length;
+                            newVal = parseFloat(newVal.toFixed(decimals));
+                            sendCommand(widget.item.name, newVal.toString());
+                        }
+                    }
                 }
             }
         }
