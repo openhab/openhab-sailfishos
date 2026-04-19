@@ -456,7 +456,13 @@ Page {
             implicitHeight: Theme.itemSizeLarge
 
             // React to SSE-driven state changes instead of polling with a Timer
-            property int _externalValue: (currentState !== undefined && currentState !== "") ? (Number(currentState) || 0) : 0
+            property real _externalValue: {
+                if (currentState !== undefined && currentState !== "") {
+                    var v = parseFloat(currentState);
+                    return isNaN(v) ? 0 : v;
+                }
+                return 0;
+            }
             on_ExternalValueChanged: {
                 if (!slider.pressed) {
                     slider.value = _externalValue;
@@ -477,7 +483,8 @@ Page {
                 valueText: Math.round(value) + "%"
 
                 Component.onCompleted: {
-                    value = Number(currentState) || 0;
+                    var v = parseFloat(currentState);
+                    value = isNaN(v) ? 0 : v;
                 }
 
                 onReleased: {
