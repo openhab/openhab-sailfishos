@@ -375,6 +375,7 @@ Page {
                         case "Selection":           return selectionComp;
                         case "Colorpicker":         return colorpickerComp;
                         case "Setpoint":            return setpointComp;
+                        //case "Image":               return imageComp;
                         case "Group":               return groupComp;
                         case "Text":                return widget.linkedPage ? groupComp : textComp;
                         default:                    return textComp;
@@ -949,6 +950,58 @@ Page {
                             sendCommand(widget.item.name, newVal.toString());
                         }
                     }
+                }
+            }
+        }
+    }
+
+    Component {
+        id: imageComp
+        ListItem {
+            width: listView.width
+            contentHeight: Theme.itemSizeMedium
+            enabled: false
+
+            // SSE updates provide the raw state in currentState.
+            // If a pattern is present, the state is formatted with it.
+            // Fallback: Parse text from [...] in label (initially from Sitemap REST call).
+            readonly property string displayState: {
+                if (currentState && currentState !== "") {
+                    if (pattern && pattern !== "") {
+                        return PatternFormatter.formatState(pattern, currentState);
+                    }
+                    return currentState;
+                }
+                var lbl = widget.label || "";
+                var match = lbl.match(/\[([^[]*)\]/);
+                if (match) return match[1];
+                return "N/A";
+            }
+
+            // Label text and remove [...] after label description
+            readonly property string displayLabel: (widget.label || "").replace(/\s*\[.*\]/, "")
+
+            Row {
+                anchors.fill: parent; anchors.leftMargin: Theme.horizontalPageMargin; anchors.rightMargin: Theme.horizontalPageMargin; spacing: Theme.paddingMedium
+
+                Loader {
+                    sourceComponent: smartIcon
+                    onLoaded: if(item) item.iconName = widget.icon
+                    anchors.verticalCenter: parent.verticalCenter
+                }
+
+                Label {
+                    text: displayLabel
+                    width: parent.width - (Theme.iconSizeSmall + Theme.paddingMedium * 2) - stateVal.width
+                    anchors.verticalCenter: parent.verticalCenter
+                    truncationMode: TruncationMode.Fade
+                }
+
+                Label {
+                    id: stateVal
+                    text: displayState
+                    color: Theme.secondaryColor
+                    anchors.verticalCenter: parent.verticalCenter
                 }
             }
         }
