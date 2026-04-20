@@ -121,7 +121,9 @@ function handleSSEMessage(message) {
         if (!itemName || newState === undefined) return;
 
         var model = _currentModel;
-        console.log("[SseEvents] Update received for: " + itemName + " New value: " + newState + " (model count: " + model.count + ")");
+        var logState = (newState.toString().length > 100) ? newState.toString().substring(0, 100) + "..." : newState.toString();
+        console.log("[SseEvents] Update received for: " + itemName + " New value: " + logState + " (model count: " + model.count + ")");
+
 
         // Iterate model and match by top-level itemName role
         // Do NOT return after first match - an item can appear in multiple rows
@@ -145,7 +147,7 @@ function handleSSEMessage(message) {
                 model.setProperty(i, "itemData", data);
                 // Also update the top-level itemState role for reactive UI bindings
                 model.setProperty(i, "itemState", newState.toString());
-                console.log("[SseEvents] Successfully updated: row " + i + " item: " + itemName + " -> " + newState);
+                console.log("[SseEvents] Successfully updated: row " + i + " item: " + itemName + " -> " + logState);
                 found = true;
             }
         }
