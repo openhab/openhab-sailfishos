@@ -6,6 +6,7 @@ import "../components"
 import "../base/utilities/SseEvents.js" as SseEvents
 import "../base/utilities/PatternFormatter.js" as PatternFormatter
 import "../base/utilities/ColorUtils.js" as ColorUtils
+import "../base/utilities/ImageUtils.js" as ImageUtils
 
 Page {
     id: page
@@ -354,13 +355,16 @@ Page {
 
         delegate: Item {
             width: listView.width
-            height: type === "Header" ? Theme.itemSizeSmall :
-                    (type === "Slider" ? Theme.itemSizeLarge : Theme.itemSizeMedium)
+            height: type === "Image" ? componentLoader.implicitHeight
+                  : type === "Header" ? Theme.itemSizeSmall
+                  : type === "Slider" ? Theme.itemSizeLarge
+                  : Theme.itemSizeMedium
 
             // If new widget types are added, add them as new cases in the switch statement below and create corresponding components
             Loader {
                 id: componentLoader
-                anchors.fill: parent
+                width: parent.width
+                anchors.top: parent.top
                 property var widget: itemData
                 property string currentState: model.itemState || ""
                 property string pattern: model.widgetPattern || ""
@@ -375,7 +379,7 @@ Page {
                         case "Selection":           return selectionComp;
                         case "Colorpicker":         return colorpickerComp;
                         case "Setpoint":            return setpointComp;
-                        //case "Image":               return imageComp;
+                        case "Image":               return imageComp;
                         case "Group":               return groupComp;
                         case "Text":                return widget.linkedPage ? groupComp : textComp;
                         default:                    return textComp;
@@ -959,49 +963,88 @@ Page {
         id: imageComp
         ListItem {
             width: listView.width
-            contentHeight: Theme.itemSizeMedium
+            contentHeight: imgColumn.height + Theme.paddingMedium
+            implicitHeight: contentHeight
             enabled: false
 
-            // SSE updates provide the raw state in currentState.
-            // If a pattern is present, the state is formatted with it.
-            // Fallback: Parse text from [...] in label (initially from Sitemap REST call).
-            readonly property string displayState: {
-                if (currentState && currentState !== "") {
-                    if (pattern && pattern !== "") {
-                        return PatternFormatter.formatState(pattern, currentState);
-                    }
-                    return currentState;
-                }
-                var lbl = widget.label || "";
-                var match = lbl.match(/\[([^[]*)\]/);
-                if (match) return match[1];
-                return "N/A";
-            }
-
-            // Label text and remove [...] after label description
             readonly property string displayLabel: (widget.label || "").replace(/\s*\[.*\]/, "")
 
-            Row {
-                anchors.fill: parent; anchors.leftMargin: Theme.horizontalPageMargin; anchors.rightMargin: Theme.horizontalPageMargin; spacing: Theme.paddingMedium
+            // Build image source from currentState (data:image/…;base64,…) or item state
+            readonly property string imageSource: {
+                var st = currentState || "";
+                if (st === "") {
+                    // Try to extract from label [...] as fallback
+                    var lbl = widget.label || "";
+                    var m = lbl.match(/\[([^[]*)\]/);
+                    if (m) st = m[1];
+                }
+                return ImageUtils.imageSourceFromState(st);
+            }
 
-                Loader {
-                    sourceComponent: smartIcon
-                    onLoaded: if(item) item.iconName = widget.icon
-                    anchors.verticalCenter: parent.verticalCenter
+            Column {
+                id: imgColumn
+                width: parent.width
+                spacing: Theme.paddingSmall
+
+                // Header row with icon + label
+                Row {
+                    x: Theme.horizontalPageMargin
+                    width: parent.width - 2 * Theme.horizontalPageMargin
+                    height: Theme.itemSizeSmall
+                    spacing: Theme.paddingMedium
+                    visible: displayLabel !== ""
+
+                    Loader {
+                        sourceComponent: smartIcon
+                        onLoaded: if(item) item.iconName = widget.icon
+                        anchors.verticalCenter: parent.verticalCenter
+                    }
+
+                    Label {
+                        text: displayLabel
+                        anchors.verticalCenter: parent.verticalCenter
+                        truncationMode: TruncationMode.Fade
+                        width: parent.width - Theme.iconSizeSmall - Theme.paddingMedium
+                    }
                 }
 
-                Label {
-                    text: displayLabel
-                    width: parent.width - (Theme.iconSizeSmall + Theme.paddingMedium * 2) - stateVal.width
-                    anchors.verticalCenter: parent.verticalCenter
-                    truncationMode: TruncationMode.Fade
+                // The actual image
+                Image {
+                    id: itemImage
+                    width: parent.width - 2 * Theme.horizontalPageMargin
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    fillMode: Image.PreserveAspectFit
+                    source: imageSource
+                    visible: imageSource !== ""
+                    asynchronous: true
+                    cache: false
+
+                    BusyIndicator {
+                        anchors.centerIn: parent
+                        running: itemImage.status === Image.Loading
+                        size: BusyIndicatorSize.Medium
+                    }
                 }
 
+                // Error placeholder when image decoding fails (e.g. missing webp plugin)
                 Label {
-                    id: stateVal
-                    text: displayState
+                    visible: imageSource !== "" && itemImage.status === Image.Error
+                    text: qsTr("Image format not supported")
+                    color: Theme.errorColor || Theme.secondaryColor
+                    font.pixelSize: Theme.fontSizeSmall
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    height: Theme.itemSizeMedium
+                    verticalAlignment: Text.AlignVCenter
+                }
+
+                // Placeholder when no image available
+                Label {
+                    visible: imageSource === ""
+                    text: qsTr("No image available")
                     color: Theme.secondaryColor
-                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    height: Theme.itemSizeMedium
+                    verticalAlignment: Text.AlignVCenter
                 }
             }
         }

@@ -9,7 +9,7 @@
     </message>
     <message>
         <source>Hue</source>
-        <translation type="unfinished"></translation>
+        <translation>Spektrum</translation>
     </message>
     <message>
         <source>Saturation</source>
@@ -17,11 +17,11 @@
     </message>
     <message>
         <source>Brightness</source>
-        <translation type="unfinished"></translation>
+        <translation>Regler</translation>
     </message>
     <message>
         <source>Preset Colors</source>
-        <translation type="unfinished"></translation>
+        <translation>Gitter</translation>
     </message>
 </context>
 <context>
@@ -145,6 +145,14 @@
     <message>
         <source>Scroll to top</source>
         <translation>Nach oben scrollen</translation>
+    </message>
+    <message>
+        <source>No image available</source>
+        <translation>Kein Bild verfügbar.</translation>
+    </message>
+    <message>
+        <source>Image format not supported</source>
+        <translation>Bildformat nicht unterstützt.</translation>
     </message>
 </context>
 <context>

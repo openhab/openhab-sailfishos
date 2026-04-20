@@ -44,6 +44,7 @@ DISTFILES += qml/harbour-openhab.qml \
     qml/base/utilities/SseEvents.js \
     qml/base/utilities/PatternFormatter.js \
     qml/base/utilities/ColorUtils.js \
+    qml/base/utilities/ImageUtils.js \
     rpm/harbour-openhab.changes \
     rpm/harbour-openhab.changes.run.in \
     rpm/harbour-openhab.spec \
