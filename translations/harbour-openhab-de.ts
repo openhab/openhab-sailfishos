@@ -5,23 +5,23 @@
     <name>ColorPickerPage</name>
     <message>
         <source>Color Picker</source>
-        <translation type="unfinished"></translation>
+        <translation>Farbe</translation>
     </message>
     <message>
         <source>Hue</source>
-        <translation>Spektrum</translation>
+        <translation>Farbton</translation>
     </message>
     <message>
         <source>Saturation</source>
-        <translation type="unfinished"></translation>
+        <translation>Sättigung</translation>
     </message>
     <message>
         <source>Brightness</source>
-        <translation>Regler</translation>
+        <translation>Helligkeit</translation>
     </message>
     <message>
         <source>Preset Colors</source>
-        <translation>Gitter</translation>
+        <translation>voreingestellte Farben</translation>
     </message>
 </context>
 <context>
