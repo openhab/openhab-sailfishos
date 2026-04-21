@@ -431,7 +431,8 @@ Page {
                 }
 
                 Label {
-                    text: widget.label || ""
+                    property string _switchLabel: widget.label ? widget.label.replace(/\s*\[.*\]/, "") : ""
+                    text: _switchLabel || ""
                     anchors.verticalCenter: parent.verticalCenter
                     width: parent.width - (iconLoader.visible ? iconLoader.width + parent.spacing : 0)
                                         - statusLabel.width - parent.spacing
