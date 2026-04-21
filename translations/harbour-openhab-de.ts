@@ -154,6 +154,14 @@
         <source>Image format not supported</source>
         <translation>Bildformat nicht unterstützt.</translation>
     </message>
+    <message>
+        <source>No location data</source>
+        <translation>Keine GPS Positionsdaten vorhanden.</translation>
+    </message>
+    <message>
+        <source>Map tile could not be loaded</source>
+        <translation>Karte konnte nicht geladen werden.</translation>
+    </message>
 </context>
 <context>
     <name>SitemapPullDownMenu</name>

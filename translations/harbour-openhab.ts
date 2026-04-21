@@ -154,6 +154,14 @@
         <source>Image format not supported</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>No location data</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Map tile could not be loaded</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>SitemapPullDownMenu</name>

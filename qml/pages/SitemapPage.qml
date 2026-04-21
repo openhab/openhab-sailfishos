@@ -355,9 +355,10 @@ Page {
 
         delegate: Item {
             width: listView.width
-            height: type === "Image" ? componentLoader.implicitHeight
-                  : type === "Header" ? Theme.itemSizeSmall
-                  : type === "Slider" ? Theme.itemSizeLarge
+            height: type === "Image"   ? componentLoader.height
+                  : type === "Mapview"  ? componentLoader.height
+                  : type === "Header"   ? Theme.itemSizeSmall
+                  : type === "Slider"   ? Theme.itemSizeLarge
                   : Theme.itemSizeMedium
 
             // If new widget types are added, add them as new cases in the switch statement below and create corresponding components
@@ -380,6 +381,7 @@ Page {
                         case "Colorpicker":         return colorpickerComp;
                         case "Setpoint":            return setpointComp;
                         case "Image":               return imageComp;
+                        case "Mapview":             return mapviewComp;
                         case "Group":               return groupComp;
                         case "Text":                return widget.linkedPage ? groupComp : textComp;
                         default:                    return textComp;
@@ -1046,6 +1048,163 @@ Page {
                     anchors.horizontalCenter: parent.horizontalCenter
                     height: Theme.itemSizeMedium
                     verticalAlignment: Text.AlignVCenter
+                }
+            }
+        }
+    }
+    // Displays Location Item states as an OpenStreetMap tile image.
+    // The item state is expected to be "lat,lng" (e.g. "52.4077,13.1882").
+    // Uses CartoDB Voyager tiles – free for open-source apps, no API key needed
+    Component {
+        id: mapviewComp
+
+        Column {
+            width: listView.width
+            spacing: 0
+
+            // Parse coordinates from "lat,lng" state string
+            readonly property var coords: {
+                var s = currentState || "";
+                if (s === "") {
+                    var lbl = widget.label || "";
+                    var m = lbl.match(/\[([^[]*)\]/);
+                    if (m) s = m[1];
+                }
+                var parts = s.split(",");
+                if (parts.length >= 2) {
+                    var lat = parseFloat(parts[0]);
+                    var lng = parseFloat(parts[1]);
+                    if (!isNaN(lat) && !isNaN(lng)) return { lat: lat, lng: lng, valid: true };
+                }
+                return { lat: 0, lng: 0, valid: false };
+            }
+
+            // OSM tile calculation (zoom 15)
+            readonly property int tileZ: 15
+            readonly property int tileX: {
+                if (!coords.valid) return 0;
+                return Math.floor((coords.lng + 180) / 360 * Math.pow(2, tileZ));
+            }
+            readonly property int tileY: {
+                if (!coords.valid) return 0;
+                var latRad = coords.lat * Math.PI / 180;
+                return Math.floor((1 - Math.log(Math.tan(latRad) + 1 / Math.cos(latRad)) / Math.PI) / 2 * Math.pow(2, tileZ));
+            }
+            readonly property string tileUrl: coords.valid
+                ? "https://a.basemaps.cartocdn.com/rastertiles/voyager/" + tileZ + "/" + tileX + "/" + tileY + ".png"
+                : ""
+
+            // Pixel position of the coordinate within the 256×256 tile (scaled to mapImage width)
+            readonly property real markerFracX: {
+                if (!coords.valid) return 0;
+                return (coords.lng + 180) / 360 * Math.pow(2, tileZ) - tileX;
+            }
+            readonly property real markerFracY: {
+                if (!coords.valid) return 0;
+                var latRad = coords.lat * Math.PI / 180;
+                return (1 - Math.log(Math.tan(latRad) + 1 / Math.cos(latRad)) / Math.PI) / 2 * Math.pow(2, tileZ) - tileY;
+            }
+
+            readonly property string displayLabel: (widget.label || "").replace(/\s*\[.*\]/, "")
+
+            // Header row: icon + label + coordinates text
+            ListItem {
+                width: parent.width
+                contentHeight: Theme.itemSizeMedium
+                enabled: false
+
+                Row {
+                    anchors.fill: parent
+                    anchors.leftMargin: Theme.horizontalPageMargin
+                    anchors.rightMargin: Theme.horizontalPageMargin
+                    spacing: Theme.paddingMedium
+
+                    Loader {
+                        sourceComponent: smartIcon
+                        onLoaded: if (item) item.iconName = widget.icon || ""
+                        anchors.verticalCenter: parent.verticalCenter
+                        visible: widget.icon !== undefined && widget.icon !== "" && widget.icon !== "none"
+                        width: visible ? Theme.iconSizeSmall : 0
+                    }
+
+                    Label {
+                        text: displayLabel
+                        anchors.verticalCenter: parent.verticalCenter
+                        width: parent.width
+                               - (widget.icon && widget.icon !== "" && widget.icon !== "none"
+                                  ? Theme.iconSizeSmall + parent.spacing : 0)
+                               - coordLabel.implicitWidth - parent.spacing
+                        truncationMode: TruncationMode.Fade
+                        color: Theme.primaryColor
+                    }
+
+                    Label {
+                        id: coordLabel
+                        text: coords.valid
+                              ? coords.lat.toFixed(5) + ", " + coords.lng.toFixed(5)
+                              : "N/A"
+                        color: Theme.secondaryColor
+                        font.pixelSize: Theme.fontSizeExtraSmall
+                        anchors.verticalCenter: parent.verticalCenter
+                    }
+                }
+            }
+
+            // Tile map + marker overlay
+            Item {
+                width: parent.width
+                height: width   // OSM tiles are square (256×256)
+
+                Image {
+                    id: mapImage
+                    anchors.fill: parent
+                    fillMode: Image.Stretch
+                    asynchronous: true
+                    cache: true
+                    source: tileUrl
+
+                    BusyIndicator {
+                        anchors.centerIn: parent
+                        running: mapImage.status === Image.Loading
+                        size: BusyIndicatorSize.Medium
+                    }
+
+                    Label {
+                        anchors.centerIn: parent
+                        visible: !coords.valid
+                        text: qsTr("No location data")
+                        color: Theme.secondaryColor
+                    }
+
+                    Label {
+                        anchors.centerIn: parent
+                        visible: coords.valid && mapImage.status === Image.Error
+                        text: qsTr("Map tile could not be loaded")
+                        color: Theme.secondaryColor
+                        font.pixelSize: Theme.fontSizeSmall
+                    }
+                }
+
+                // Marker dot at the exact coordinate position within the tile
+                Rectangle {
+                    visible: coords.valid && mapImage.status === Image.Ready
+                    width: Theme.paddingLarge
+                    height: Theme.paddingLarge
+                    radius: width / 2
+                    color: Theme.highlightColor
+                    border.color: "white"
+                    border.width: 2
+                    x: markerFracX * parent.width - width / 2
+                    y: markerFracY * parent.height - height / 2
+
+                    Rectangle {
+                        anchors.centerIn: parent
+                        width: parent.width * 0.4
+                        height: width
+                        radius: width / 2
+                        color: "white"
+                        opacity: 0.9
+                    }
                 }
             }
         }
