@@ -58,7 +58,13 @@ Page {
                     widgetList.forEach(function(widget) {
                         // Extract item name and state as top-level roles for reliable access
                         var name = (widget.item && widget.item.name) ? widget.item.name : "";
-                        var state = (widget.state !== undefined && widget.state !== null) ? widget.state.toString() : "";
+                        // widget.state is the sitemap-formatted display state; widget.item.state is the raw item state.
+                        var state = "";
+                        if (widget.state !== undefined && widget.state !== null && widget.state !== "") {
+                            state = widget.state.toString();
+                        } else if (widget.item && widget.item.state !== undefined && widget.item.state !== null && widget.item.state !== "") {
+                            state = widget.item.state.toString();
+                        }
                         // Extract pattern: widget-level pattern takes priority, then stateDescription
                         var pat = widget.pattern || (widget.item && widget.item.stateDescription && widget.item.stateDescription.pattern) || "";
 
