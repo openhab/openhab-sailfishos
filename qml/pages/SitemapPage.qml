@@ -145,58 +145,11 @@ Page {
                 // After async model load, rebind SSE to this (now populated) model
                 SseEvents.rebindModel(sitemapModel);
                 console.log("[SitemapPage] Model populated with " + sitemapModel.count + " entries, SSE rebound");
-
-                fetchAllItemStates();
             }
         }
         xhr.open("GET", fullApiUrl);
         xhr.send();
     }
-
-
-   function fetchAllItemStates() {
-       var itemNames = [];
-       // Collect all item names from the model using top-level itemName role
-       for (var i = 0; i < sitemapModel.count; i++) {
-           var entry = sitemapModel.get(i);
-           if (entry.itemName && entry.itemName !== "") {
-               itemNames.push(entry.itemName);
-           }
-       }
-
-       if (itemNames.length === 0) return;
-
-       var itemsUrl = settings.base_url + "/rest/items?fields=name,state";
-       var xhr = new XMLHttpRequest();
-       xhr.onreadystatechange = function() {
-           if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
-               var items = JSON.parse(xhr.responseText);
-               var itemStateMap = {};
-
-               // Build map: { "ItemName": "StateValue" }
-               items.forEach(function(item) {
-                   itemStateMap[item.name] = item.state;
-               });
-
-               // Update model using top-level itemName role
-               for (var i = 0; i < sitemapModel.count; i++) {
-                   var entry = sitemapModel.get(i);
-                   if (entry.itemName && entry.itemName !== "") {
-                       var newState = itemStateMap[entry.itemName];
-
-                       if (newState !== undefined) {
-                           var data = entry.itemData;
-                           data.state = newState.toString();
-                           sitemapModel.setProperty(i, "itemData", data);
-                           sitemapModel.setProperty(i, "itemState", newState.toString());
-                       }
-                   }
-               }
-           }
-       }
-       xhr.open("GET", itemsUrl);
-       xhr.send();
-   }
 
    Component.onCompleted: {
       fetchSitemap()
