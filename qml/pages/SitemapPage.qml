@@ -1171,11 +1171,12 @@ Page {
             width: listView.width
             contentHeight: Theme.itemSizeMedium
             enabled: !!(widget.linkedPage)
+            property string _groupLabel: widget.label ? widget.label.replace(/\s*\[.*\]/, "") : ""
             onClicked: {
                 if (widget.linkedPage) {
                     pageStack.animatorPush(Qt.resolvedUrl("SitemapPage.qml"), {
                         "sitemapName": widget.linkedPage.link,
-                        "pageTitle": widget.label
+                        "pageTitle": _groupLabel
                     });
                 }
             }
@@ -1193,7 +1194,8 @@ Page {
                 }
 
                 Label {
-                    text: widget.label || ""
+
+                    text: _groupLabel || ""
                     anchors.verticalCenter: parent.verticalCenter
                     color: groupItem.enabled ? Theme.primaryColor : Theme.secondaryColor
                     width: parent.width - (Theme.iconSizeSmall * 2 + Theme.paddingMedium * 4) - Theme.paddingLarge
