@@ -25,6 +25,29 @@
     </message>
 </context>
 <context>
+    <name>InputDialog</name>
+    <message>
+        <source>Set value</source>
+        <translation>Neuen Wert setzen</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>abbrechen</translation>
+    </message>
+    <message>
+        <source>Current value: %1</source>
+        <translation>Aktueller Wert: %1</translation>
+    </message>
+    <message>
+        <source>(not set)</source>
+        <translation>(nicht gesetzt)</translation>
+    </message>
+    <message>
+        <source>Enter new value</source>
+        <translation>Neuen Wert eingeben</translation>
+    </message>
+</context>
+<context>
     <name>LegalPage</name>
     <message>
         <source>Legal</source>

@@ -25,6 +25,29 @@
     </message>
 </context>
 <context>
+    <name>InputDialog</name>
+    <message>
+        <source>Set value</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Current value: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(not set)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enter new value</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>LegalPage</name>
     <message>
         <source>Legal</source>

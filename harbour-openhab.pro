@@ -40,6 +40,7 @@ DISTFILES += qml/harbour-openhab.qml \
     qml/pages/SitemapPage.qml \
     qml/pages/SelectionPage.qml \
     qml/pages/ColorPickerPage.qml \
+    qml/pages/InputDialog.qml \
     qml/base/utilities/SitemapLoader.js \
     qml/base/utilities/SseEvents.js \
     qml/base/utilities/PatternFormatter.js \

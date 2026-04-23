@@ -341,6 +341,7 @@ Page {
                         case "Setpoint":            return setpointComp;
                         case "Image":               return imageComp;
                         case "Mapview":             return mapviewComp;
+                        case "Input":               return inputComp;
                         case "Group":               return groupComp;
                         case "Text":                return widget.linkedPage ? groupComp : textComp;
                         default:                    return textComp;
@@ -1164,6 +1165,87 @@ Page {
                         color: "white"
                         opacity: 0.9
                     }
+                }
+            }
+        }
+    }
+
+    // Input component: shows current state with SSE updates, opens InputDialog on tap.
+    Component {
+        id: inputComp
+        ListItem {
+            id: inputListItem
+            width: listView.width
+            contentHeight: Theme.itemSizeMedium
+
+            readonly property string displayState: {
+                if (currentState && currentState !== "") {
+                    if (pattern && pattern !== "") {
+                        return PatternFormatter.formatState(pattern, currentState);
+                    }
+                    return currentState;
+                }
+                var lbl = widget.label || "";
+                var match = lbl.match(/\[([^[]*)\]/);
+                if (match) return match[1];
+                return "N/A";
+            }
+
+            readonly property string displayLabel: (widget.label || "").replace(/\s*\[.*\]/, "")
+
+            onClicked: {
+                var dlgPage = pageStack.animatorPush(Qt.resolvedUrl("InputDialog.qml"), {
+                    "itemName":     widget.item ? widget.item.name : "",
+                    "itemLabel":    displayLabel,
+                    "currentValue": currentState || "",
+                    "inputHint":    widget.inputHint || "text"
+                })
+                dlgPage.pageCompleted.connect(function(dlg) {
+                    dlg.commandSent.connect(function(value) {
+                        if (widget.item && widget.item.name) {
+                            sendCommand(widget.item.name, value)
+                        }
+                    })
+                })
+            }
+
+            Row {
+                anchors.fill: parent
+                anchors.leftMargin: Theme.horizontalPageMargin
+                anchors.rightMargin: Theme.horizontalPageMargin
+                spacing: Theme.paddingMedium
+
+                Loader {
+                    id: inputIconLoader
+                    sourceComponent: smartIcon
+                    anchors.verticalCenter: parent.verticalCenter
+                    onLoaded: if (item) item.iconName = widget.icon || ""
+                    visible: widget.icon !== undefined && widget.icon !== "" && widget.icon !== "none"
+                    width: visible ? Theme.iconSizeSmall : 0
+                }
+
+                Label {
+                    text: displayLabel
+                    anchors.verticalCenter: parent.verticalCenter
+                    width: parent.width
+                        - (inputIconLoader.visible ? inputIconLoader.width + parent.spacing : 0)
+                        - inputStateLabel.implicitWidth - parent.spacing
+                        - inputEditIcon.width - parent.spacing
+                    truncationMode: TruncationMode.Fade
+                    color: inputListItem.highlighted ? Theme.highlightColor : Theme.primaryColor
+                }
+
+                Label {
+                    id: inputStateLabel
+                    text: displayState
+                    color: Theme.secondaryColor
+                    anchors.verticalCenter: parent.verticalCenter
+                }
+
+                Icon {
+                    id: inputEditIcon
+                    source: "image://theme/icon-m-edit"
+                    anchors.verticalCenter: parent.verticalCenter
                 }
             }
         }
