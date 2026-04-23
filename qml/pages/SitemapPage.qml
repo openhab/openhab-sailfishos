@@ -1,6 +1,7 @@
 import QtQuick 2.0
 import QtQuick.Layouts 1.1
 import Sailfish.Silica 1.0
+import Sailfish.WebView 1.0
 import "../base"
 import "../components"
 import "../base/utilities/SseEvents.js" as SseEvents
@@ -314,8 +315,9 @@ Page {
 
         delegate: Item {
             width: listView.width
-            height: type === "Image"   ? componentLoader.height
+            height: type === "Image"    ? componentLoader.height
                   : type === "Mapview"  ? componentLoader.height
+                  : type === "Webview"  ? componentLoader.height
                   : type === "Header"   ? Theme.itemSizeSmall
                   : type === "Slider"   ? Theme.itemSizeLarge
                   : Theme.itemSizeMedium
@@ -342,6 +344,7 @@ Page {
                         case "Image":               return imageComp;
                         case "Mapview":             return mapviewComp;
                         case "Input":               return inputComp;
+                        case "Webview":             return webviewComp;
                         case "Group":               return groupComp;
                         case "Text":                return widget.linkedPage ? groupComp : textComp;
                         default:                    return textComp;
@@ -1247,6 +1250,25 @@ Page {
                     source: "image://theme/icon-m-edit"
                     anchors.verticalCenter: parent.verticalCenter
                 }
+            }
+        }
+    }
+
+    // Webview component for embedded web content
+    Component {
+        id: webviewComp
+        Item {
+            width: listView.width
+            // Height is derived from widget.height (which is in rows, typ. 1 row = 40-50px). If undefined, fallback to roughly 400px.
+            height: (widget.height && widget.height > 0) ? widget.height * Theme.itemSizeMedium : 400
+
+            WebView {
+                id: webViewItem
+                anchors.fill: parent
+                // URL comes from the widget REST property
+                url: widget.url || ""
+                // Only load when the page is active to save resources
+                active: page.status === PageStatus.Active
             }
         }
     }

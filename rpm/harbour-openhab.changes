@@ -13,7 +13,7 @@
 # - Summary of changes
 
 * Sun Apr 12 2026 Dominik Heidinger <dominikh@atomicmail.io> 0.3-1
-- New supported sitemap widgets: Colorpicker, Setpoint, Image, Mapview, Input
+- New supported sitemap widgets: Colorpicker, Setpoint, Image, Mapview, Input, Webview
 - ADDED: Switch translations from local to Crowdin.
 
 * Tue Mar 31 2026 Dominik Heidinger <dominikh@atomicmail.io> 0.2-1
