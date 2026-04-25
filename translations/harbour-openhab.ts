@@ -185,6 +185,22 @@
         <source>Map tile could not be loaded</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>No video URL configured</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Tap to play</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Video</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open in browser</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>SitemapPullDownMenu</name>

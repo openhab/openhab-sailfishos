@@ -316,6 +316,7 @@ Page {
         delegate: Item {
             width: listView.width
             height: type === "Image"    ? componentLoader.height
+                  : type === "Video"    ? componentLoader.height
                   : type === "Mapview"  ? componentLoader.height
                   : type === "Webview"  ? componentLoader.height
                   : type === "Header"   ? Theme.itemSizeSmall
@@ -342,6 +343,7 @@ Page {
                         case "Colorpicker":         return colorpickerComp;
                         case "Setpoint":            return setpointComp;
                         case "Image":               return imageComp;
+                        case "Video":               return videoComp;
                         case "Mapview":             return mapviewComp;
                         case "Input":               return inputComp;
                         case "Webview":             return webviewComp;
@@ -1015,6 +1017,241 @@ Page {
             }
         }
     }
+
+    // Video component – plays video streams from openHAB Video widget elements.
+    // Supports MJPEG streams (encoding="mjpeg") via periodic image polling and
+    // regular video sources (mp4, HLS, etc.) via QtMultimedia Video player.
+    // The video URL comes from widget.url as defined in the openHAB sitemap API.
+    Component {
+        id: videoComp
+        ListItem {
+            id: videoListItem
+            width: listView.width
+            contentHeight: videoColumn.height + Theme.paddingMedium
+            implicitHeight: contentHeight
+            enabled: false
+
+            readonly property string displayLabel: (widget.label || "").replace(/\s*\[.*\]/, "")
+
+            // Video URL comes from widget.url (openHAB sitemap API for Video elements)
+            readonly property string videoUrl: widget.url || ""
+
+            // MJPEG streams need special handling (periodic image polling with cache-busting)
+            readonly property bool isMjpeg: (widget.encoding || "").toLowerCase() === "mjpeg"
+
+            // 16:9 aspect ratio height based on available content width
+            readonly property int videoAreaWidth: listView.width - 2 * Theme.horizontalPageMargin
+            readonly property int videoAreaHeight: Math.round(videoAreaWidth * 9 / 16)
+
+            Column {
+                id: videoColumn
+                width: parent.width
+                spacing: Theme.paddingSmall
+
+                // Header row with icon + label
+                Row {
+                    x: Theme.horizontalPageMargin
+                    width: parent.width - 2 * Theme.horizontalPageMargin
+                    height: Theme.itemSizeSmall
+                    spacing: Theme.paddingMedium
+                    visible: displayLabel !== ""
+
+                    Loader {
+                        sourceComponent: smartIcon
+                        onLoaded: if(item) item.iconName = widget.icon
+                        anchors.verticalCenter: parent.verticalCenter
+                    }
+
+                    Label {
+                        text: displayLabel
+                        anchors.verticalCenter: parent.verticalCenter
+                        truncationMode: TruncationMode.Fade
+                        width: parent.width - Theme.iconSizeSmall - Theme.paddingMedium
+                    }
+                }
+
+                // ── MJPEG stream ──────────────────────────────────────────────────────────
+                // MJPEG (Motion JPEG) is an HTTP multipart stream of JPEG frames.
+                // QML Image cannot decode multipart streams directly, so we poll
+                // the URL every 500 ms with a cache-busting timestamp query param.
+                Item {
+                    id: mjpegContainer
+                    visible: isMjpeg && videoUrl !== ""
+                    width: videoAreaWidth
+                    height: visible ? videoAreaHeight : 0
+                    x: Theme.horizontalPageMargin
+
+                    Image {
+                        id: mjpegImage
+                        anchors.fill: parent
+                        fillMode: Image.PreserveAspectFit
+                        cache: false
+                        asynchronous: true
+                        // Append timestamp to bust HTTP cache on every tick
+                        source: (isMjpeg && videoUrl !== "" && mjpegTimer.running)
+                            ? (videoUrl + (videoUrl.indexOf("?") >= 0 ? "&" : "?") + "_sfos_ts=" + mjpegTimer.tick)
+                            : ""
+                    }
+
+                    BusyIndicator {
+                        anchors.centerIn: parent
+                        running: mjpegImage.status === Image.Loading && mjpegTimer.running
+                        size: BusyIndicatorSize.Medium
+                    }
+
+                    // Semi-transparent play button overlay (shown when paused)
+                    Rectangle {
+                        anchors.centerIn: parent
+                        width: Theme.iconSizeLarge + Theme.paddingLarge
+                        height: width
+                        radius: width / 2
+                        color: Qt.rgba(0, 0, 0, 0.55)
+                        visible: !mjpegTimer.running
+
+                        Image {
+                            anchors.centerIn: parent
+                            source: "image://theme/icon-m-play"
+                            width: Theme.iconSizeMedium
+                            height: Theme.iconSizeMedium
+                        }
+                    }
+
+                    // Tap toggles stream on/off
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: {
+                            if (mjpegTimer.running)
+                                mjpegTimer.stop()
+                            else
+                                mjpegTimer.start()
+                        }
+                    }
+
+                    // Refresh timer: increments tick to trigger Image source re-evaluation
+                    Timer {
+                        id: mjpegTimer
+                        property int tick: 0
+                        interval: 500
+                        running: isMjpeg && videoUrl !== ""
+                        repeat: true
+                        onTriggered: tick++
+                    }
+                }
+
+                // ── Regular video (mp4 / HLS / MPEG-TS etc.) ─────────────────────────────
+                // Sailfish OS only supports one active WebView per page-stack level.
+                // Having a second WebView here (alongside webviewComp) causes the
+                // Gecko renderer to display the wrong content (see: shared renderer).
+                //
+                // Solution: Show a black placeholder with a play button. Tapping
+                // pushes a dedicated full-screen VideoPlayerPage (defined below as
+                // videoPlayerPageComp) which owns its own single WebView.
+                Item {
+                    id: videoContainer
+                    visible: !isMjpeg && videoUrl !== ""
+                    width: videoAreaWidth
+                    height: visible ? videoAreaHeight : 0
+                    x: Theme.horizontalPageMargin
+
+                    Rectangle {
+                        anchors.fill: parent
+                        color: "#000000"
+                        radius: Theme.paddingSmall
+
+                        // Play icon
+                        Image {
+                            anchors.centerIn: parent
+                            source: "image://theme/icon-m-play"
+                            width: Theme.iconSizeLarge
+                            height: Theme.iconSizeLarge
+                        }
+
+                        // Stream type hint (HLS / VIDEO / …)
+                        Label {
+                            anchors.bottom: parent.bottom
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            anchors.bottomMargin: Theme.paddingSmall
+                            text: widget.encoding
+                                  ? widget.encoding.toUpperCase()
+                                  : qsTr("Tap to play")
+                            font.pixelSize: Theme.fontSizeExtraSmall
+                            color: Theme.secondaryHighlightColor
+                        }
+
+                        // Tap → push dedicated video player page
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked: pageStack.animatorPush(videoPlayerPageComp, {
+                                "videoSrc":   videoUrl,
+                                "videoTitle": displayLabel || qsTr("Video")
+                            })
+                        }
+                    }
+                }
+
+                // ── No URL configured ─────────────────────────────────────────────────────
+                Label {
+                    visible: videoUrl === ""
+                    text: qsTr("No video URL configured")
+                    color: Theme.secondaryColor
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    height: Theme.itemSizeMedium
+                    verticalAlignment: Text.AlignVCenter
+                }
+            }
+        }
+    }
+
+    // Dedicated full-screen video player page.
+    // Pushed by videoComp when the user taps the video placeholder.
+    // Keeping the video in its own Page ensures that only ONE WebView is
+    // active at a time in the page stack, which is required by Sailfish OS's
+    // Gecko renderer (multiple concurrent active WebViews cause bleed-through).
+    Component {
+        id: videoPlayerPageComp
+
+        Page {
+            id: videoPage
+            allowedOrientations: Orientation.All
+
+            // Properties injected by pageStack.animatorPush(…, { … })
+            property string videoSrc: ""
+            property string videoTitle: ""
+
+            // Pull-down menu gives a quick way to open the stream in the browser
+            SilicaFlickable {
+                anchors.fill: parent
+                contentHeight: height   // non-scrollable; only used for PullDownMenu
+
+                PullDownMenu {
+                    MenuItem {
+                        text: qsTr("Open in browser")
+                        onClicked: Qt.openUrlExternally(videoPage.videoSrc)
+                    }
+                }
+
+                // Header with back-navigation hint
+                PageHeader { title: videoPage.videoTitle || qsTr("Video") }
+
+                // Full-width/height WebView – the only active WebView on this page
+                WebView {
+                    id: videoPlayerWebView
+                    anchors {
+                        top: parent.top
+                        bottom: parent.bottom
+                        left: parent.left
+                        right: parent.right
+                    }
+                    // Load the video URL directly – Gecko renders video inline
+                    url: videoPage.videoSrc
+
+                    // Only consume resources while this page is actually visible
+                    active: videoPage.status === PageStatus.Active
+                }
+            }
+        }
+    }
+
     // Displays Location Item states as an OpenStreetMap tile image.
     // The item state is expected to be "lat,lng" (e.g. "52.4077,13.1882").
     // Uses CartoDB Voyager tiles – free for open-source apps, no API key needed
