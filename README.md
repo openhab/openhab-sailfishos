@@ -21,7 +21,7 @@ The documentation is available at [www.openhab.org/docs/](https://www.openhab.or
 - Demo Mode: Explore the app without connecting to an openHAB server
 - Display your Main UI Webview
 - Display your sitemaps and widgets and control your devices from your mobile device
-- Supported widgets/element-types within sitemap: Frame, Text, Group, Switch, Switches with Button-Mappings, Selections, Slider, Rollershutter, Colorpicker, Setpoint, Image, Mapview, Input, Webview, Video
+- Supported widgets/element-types within sitemap: Frame, Text, Group, Switch, Switches with Button-Mappings, Selections, Slider, Rollershutter, Colorpicker, Setpoint, Image, Mapview, Input, Webview, Video, Colortemperaturepicker
 - Customizable CoverActions via Settings
 
 <img src="docs/images/main-ui.png" alt="Main UI" width=200px> <img src="docs/images/sitemap-1.png" alt="Settings" width=200px> <img src="docs/images/sitemap-2.png" alt="Sitemap view" width=200px>

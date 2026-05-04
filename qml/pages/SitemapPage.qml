@@ -315,12 +315,13 @@ Page {
 
         delegate: Item {
             width: listView.width
-            height: type === "Image"    ? componentLoader.height
-                  : type === "Video"    ? componentLoader.height
-                  : type === "Mapview"  ? componentLoader.height
-                  : type === "Webview"  ? componentLoader.height
-                  : type === "Header"   ? Theme.itemSizeSmall
-                  : type === "Slider"   ? Theme.itemSizeLarge
+            height: type === "Image"                  ? componentLoader.height
+                  : type === "Video"                  ? componentLoader.height
+                  : type === "Mapview"                ? componentLoader.height
+                  : type === "Webview"                ? componentLoader.height
+                  : type === "Header"                 ? Theme.itemSizeSmall
+                  : type === "Slider"                 ? Theme.itemSizeLarge
+                  : type === "Colortemperaturepicker" ? Theme.itemSizeLarge
                   : Theme.itemSizeMedium
 
             // If new widget types are added, add them as new cases in the switch statement below and create corresponding components
@@ -334,22 +335,23 @@ Page {
                 property string mappingsJson: model.mappingsJson || ""
                 sourceComponent: {
                     switch(type) {
-                        case "Header":              return headerComp;
-                        case "Switch":              return switchComp;
-                        case "SwitchWithMappings":  return switchWithMappingsComp;
-                        case "Rollershutter":       return rollershutterButtonsComp;
-                        case "Slider":              return sliderComp;
-                        case "Selection":           return selectionComp;
-                        case "Colorpicker":         return colorpickerComp;
-                        case "Setpoint":            return setpointComp;
-                        case "Image":               return imageComp;
-                        case "Video":               return videoComp;
-                        case "Mapview":             return mapviewComp;
-                        case "Input":               return inputComp;
-                        case "Webview":             return webviewComp;
-                        case "Group":               return groupComp;
-                        case "Text":                return widget.linkedPage ? groupComp : textComp;
-                        default:                    return textComp;
+                        case "Header":                      return headerComp;
+                        case "Switch":                      return switchComp;
+                        case "SwitchWithMappings":          return switchWithMappingsComp;
+                        case "Rollershutter":               return rollershutterButtonsComp;
+                        case "Slider":                      return sliderComp;
+                        case "Selection":                   return selectionComp;
+                        case "Colorpicker":                 return colorpickerComp;
+                        case "Colortemperaturepicker":      return colortemperaturepickerComp;
+                        case "Setpoint":                    return setpointComp;
+                        case "Image":                       return imageComp;
+                        case "Video":                       return videoComp;
+                        case "Mapview":                     return mapviewComp;
+                        case "Input":                       return inputComp;
+                        case "Webview":                     return webviewComp;
+                        case "Group":                       return groupComp;
+                        case "Text":                        return widget.linkedPage ? groupComp : textComp;
+                        default:                            return textComp;
                     }
                 }
             }
@@ -805,6 +807,190 @@ Page {
                     id: navArrow
                     source: "image://theme/icon-m-right"
                     anchors.verticalCenter: parent.verticalCenter
+                }
+            }
+        }
+    }
+
+    // Colortemperaturepicker component – iOS-style color temperature slider (warm ↔ cool)
+    // The openHAB item state is a numeric Kelvin value, optionally formatted as "4500 °C".
+    Component {
+        id: colortemperaturepickerComp
+        ListItem {
+            id: ctpItem
+            width: listView.width
+            contentHeight: Theme.itemSizeLarge
+            highlighted: false
+
+            readonly property string displayLabel: (widget.label || "").replace(/\s*\[.*\]/, "")
+
+            // Range: prefer widget.minValue / maxValue, fall back to 2000–6500 K
+            readonly property real minTemp: (widget.minValue !== undefined && widget.minValue !== null
+                                             && widget.minValue >= 1000) ? widget.minValue : 1000
+            readonly property real maxTemp: (widget.maxValue !== undefined && widget.maxValue !== null
+                                             && widget.maxValue > minTemp)  ? widget.maxValue : 10000
+
+            // Computed property bound to currentState – fires on every SSE update.
+            // parseFloat handles "4500 °C" → 4500 correctly (stops at first non-numeric char).
+            readonly property real _parsedTemp: {
+                var v = parseFloat(currentState);
+                return isNaN(v) ? (minTemp + maxTemp) * 0.5
+                                : Math.max(minTemp, Math.min(maxTemp, v));
+            }
+
+            // Mutable slider value – initialised once, then kept in sync via the handler below
+            property real sliderValue: _parsedTemp
+
+            // SSE-driven update: only overwrite when the user is not currently dragging
+            on_ParsedTempChanged: {
+                if (!ctMouseArea.pressed) {
+                    sliderValue = _parsedTemp;
+                }
+            }
+
+            Column {
+                anchors {
+                    left:   parent.left
+                    right:  parent.right
+                    leftMargin:  Theme.horizontalPageMargin
+                    rightMargin: Theme.horizontalPageMargin
+                    verticalCenter: parent.verticalCenter
+                }
+                spacing: Theme.paddingMedium
+
+                // ── Label row ────────────────────────────────────────────────────────
+                Row {
+                    width: parent.width
+                    spacing: Theme.paddingMedium
+
+                    Loader {
+                        id: ctIconLoader
+                        sourceComponent: smartIcon
+                        anchors.verticalCenter: parent.verticalCenter
+                        onLoaded: if (item) item.iconName = widget.icon || ""
+                        visible: widget.icon !== undefined && widget.icon !== "" && widget.icon !== "none"
+                        width: visible ? Theme.iconSizeSmall : 0
+                    }
+
+                    Label {
+                        text: displayLabel
+                        anchors.verticalCenter: parent.verticalCenter
+                        width: parent.width
+                            - (ctIconLoader.visible ? ctIconLoader.width + parent.spacing : 0)
+                            - ctValueLabel.implicitWidth - parent.spacing
+                        truncationMode: TruncationMode.Fade
+                        color: ctpItem.highlighted ? Theme.highlightColor : Theme.primaryColor
+                    }
+
+                    Label {
+                        id: ctValueLabel
+                        anchors.verticalCenter: parent.verticalCenter
+                        text: Math.round(ctpItem.sliderValue) + " K"
+                        color: Theme.highlightColor
+                        font.pixelSize: Theme.fontSizeSmall
+                        font.bold: true
+                    }
+                }
+
+                // ── Gradient track + thumb ────────────────────────────────────────────
+                Item {
+                    id: ctTrack
+                    width:  parent.width
+                    height: Theme.paddingLarge + Theme.paddingMedium
+
+                    Canvas {
+                        id: ctCanvas
+                        anchors.fill: parent
+
+                        onWidthChanged:  requestPaint()
+                        onHeightChanged: requestPaint()
+                        Component.onCompleted: requestPaint()
+
+                        onPaint: {
+                            var ctx = getContext("2d");
+                            ctx.clearRect(0, 0, width, height);
+
+                            // Horizontal warm → neutral → cool gradient
+                            var grad = ctx.createLinearGradient(0, 0, width, 0);
+                            grad.addColorStop(0.00, "#FF8800");   // warm amber
+                            grad.addColorStop(0.40, "#FFD580");   // warm yellow
+                            grad.addColorStop(0.60, "#FFF8F0");   // neutral white
+                            grad.addColorStop(1.00, "#9EC5FF");   // cool blue-white
+                            ctx.fillStyle = grad;
+
+                            // Rounded rectangle (pill shape)
+                            var r = height / 2;
+                            var w = width, h = height;
+                            ctx.beginPath();
+                            ctx.moveTo(r, 0);
+                            ctx.lineTo(w - r, 0);
+                            ctx.arc(w - r, r, r, -Math.PI / 2, 0);
+                            ctx.lineTo(w, h - r);
+                            ctx.arc(w - r, h - r, r, 0, Math.PI / 2);
+                            ctx.lineTo(r, h);
+                            ctx.arc(r, h - r, r, Math.PI / 2, Math.PI);
+                            ctx.lineTo(0, r);
+                            ctx.arc(r, r, r, Math.PI, 3 * Math.PI / 2);
+                            ctx.closePath();
+                            ctx.fill();
+                        }
+                    }
+
+                    // Thumb circle (white disk with subtle border)
+                    Rectangle {
+                        id: ctThumb
+                        width:  ctTrack.height + Theme.paddingSmall
+                        height: width
+                        radius: width / 2
+                        color:  "white"
+                        border.color: Qt.rgba(0, 0, 0, 0.22)
+                        border.width: 1
+                        anchors.verticalCenter: parent.verticalCenter
+
+                        // Fractional position [0..1] derived from current slider value
+                        readonly property real fraction: (ctpItem.maxTemp > ctpItem.minTemp)
+                            ? (ctpItem.sliderValue - ctpItem.minTemp) / (ctpItem.maxTemp - ctpItem.minTemp)
+                            : 0
+
+                        x: Math.max(0, Math.min(ctTrack.width - width,
+                               fraction * (ctTrack.width - width)))
+
+                        // Inner glow: tinted dot that reflects the current temperature colour
+                        Rectangle {
+                            anchors.centerIn: parent
+                            width:  parent.width  * 0.45
+                            height: parent.height * 0.45
+                            radius: width / 2
+                            opacity: 0.65
+                            // Interpolate between warm amber and cool blue based on fraction
+                            color: Qt.rgba(
+                                (1 - ctThumb.fraction) + 0.62 * ctThumb.fraction,
+                                0.53 * (1 - ctThumb.fraction) + 0.77 * ctThumb.fraction,
+                                ctThumb.fraction,
+                                1.0
+                            )
+                        }
+                    }
+
+                    // MouseArea covering the full track item for drag interaction
+                    MouseArea {
+                        id: ctMouseArea
+                        anchors.fill: parent
+
+                        function posToValue(mx) {
+                            var clamped = Math.max(0, Math.min(ctTrack.width, mx));
+                            return ctpItem.minTemp + (clamped / ctTrack.width) * (ctpItem.maxTemp - ctpItem.minTemp);
+                        }
+
+                        onPressed:          ctpItem.sliderValue = posToValue(mouseX)
+                        onPositionChanged:  if (pressed) ctpItem.sliderValue = posToValue(mouseX)
+                        onReleased: {
+                            if (widget.item && widget.item.name) {
+                                sendCommand(widget.item.name,
+                                            Math.round(ctpItem.sliderValue).toString());
+                            }
+                        }
+                    }
                 }
             }
         }
