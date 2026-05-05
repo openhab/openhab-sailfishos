@@ -187,19 +187,23 @@
     </message>
     <message>
         <source>No video URL configured</source>
-        <translation type="unfinished"></translation>
+        <translation>Keine Video URL konfiguriert.</translation>
     </message>
     <message>
         <source>Tap to play</source>
-        <translation type="unfinished"></translation>
+        <translation>zum Abspielen tippen</translation>
     </message>
     <message>
         <source>Video</source>
-        <translation type="unfinished"></translation>
+        <translation>Video</translation>
     </message>
     <message>
         <source>Open in browser</source>
-        <translation type="unfinished"></translation>
+        <translation>Im Browser öffnen</translation>
+    </message>
+    <message>
+        <source>No buttons configured</source>
+        <translation>Keine Buttons konfiguriert</translation>
     </message>
 </context>
 <context>

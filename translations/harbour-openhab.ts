@@ -201,6 +201,10 @@
         <source>Open in browser</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>No buttons configured</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>SitemapPullDownMenu</name>

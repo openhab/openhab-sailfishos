@@ -134,6 +134,32 @@ Page {
                                 "itemData": widget
                             });
                         }
+                        // Buttongrid: serialise the buttons array to JSON so it survives the ListModel storage
+                        else if (widget.type === "Buttongrid") {
+                            // Explicitly copy each button to plain JS objects to ensure correct serialisation
+                            // in Qt's JavaScript engine (QML list types would fail JSON.stringify otherwise)
+                            var rawBtns = widget.buttons || widget.mappings || [];
+                            var btnArr = [];
+                            for (var bi = 0; bi < rawBtns.length; bi++) {
+                                var b = rawBtns[bi];
+                                btnArr.push({
+                                    "row":     b.row     !== undefined ? b.row     : 1,
+                                    "column":  b.column  !== undefined ? b.column  : (bi + 1),
+                                    "label":   b.label   || "",
+                                    "command": b.command || ""
+                                });
+                            }
+                            var buttonsJson = JSON.stringify(btnArr);
+                            console.log("[Buttongrid] buttons found: " + btnArr.length + " json: " + buttonsJson.substring(0, 200));
+                            sitemapModel.append({
+                                "type": "Buttongrid",
+                                "itemName": name,
+                                "itemState": state,
+                                "widgetPattern": pat,
+                                "mappingsJson": buttonsJson,
+                                "itemData": widget
+                            });
+                        }
                         // Default case for other widget types
                         else {
                             sitemapModel.append({
@@ -319,6 +345,7 @@ Page {
                   : type === "Video"                  ? componentLoader.height
                   : type === "Mapview"                ? componentLoader.height
                   : type === "Webview"                ? componentLoader.height
+                  : type === "Buttongrid"             ? componentLoader.height
                   : type === "Header"                 ? Theme.itemSizeSmall
                   : type === "Slider"                 ? Theme.itemSizeLarge
                   : type === "Colortemperaturepicker" ? Theme.itemSizeLarge
@@ -349,6 +376,7 @@ Page {
                         case "Mapview":                     return mapviewComp;
                         case "Input":                       return inputComp;
                         case "Webview":                     return webviewComp;
+                        case "Buttongrid":                  return buttongridComp;
                         case "Group":                       return groupComp;
                         case "Text":                        return widget.linkedPage ? groupComp : textComp;
                         default:                            return textComp;
@@ -1692,6 +1720,200 @@ Page {
                 url: widget.url || ""
                 // Only load when the page is active to save resources
                 active: page.status === PageStatus.Active
+            }
+        }
+    }
+
+    // Buttongrid component – displays openHAB Buttongrid widget as a responsive button grid.
+    Component {
+        id: buttongridComp
+        ListItem {
+            id: buttongridItem
+            width: listView.width
+            contentHeight: bgColumn.height + Theme.paddingMedium
+            implicitHeight: contentHeight
+            highlighted: false
+
+            // Buttons parsed from the serialised JSON string in mappingsJson
+            readonly property var buttons: {
+                if (mappingsJson && mappingsJson !== "" && mappingsJson !== "[]") {
+                    try {
+                        var parsed = JSON.parse(mappingsJson);
+                        if (parsed && parsed.length > 0) {
+                            //console.log("[buttongridComp] buttons from mappingsJson: " + parsed.length);
+                            return parsed;
+                        }
+                    } catch (e) {
+                        console.log("[buttongridComp] JSON parse error: " + e);
+                    }
+                }
+                // Fallback: try widget.buttons directly (plain JS array from initial JSON parse may survive)
+                var wb = widget ? (widget.buttons || widget.mappings) : null;
+                if (wb && wb.length > 0) {
+                    console.log("[buttongridComp] buttons from widget.buttons fallback: " + wb.length);
+                    return wb;
+                }
+                console.log("[buttongridComp] No buttons found. mappingsJson='" + mappingsJson + "'");
+                return [];
+            }
+
+            readonly property string displayLabel: (widget.label || "").replace(/\s*\[.*\]/, "")
+
+            readonly property var buttonsByRow: {
+                var rowMap = {};
+                var rowOrder = [];
+                for (var i = 0; i < buttons.length; i++) {
+                    var btn = buttons[i];
+                    var r = btn.row !== undefined ? btn.row : 1;
+                    if (rowMap[r] === undefined) {
+                        rowMap[r] = [];
+                        rowOrder.push(r);
+                    }
+                    rowMap[r].push(btn);
+                }
+                rowOrder.sort(function(a, b) { return a - b; });
+                var result = [];
+                for (var j = 0; j < rowOrder.length; j++) {
+                    var row = rowMap[rowOrder[j]].slice();
+                    row.sort(function(a, b) { return a.column - b.column; });
+                    result.push(row);
+                }
+                return result;
+            }
+
+            Column {
+                id: bgColumn
+                width: parent.width
+                spacing: Theme.paddingSmall
+
+                // ── Header row: icon + label ──────────────────────────────────────────
+                Row {
+                    x: Theme.horizontalPageMargin
+                    width: parent.width - 2 * Theme.horizontalPageMargin
+                    height: Theme.itemSizeMedium
+                    spacing: Theme.paddingMedium
+
+                    Loader {
+                        id: bgIconLoader
+                        sourceComponent: smartIcon
+                        anchors.verticalCenter: parent.verticalCenter
+                        onLoaded: if (item) item.iconName = widget.icon || ""
+                        visible: widget.icon !== undefined && widget.icon !== "" && widget.icon !== "none"
+                        width: visible ? Theme.iconSizeSmall : 0
+                    }
+
+                    Label {
+                        text: buttongridItem.displayLabel
+                        anchors.verticalCenter: parent.verticalCenter
+                        width: parent.width - (bgIconLoader.visible ? bgIconLoader.width + parent.spacing : 0)
+                        truncationMode: TruncationMode.Fade
+                        color: Theme.primaryColor
+                    }
+                }
+
+                // ── Button grid: iOS-style card container ────────────────────────────
+                Rectangle {
+                    x: Theme.horizontalPageMargin
+                    width: parent.width - 2 * Theme.horizontalPageMargin
+                    height: btnGridInner.height + Theme.paddingMedium * 2
+                    radius: Theme.paddingLarge
+                    color: Qt.rgba(Theme.highlightColor.r, Theme.highlightColor.g, Theme.highlightColor.b, 0.07)
+                    border.width: 1
+                    border.color: Qt.rgba(Theme.highlightColor.r, Theme.highlightColor.g, Theme.highlightColor.b, 0.18)
+
+                    // Placeholder when no buttons are configured
+                    Label {
+                        visible: buttongridItem.buttonsByRow.length === 0
+                        anchors.centerIn: parent
+                        width: parent.width - Theme.paddingMedium * 2
+                        height: Theme.itemSizeSmall
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                        text: qsTr("No buttons configured")
+                        color: Theme.secondaryColor
+                        font.pixelSize: Theme.fontSizeSmall
+                    }
+
+                    Column {
+                        id: btnGridInner
+                        x: Theme.paddingMedium
+                        y: Theme.paddingMedium
+                        width: parent.width - 2 * Theme.paddingMedium
+                        spacing: Theme.paddingSmall
+
+                        Repeater {
+                            model: buttongridItem.buttonsByRow
+
+                            // One horizontal row of buttons
+                            Row {
+                                id: btnRow
+                                property var rowButtons: modelData
+                                width: parent.width
+                                // Compact iOS-like button height
+                                height: Theme.itemSizeExtraSmall + Theme.paddingSmall
+                                spacing: Theme.paddingSmall
+
+                                Repeater {
+                                    model: btnRow.rowButtons
+
+                                    Rectangle {
+                                        id: btnRect
+                                        property var btn: modelData
+                                        property bool isActive: currentState !== "" && currentState === btn.command
+                                        property bool isPressed: btnMouseArea.pressed
+
+                                        width: Math.max(0,
+                                                   (btnRow.width - (btnRow.rowButtons.length - 1) * btnRow.spacing)
+                                                   / Math.max(1, btnRow.rowButtons.length))
+                                        height: btnRow.height
+                                        radius: height * 0.32
+
+                                        color: isActive
+                                            ? (isPressed
+                                               ? Qt.darker(Theme.highlightColor, 1.25)
+                                               : Theme.highlightColor)
+                                            : (isPressed
+                                               ? Qt.rgba(Theme.highlightColor.r, Theme.highlightColor.g, Theme.highlightColor.b, 0.28)
+                                               : Qt.rgba(Theme.highlightColor.r, Theme.highlightColor.g, Theme.highlightColor.b, 0.11))
+
+                                        border.width: isActive ? 0 : 1
+                                        border.color: Qt.rgba(Theme.highlightColor.r, Theme.highlightColor.g, Theme.highlightColor.b, 0.38)
+
+                                        scale: isPressed ? 0.94 : 1.0
+                                        Behavior on scale { NumberAnimation { duration: 80; easing.type: Easing.OutCubic } }
+                                        Behavior on color  { ColorAnimation  { duration: 100 } }
+
+                                        Label {
+                                            anchors.centerIn: parent
+                                            width: parent.width - Theme.paddingSmall * 2
+                                            text: btn.label || btn.command || ""
+                                            font.pixelSize: Theme.fontSizeSmall
+                                            font.bold: isActive
+                                            // White text on filled active button (iOS pattern)
+                                            color: isActive ? "white" : Theme.primaryColor
+                                            horizontalAlignment: Text.AlignHCenter
+                                            truncationMode: TruncationMode.Fade
+                                            elide: Text.ElideRight
+                                        }
+
+                                        MouseArea {
+                                            id: btnMouseArea
+                                            anchors.fill: parent
+                                            onClicked: {
+                                                if (widget.item && widget.item.name) {
+                                                    sendCommand(widget.item.name, btn.command);
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // Bottom padding
+                Item { width: parent.width; height: Theme.paddingSmall }
             }
         }
     }
