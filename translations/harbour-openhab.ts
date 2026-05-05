@@ -205,6 +205,22 @@
         <source>No buttons configured</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Chart unavailable</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No item configured</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Period: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Every %1 min.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>SitemapPullDownMenu</name>

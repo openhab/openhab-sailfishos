@@ -346,6 +346,7 @@ Page {
                   : type === "Mapview"                ? componentLoader.height
                   : type === "Webview"                ? componentLoader.height
                   : type === "Buttongrid"             ? componentLoader.height
+                  : type === "Chart"                  ? componentLoader.height
                   : type === "Header"                 ? Theme.itemSizeSmall
                   : type === "Slider"                 ? Theme.itemSizeLarge
                   : type === "Colortemperaturepicker" ? Theme.itemSizeLarge
@@ -377,6 +378,7 @@ Page {
                         case "Input":                       return inputComp;
                         case "Webview":                     return webviewComp;
                         case "Buttongrid":                  return buttongridComp;
+                        case "Chart":                       return chartComp;
                         case "Group":                       return groupComp;
                         case "Text":                        return widget.linkedPage ? groupComp : textComp;
                         default:                            return textComp;
@@ -1913,6 +1915,194 @@ Page {
                 }
 
                 // Bottom padding
+                Item { width: parent.width; height: Theme.paddingSmall }
+            }
+        }
+    }
+
+    // Chart component – fetches the openHAB chart as an image from the /chart endpoint.
+    // URL pattern: {base_url}/chart?items={item.name}&period={period}&legend={legend}
+    // The image is automatically reloaded when the refresh timer expires.
+    Component {
+        id: chartComp
+        ListItem {
+            id: chartListItem
+            width: listView.width
+            contentHeight: chartColumn.height + Theme.paddingMedium
+            implicitHeight: contentHeight
+            enabled: false
+
+            readonly property string displayLabel: (widget.label || "").replace(/\s*\[.*\]/, "")
+
+            // Cache-busting timestamp – updated by the refresh timer
+            property int _cacheBust: Math.floor(Date.now() / 1000)
+
+            property int _refreshMs: {
+                var r = widget.refresh !== undefined ? widget.refresh : 0;
+                if (r <= 0) return 600000;
+                if (r < 10000) return r * 1000;  // looks like seconds → convert to ms
+                return r;
+            }
+
+            readonly property string chartUrl: {
+                var params = [];
+
+                if (widget.item && widget.item.name && widget.item.name !== "") {
+                    params.push("items=" + encodeURIComponent(widget.item.name));
+                } else if (widget.items && widget.items.length > 0) {
+                    for (var i = 0; i < widget.items.length; i++) {
+                        if (widget.items[i] && widget.items[i].name)
+                            params.push("items=" + encodeURIComponent(widget.items[i].name));
+                    }
+                }
+
+                // Time period (e.g. "D", "W", "M", "Y", "h", "3W-h")
+                if (widget.period && widget.period !== "")
+                    params.push("period=" + encodeURIComponent(widget.period));
+
+                if (widget.legend !== undefined && widget.legend !== null && widget.legend !== "")
+                    params.push("legend=" + widget.legend);
+
+                // Persistence service (optional)
+                if (widget.service && widget.service !== "")
+                    params.push("service=" + encodeURIComponent(widget.service));
+
+                // Dark theme to match Sailfish OS appearance
+                params.push("theme=dark");
+
+                // Cache-busting: forces image reload after timer fires
+                params.push("t=" + _cacheBust);
+
+                return settings.base_url + "/chart?" + params.join("&");
+            }
+
+            // Refresh timer
+            Timer {
+                id: chartRefreshTimer
+                interval: chartListItem._refreshMs
+                running: true
+                repeat: true
+                onTriggered: {
+                    chartListItem._cacheBust = Math.floor(Date.now() / 1000);
+                    console.log("[Chart] Image refreshed: " + chartListItem.chartUrl);
+                }
+            }
+
+            Column {
+                id: chartColumn
+                width: parent.width
+                spacing: 0
+
+                Row {
+                    x: Theme.horizontalPageMargin
+                    width: parent.width - 2 * Theme.horizontalPageMargin
+                    height: Theme.itemSizeSmall
+                    spacing: Theme.paddingMedium
+                    visible: chartListItem.displayLabel !== ""
+
+                    Loader {
+                        sourceComponent: smartIcon
+                        onLoaded: if (item) item.iconName = widget.icon
+                        anchors.verticalCenter: parent.verticalCenter
+                    }
+
+                    Label {
+                        text: chartListItem.displayLabel
+                        anchors.verticalCenter: parent.verticalCenter
+                        truncationMode: TruncationMode.Fade
+                        width: parent.width - Theme.iconSizeSmall - Theme.paddingMedium
+                        color: Theme.primaryColor
+                    }
+                }
+
+                Rectangle {
+                    visible: chartListItem.displayLabel !== ""
+                    width: parent.width - 2 * Theme.horizontalPageMargin
+                    height: 1
+                    x: Theme.horizontalPageMargin
+                    color: Theme.rgba(Theme.primaryColor, 0.12)
+                }
+
+                Item {
+                    width: parent.width - 2 * Theme.horizontalPageMargin
+                    height: Math.round(width * 9 / 16)
+                    x: Theme.horizontalPageMargin
+
+                    Rectangle {
+                        anchors.fill: parent
+                        color: Theme.rgba(Theme.overlayBackgroundColor, 0.6)
+                        radius: Theme.paddingSmall
+                    }
+
+                    Image {
+                        id: chartImage
+                        anchors.fill: parent
+                        anchors.margins: Theme.paddingSmall
+                        fillMode: Image.PreserveAspectFit
+                        source: chartListItem.chartUrl
+                        asynchronous: true
+                        cache: false
+                        smooth: true
+                    }
+
+                    BusyIndicator {
+                        anchors.centerIn: parent
+                        running: chartImage.status === Image.Loading
+                        size: BusyIndicatorSize.Medium
+                    }
+
+                    Column {
+                        anchors.centerIn: parent
+                        spacing: Theme.paddingSmall
+                        visible: chartImage.status === Image.Error
+
+                        Image {
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            source: "image://theme/icon-m-warning"
+                            width: Theme.iconSizeMedium
+                            height: Theme.iconSizeMedium
+                        }
+
+                        Label {
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            text: qsTr("Chart unavailable")
+                            color: Theme.secondaryColor
+                            font.pixelSize: Theme.fontSizeSmall
+                        }
+                    }
+
+                    Label {
+                        anchors.centerIn: parent
+                        visible: !widget.item && !(widget.items && widget.items.length > 0)
+                        text: qsTr("No item configured")
+                        color: Theme.secondaryColor
+                        font.pixelSize: Theme.fontSizeSmall
+                    }
+                }
+                
+                Row {
+                    x: Theme.horizontalPageMargin
+                    width: parent.width - 2 * Theme.horizontalPageMargin
+                    height: Theme.itemSizeExtraSmall
+                    spacing: Theme.paddingMedium
+
+                    Label {
+                        anchors.verticalCenter: parent.verticalCenter
+                        text: widget.period ? qsTr("Period: ") + widget.period : ""
+                        color: Theme.secondaryColor
+                        font.pixelSize: Theme.fontSizeExtraSmall
+                        visible: widget.period && widget.period !== ""
+                    }
+
+                    Label {
+                        anchors.verticalCenter: parent.verticalCenter
+                        text: qsTr("Every %1 min.").arg(Math.round(chartListItem._refreshMs / 60000))
+                        color: Theme.secondaryColor
+                        font.pixelSize: Theme.fontSizeExtraSmall
+                        visible: chartListItem._refreshMs >= 60000
+                    }
+                }
+
                 Item { width: parent.width; height: Theme.paddingSmall }
             }
         }
