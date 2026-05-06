@@ -26,6 +26,9 @@ Page {
     property real   initialSaturation: 100
     property real   initialBrightness: 100
     property string baseUrl: ""
+    // Auth credentials (plain text) – only set when both are non-empty in settings
+    property string username: ""
+    property string password: ""
 
     // ── Current editable HSB values ──
     property real currentHue:        initialHue
@@ -88,6 +91,9 @@ Page {
             };
             xhr.open("POST", baseUrl + "/rest/items/" + itemName, true);
             xhr.setRequestHeader("Content-Type", "text/plain");
+            if (username && username !== "" && password && password !== "") {
+                xhr.setRequestHeader("Authorization", "Basic " + Qt.btoa(username + ":" + password))
+            }
             xhr.send(cmd);
         }
     }

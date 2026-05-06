@@ -162,6 +162,30 @@
         <source>Report a bug or request a feature</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Username</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Password</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server username – leave empty to send no credentials.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enter username</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server password – leave empty to send no credentials.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enter password</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>SitemapPage</name>

@@ -14,7 +14,12 @@ ApplicationWindow {
     }
 
     function loadAvailableSitemaps() {
-        SitemapLoader.loadAvailableSitemaps(settings.base_url, availableSitemapModel)
+        SitemapLoader.loadAvailableSitemaps(
+            settings.base_url, availableSitemapModel,
+            undefined, undefined,
+            settings.username_local,
+            settings.decodePassword(settings.password_local)
+        )
     }
 
     // Track whether sitemaps were already loaded by a base_url change

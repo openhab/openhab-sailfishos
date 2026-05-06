@@ -14,7 +14,7 @@ bool SSEManager::isActive() const {
     return m_active;
 }
 
-void SSEManager::connectToOpenHAB(const QString &baseUrl)
+void SSEManager::connectToOpenHAB(const QString &baseUrl, const QString &username, const QString &password)
 {
     // Cleanly close any existing connection
     if (m_reply) {
@@ -25,11 +25,20 @@ void SSEManager::connectToOpenHAB(const QString &baseUrl)
     }
 
     m_baseUrl = baseUrl;
+    m_username = username;
+    m_password = password;
     m_shouldReconnect = true;
 
     QUrl url(baseUrl + "/rest/events");
     QNetworkRequest request(url);
     request.setRawHeader("Accept", "text/event-stream");
+
+    // Add Basic Authentication header when credentials are provided
+    if (!username.isEmpty() && !password.isEmpty()) {
+        QByteArray credentials = (username + ":" + password).toUtf8().toBase64();
+        request.setRawHeader("Authorization", "Basic " + credentials);
+        qDebug() << "SSE connecting with Basic Auth for user:" << username;
+    }
 
     m_reply = m_nam.get(request);
 
@@ -111,11 +120,13 @@ void SSEManager::onFinished()
     }
     emit statusChanged("Reconnecting...");
 
-    // Capture baseUrl by value to avoid depending on stale member state
+    // Capture baseUrl and credentials by value to avoid depending on stale member state
     QString reconnectUrl = m_baseUrl;
-    QTimer::singleShot(5000, this, [this, reconnectUrl]() {
+    QString reconnectUser = m_username;
+    QString reconnectPass = m_password;
+    QTimer::singleShot(5000, this, [this, reconnectUrl, reconnectUser, reconnectPass]() {
         if (m_shouldReconnect) {
-            connectToOpenHAB(reconnectUrl);
+            connectToOpenHAB(reconnectUrl, reconnectUser, reconnectPass);
         }
     });
 }

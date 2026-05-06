@@ -5,11 +5,23 @@ import "../base"
 CoverBackground {
     Settings { id: settings }
 
+    // Returns the Basic Auth header value when both credentials are set
+    function getAuthHeader() {
+        var u = settings.username_local
+        var p = settings.decodePassword(settings.password_local)
+        if (u && u !== "" && p && p !== "") {
+            return "Basic " + Qt.btoa(u + ":" + p)
+        }
+        return null
+    }
+
     function sendCommand(itemName, command) {
         if (!itemName) return;
         var xhr = new XMLHttpRequest();
         xhr.open("POST", settings.base_url + "/rest/items/" + itemName, true);
         xhr.setRequestHeader("Content-Type", "text/plain");
+        var auth = getAuthHeader()
+        if (auth) xhr.setRequestHeader("Authorization", auth)
         xhr.onreadystatechange = function() {
             if (xhr.readyState === XMLHttpRequest.DONE && xhr.status >= 200 && xhr.status < 300) {
                 //refreshTimer.restart();
@@ -26,6 +38,8 @@ CoverBackground {
         var xhr = new XMLHttpRequest();
         xhr.open("GET", settings.base_url + "/rest/items/" + itemName, true);
         xhr.setRequestHeader("Accept", "application/json");
+        var auth = getAuthHeader()
+        if (auth) xhr.setRequestHeader("Authorization", auth)
         xhr.onreadystatechange = function() {
             if (xhr.readyState === XMLHttpRequest.DONE && xhr.status >= 200 && xhr.status < 300) {
                 var response = JSON.parse(xhr.responseText);

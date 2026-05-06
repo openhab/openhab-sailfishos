@@ -19,6 +19,7 @@ The documentation is available at [www.openhab.org/docs/](https://www.openhab.or
 ## Features
 
 - Demo Mode: Explore the app without connecting to an openHAB server
+- Local authentification - if enabled on openHAB server.
 - Display your Main UI Webview
 - Display your sitemaps and widgets and control your devices from your mobile device
 - Supported widgets/element-types within sitemap: Frame, Text, Group, Switch, Switches with Button-Mappings, Selections, Slider, Rollershutter, Colorpicker, Setpoint, Image, Mapview, Input, Webview, Video, Colortemperaturepicker, Buttongrid, Chart

@@ -13,8 +13,8 @@
 # - Summary of changes
 
 * Sun Apr 12 2026 Dominik Heidinger <dominikh@atomicmail.io> 0.3-1
-- New supported sitemap widgets: Colorpicker, Setpoint, Image, Mapview, Input, Webview, Video, Colortemperaturepicker, Buttongrid, Chart
-- ADDED: Switch translations from local to Crowdin.
+- New supported sitemap widgets: Colorpicker, Setpoint, Image, Mapview, Input, Webview, Video, Colortemperaturepicker, Buttongrid, Chart.
+- ADDED: Local authentification - if enabled on openHAB server.
 
 * Tue Mar 31 2026 Dominik Heidinger <dominikh@atomicmail.io> 0.2-1
 - FIX: Scrolling in MainUI was not possible due to silica ScrollDown Menu.

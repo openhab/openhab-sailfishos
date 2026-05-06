@@ -16,7 +16,12 @@ Dialog {
     }
 
     function loadAvailableSitemaps() {
-        SitemapLoader.loadAvailableSitemaps(settings.base_url, availableSitemapModel)
+        SitemapLoader.loadAvailableSitemaps(
+            settings.base_url, availableSitemapModel,
+            undefined, undefined,
+            settings.username_local,
+            settings.decodePassword(settings.password_local)
+        )
     }
 
     Component.onCompleted: { }
@@ -62,6 +67,33 @@ Dialog {
 
                 EnterKey.enabled: text.length > 0
                 EnterKey.iconSource: "image://theme/icon-m-enter-next"
+                EnterKey.onClicked: focus = false
+            }
+
+            TextField {
+                id: usernameLocalField
+                width: parent.width
+                label: qsTr("Username")
+                description: qsTr("OPTIONAL: Server username – leave empty to send no credentials.")
+                placeholderText: qsTr("Enter username")
+                text: settings.username_local
+                inputMethodHints: Qt.ImhNoAutoUppercase | Qt.ImhNoPredictiveText
+
+                EnterKey.enabled: true
+                EnterKey.iconSource: "image://theme/icon-m-enter-next"
+                EnterKey.onClicked: passwordLocalField.focus = true
+            }
+
+            PasswordField {
+                id: passwordLocalField
+                width: parent.width
+                label: qsTr("Password")
+                description: qsTr("OPTIONAL: Server password – leave empty to send no credentials.")
+                placeholderText: qsTr("Enter password")
+                // Decode the base64-obfuscated value stored in settings
+                text: settings.decodePassword(settings.password_local)
+
+                EnterKey.iconSource: "image://theme/icon-m-enter-close"
                 EnterKey.onClicked: focus = false
             }
 
@@ -295,6 +327,10 @@ Dialog {
             settings.coverAction1_command = coverAction1CommandField.text
             settings.coverAction2 = coverAction2Field.text
             settings.coverAction2_command = coverAction2CommandField.text
+
+            settings.username_local = usernameLocalField.text
+            // Encode password as base64-obfuscated value before storing in dconf
+            settings.password_local = settings.encodePassword(passwordLocalField.text)
         }
     }
 }

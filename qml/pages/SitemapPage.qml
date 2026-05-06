@@ -32,11 +32,24 @@ Page {
 
     // --- Logic ---
 
+    // Returns the Basic Auth header value when both username and password are set,
+    // otherwise returns null. Credentials are only sent when BOTH values are non-empty.
+    function getAuthHeader() {
+        var u = settings.username_local
+        var p = settings.decodePassword(settings.password_local)
+        if (u && u !== "" && p && p !== "") {
+            return "Basic " + Qt.btoa(u + ":" + p)
+        }
+        return null
+    }
+
     function sendCommand(itemName, command) {
         if (!itemName) return;
         var xhr = new XMLHttpRequest();
         xhr.open("POST", settings.base_url + "/rest/items/" + itemName, true);
         xhr.setRequestHeader("Content-Type", "text/plain");
+        var auth = getAuthHeader()
+        if (auth) xhr.setRequestHeader("Authorization", auth)
         xhr.onreadystatechange = function() {
             if (xhr.readyState === XMLHttpRequest.DONE && xhr.status >= 200 && xhr.status < 300) {
                 //refreshTimer.restart();
@@ -181,6 +194,8 @@ Page {
             }
         }
         xhr.open("GET", fullApiUrl);
+        var auth = getAuthHeader()
+        if (auth) xhr.setRequestHeader("Authorization", auth)
         xhr.send();
     }
 
@@ -189,7 +204,8 @@ Page {
 
       if (!isSubPage && sseManager) {
           // Top-level sitemap: start SSE connection and bind to our model
-          SseEvents.startSSE(sseManager, settings.base_url, sitemapModel);
+          SseEvents.startSSE(sseManager, settings.base_url, sitemapModel,
+                             settings.username_local, settings.decodePassword(settings.password_local));
           console.log("[SitemapPage] SSE started (top-level sitemap)");
       } else if (isSubPage) {
           // Sub-page: rebind the existing SSE handler to our model
@@ -218,10 +234,11 @@ Page {
    onStatusChanged: {
        if (status === PageStatus.Active && _wasActive) {
            // Returning from a sub-page or overlay
-           if (!isSubPage && sseManager && !sseManager.active) {
-               // SSE was stopped (e.g. by navigating to MainUiPage) – restart it
-               SseEvents.startSSE(sseManager, settings.base_url, sitemapModel);
-               console.log("[SitemapPage] SSE restarted after returning to top-level sitemap");
+            if (!isSubPage && sseManager && !sseManager.active) {
+                // SSE was stopped (e.g. by navigating to MainUiPage) – restart it
+                SseEvents.startSSE(sseManager, settings.base_url, sitemapModel,
+                                   settings.username_local, settings.decodePassword(settings.password_local));
+                console.log("[SitemapPage] SSE restarted after returning to top-level sitemap");
            } else {
                // SSE still running – just rebind to our model
                SseEvents.rebindModel(sitemapModel);
@@ -315,7 +332,8 @@ Page {
                         page.pageTitle = label
 
                         // Restart SSE and re-fetch sitemap for the newly selected sitemap
-                        SseEvents.restartSSE(sseManager, settings.base_url, sitemapModel)
+                        SseEvents.restartSSE(sseManager, settings.base_url, sitemapModel,
+                                             settings.username_local, settings.decodePassword(settings.password_local))
                         fetchSitemap()
                     })
                 })
@@ -792,7 +810,9 @@ Page {
                     "initialHue":         hsb.h,
                     "initialSaturation":  hsb.s,
                     "initialBrightness":  hsb.b,
-                    "baseUrl":            settings.base_url
+                    "baseUrl":            settings.base_url,
+                    "username":           settings.username_local,
+                    "password":           settings.decodePassword(settings.password_local)
                 });
             }
 

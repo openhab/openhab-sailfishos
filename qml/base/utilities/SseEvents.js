@@ -18,6 +18,9 @@ var _currentHandler = null;
 var _currentModel = null;
 // Reference to the sseManager for disconnect operations
 var _sseManager = null;
+// Stored credentials for reconnect/restart scenarios
+var _currentUsername = "";
+var _currentPassword = "";
 
 /**
  * Starts the SSE connection and registers the message handler.
@@ -25,8 +28,10 @@ var _sseManager = null;
  * @param {object} sseManager - The global SSEManager (C++)
  * @param {string} baseUrl - The openHAB base URL
  * @param {ListModel} model - The sitemapModel for updates
+ * @param {string} [username] - Optional: username for Basic Auth
+ * @param {string} [password] - Optional: password for Basic Auth (plain text)
  */
-function startSSE(sseManager, baseUrl, model) {
+function startSSE(sseManager, baseUrl, model, username, password) {
     if (!sseManager) {
         console.error("[SseEvents] SSEManager not available!");
         return;
@@ -37,6 +42,8 @@ function startSSE(sseManager, baseUrl, model) {
 
     _sseManager = sseManager;
     _currentModel = model;
+    _currentUsername = username || "";
+    _currentPassword = password || "";
 
     // Create handler that delegates to handleSSEMessage using the stored _currentModel
     _currentHandler = function(message) {
@@ -44,8 +51,8 @@ function startSSE(sseManager, baseUrl, model) {
     };
 
     sseManager.messageReceived.connect(_currentHandler);
-    sseManager.connectToOpenHAB(baseUrl);
-    console.log("[SseEvents] SSE started for: " + baseUrl);
+    sseManager.connectToOpenHAB(baseUrl, _currentUsername, _currentPassword);
+    console.log("[SseEvents] SSE started for: " + baseUrl + ((_currentUsername !== "") ? " (with auth)" : ""));
 }
 
 /**
@@ -68,15 +75,19 @@ function stopSSE(sseManager) {
     mgr.disconnectFromOpenHAB();
     _currentModel = null;
     _sseManager = null;
+    _currentUsername = "";
+    _currentPassword = "";
     console.log("[SseEvents] SSE stopped.");
 }
 
 /**
  * Restarts the SSE connection (e.g. on sitemap change or URL change).
+ * @param {string} [username] - Optional: username for Basic Auth
+ * @param {string} [password] - Optional: password for Basic Auth (plain text)
  */
-function restartSSE(sseManager, baseUrl, model) {
+function restartSSE(sseManager, baseUrl, model, username, password) {
     console.log("[SseEvents] SSE restarting...");
-    startSSE(sseManager, baseUrl, model);
+    startSSE(sseManager, baseUrl, model, username, password);
 }
 
 /**

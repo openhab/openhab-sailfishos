@@ -4,8 +4,10 @@
  * @param {ListModel} model - ListModel, where sitemaps will be stored
  * @param {function} onSuccess - Callback-Function on successfull call (optional)
  * @param {function} onError - Callback-Function on error (optional)
+ * @param {string} username - Username for Basic Auth (optional)
+ * @param {string} password - Plain-text password for Basic Auth (optional)
  */
-function loadAvailableSitemaps(baseUrl, model, onSuccess, onError) {
+function loadAvailableSitemaps(baseUrl, model, onSuccess, onError, username, password) {
     var url = baseUrl + "/rest/sitemaps/"
     console.log("[SitemapLoader] Loading sitemaps from: " + url)
 
@@ -45,6 +47,11 @@ function loadAvailableSitemaps(baseUrl, model, onSuccess, onError) {
         }
     }
     xhr.open("GET", url, true)
+    // Add Basic Auth header when both username and password are provided
+    if (username && username !== "" && password && password !== "") {
+        xhr.setRequestHeader("Authorization", "Basic " + Qt.btoa(username + ":" + password))
+        console.log("[SitemapLoader] Using Basic Auth for user: " + username)
+    }
     xhr.send()
 }
 
