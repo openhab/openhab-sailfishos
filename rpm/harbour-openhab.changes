@@ -12,7 +12,7 @@
 # * date Author's Name <author's email> version-release
 # - Summary of changes
 
-* Sun Apr 12 2026 Dominik Heidinger <dominikh@atomicmail.io> 0.3-1
+* Sun May 17 2026 Dominik Heidinger <dominikh@atomicmail.io> 0.3-1
 - New supported sitemap widgets: Colorpicker, Setpoint, Image, Mapview, Input, Webview, Video, Colortemperaturepicker, Buttongrid, Chart.
 - ADDED: Local authentification - if enabled on openHAB server.
 - ADDED: PullDown menu to refresh sitemap manually.
@@ -20,6 +20,7 @@
 - ADDED: Item states (max. 2 items) can be displayed on coverpage.
 - CHANGED: Changed URL of report-a-bug-button
 - CHANGED: Privacy policy links to the page as external link and not as subpage with webview.
+- ADDED: Translation for swedish language provided by @eson57.
 
 * Tue Mar 31 2026 Dominik Heidinger <dominikh@atomicmail.io> 0.2-1
 - FIX: Scrolling in MainUI was not possible due to silica ScrollDown Menu.
