@@ -37,9 +37,10 @@ ConfigurationGroup {
     property string coverAction2: ""
     property string coverAction2_command: ""
     property string username_local: ""
-    // Stored as base64-obfuscated string (prefix "b64:") to prevent plain-text
-    // visibility in the dconf database (~/.config). Not cryptographically secure,
-    // but prevents casual read-out from config files.
+    property string coverItem1: ""
+    property string coverItem2: ""
+    property string coverItemRefreshTime: "30000"
+    // Stored as base64-obfuscated string (prefix "b64")
     property string password_local: ""
 
     // Encodes a plain-text password for storage in dconf.

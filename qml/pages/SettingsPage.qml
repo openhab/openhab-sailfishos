@@ -180,6 +180,57 @@ Dialog {
 
                 EnterKey.enabled: text.length > 0
                 EnterKey.iconSource: "image://theme/icon-m-enter-close"
+                EnterKey.onClicked: coverItem1Field.focus = true
+            }
+
+            // cover Item - displays one or two items with current state in cover
+            SectionHeader {
+                text: qsTr("Cover Items")
+                font.pixelSize: Theme.fontSizeSmall
+            }
+
+            Label {
+                x: Theme.horizontalPageMargin
+                width: parent.width - 2 * Theme.horizontalPageMargin
+                font.pixelSize: Theme.fontSizeSmall
+                color: Theme.secondaryHighlightColor
+                wrapMode: Text.Wrap
+                text: qsTr("Configure Item-IDs for app cover display. Leave empty to do not display item states.")
+            }
+
+            TextField {
+                id: coverItem1Field
+                width: parent.width
+                label: qsTr("Item-ID")
+                placeholderText: qsTr("e.g. item_id1")
+                text: settings.coverItem1
+
+                EnterKey.enabled: text.length > 0
+                EnterKey.iconSource: "image://theme/icon-m-enter-next"
+                EnterKey.onClicked: coverItem2Field.focus = true
+            }
+
+            TextField {
+                id: coverItem2Field
+                width: parent.width
+                label: qsTr("Item-ID")
+                placeholderText: qsTr("e.g. item_id2")
+                text: settings.coverItem2
+
+                EnterKey.enabled: text.length > 0
+                EnterKey.iconSource: "image://theme/icon-m-enter-next"
+                EnterKey.onClicked: coverItemRefreshTimeField.focus = true
+            }
+
+            TextField {
+                id: coverItemRefreshTimeField
+                width: parent.width
+                label: qsTr("Cover item refresh time (milliseconds)")
+                placeholderText: qsTr("30000")
+                text: settings.coverItemRefreshTime
+
+                EnterKey.enabled: text.length > 0
+                EnterKey.iconSource: "image://theme/icon-m-enter-next"
                 EnterKey.onClicked: focus = false
             }
 
@@ -218,7 +269,7 @@ Dialog {
             ListItem {
                 contentHeight: Theme.itemSizeMedium
 
-                onClicked: Qt.openUrlExternally("https://community.openhab.org/")
+                onClicked: Qt.openUrlExternally("https://community.openhab.org/c/apps-services/sailfishos/82")
 
                 Label {
                     anchors.left: parent.left
@@ -274,14 +325,14 @@ Dialog {
             ListItem {
                 contentHeight: Theme.itemSizeMedium
 
-                onClicked: pageStack.push(Qt.resolvedUrl("PrivacyPolicyPage.qml"))
+                onClicked: Qt.openUrlExternally("https://www.openhabfoundation.org/privacy.html")
 
                 Label {
                     anchors.left: parent.left
                     anchors.leftMargin: Theme.horizontalPageMargin
                     anchors.verticalCenter: parent.verticalCenter
                     text: qsTr("Privacy Policy")
-                    color: Theme.highlightColor
+                    color: Theme.primaryColor
                 }
                 Image {
                     anchors.right: parent.right
@@ -327,6 +378,9 @@ Dialog {
             settings.coverAction1_command = coverAction1CommandField.text
             settings.coverAction2 = coverAction2Field.text
             settings.coverAction2_command = coverAction2CommandField.text
+            settings.coverItem1 = coverItem1Field.text
+            settings.coverItem2 = coverItem2Field.text
+            settings.coverItemRefreshTime = coverItemRefreshTimeField.text
 
             settings.username_local = usernameLocalField.text
             // Encode password as base64-obfuscated value before storing in dconf

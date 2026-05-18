@@ -254,6 +254,69 @@ Page {
     // --- UI Components ---
     // Here you can define components per openHAB widget type to display them within the sitemap.
 
+    // Toolbar as a component so it can be used as SilicaListView header
+    Component {
+        id: toolbarComp
+        Item {
+            width: listView.width
+            height: Theme.itemSizeMedium
+
+            Rectangle {
+                anchors.fill: parent
+                color: Theme.rgba(Theme.highlightBackgroundColor, 0.15)
+            }
+
+            Label {
+                id: titleLabel
+                text: qsTr(pageTitle)
+                color: Theme.highlightColor
+                font.pixelSize: Theme.fontSizeLarge
+                anchors {
+                    verticalCenter: parent.verticalCenter
+                    left: parent.left
+                    leftMargin: Theme.horizontalPageMargin
+                    right: menuButtonHeader.left
+                    rightMargin: Theme.paddingMedium
+                }
+                horizontalAlignment: Text.AlignLeft
+                truncationMode: TruncationMode.Fade
+            }
+
+            // Sitemap/Navigation menu button
+            IconButton {
+                id: menuButtonHeader
+                icon.source: "image://theme/icon-m-menu"
+                anchors {
+                    verticalCenter: parent.verticalCenter
+                    right: parent.right
+                    rightMargin: Theme.horizontalPageMargin
+                }
+                onClicked: {
+                    // Open the sitemap selection page
+                    var selectionPage = pageStack.animatorPush(Qt.resolvedUrl("SitemapSelectionPage.qml"))
+                    selectionPage.pageCompleted.connect(function(selPage) {
+                        selPage.sitemapSelected.connect(function(name, label) {
+                            settings.lastVisitedPage = name
+                            console.log("[SitemapPage] Sitemap selected: " + settings.lastVisitedPage)
+
+                            // Pop the selection page first to return to this SitemapPage
+                            pageStack.pop()
+
+                            // Update the current SitemapPage in-place instead of pushing a new one
+                            page.sitemapName = name
+                            page.pageTitle = label
+
+                            // Restart SSE and re-fetch sitemap for the newly selected sitemap
+                            SseEvents.restartSSE(sseManager, settings.base_url, sitemapModel,
+                                                 settings.username_local, settings.decodePassword(settings.password_local))
+                            fetchSitemap()
+                        })
+                    })
+                }
+            }
+        }
+    }
+
     // Displays openHAB icons
     Component {
         id: smartIcon
@@ -278,77 +341,27 @@ Page {
          }
     }
 
-    // Toolbar header with navigation icons
-    Item {
-        id: toolbar
-        anchors.top: parent.top
-        anchors.left: parent.left
-        anchors.right: parent.right
-        height: Theme.itemSizeMedium
-
-        Rectangle {
-            anchors.fill: parent
-            color: Theme.rgba(Theme.highlightBackgroundColor, 0.15)
-        }
-
-        Label {
-            id: titleLabel
-            text: qsTr(pageTitle)
-            color: Theme.highlightColor
-            font.pixelSize: Theme.fontSizeLarge
-            anchors {
-                verticalCenter: parent.verticalCenter
-                left: parent.left
-                leftMargin: Theme.horizontalPageMargin
-                right: menuButton.left
-                rightMargin: Theme.paddingMedium
-            }
-            horizontalAlignment: Text.AlignLeft
-            truncationMode: TruncationMode.Fade
-        }
-
-        // Sitemap/Navigation menu button
-        IconButton {
-            id: menuButton
-            icon.source: "image://theme/icon-m-menu"
-            anchors {
-                verticalCenter: parent.verticalCenter
-                right: parent.right
-                rightMargin: Theme.horizontalPageMargin
-            }
-            onClicked: {
-                // Open the sitemap selection page
-                var selectionPage = pageStack.animatorPush(Qt.resolvedUrl("SitemapSelectionPage.qml"))
-                selectionPage.pageCompleted.connect(function(selPage) {
-                    selPage.sitemapSelected.connect(function(name, label) {
-                        settings.lastVisitedPage = name
-                        console.log("[SitemapPage] Sitemap selected: " + settings.lastVisitedPage)
-
-                        // Pop the selection page first to return to this SitemapPage
-                        pageStack.pop()
-
-                        // Update the current SitemapPage in-place instead of pushing a new one
-                        page.sitemapName = name
-                        page.pageTitle = label
-
-                        // Restart SSE and re-fetch sitemap for the newly selected sitemap
-                        SseEvents.restartSSE(sseManager, settings.base_url, sitemapModel,
-                                             settings.username_local, settings.decodePassword(settings.password_local))
-                        fetchSitemap()
-                    })
-                })
-            }
-        }
-    }
-
     SilicaListView {
         id: listView
-        anchors.top: toolbar.bottom
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.bottom: parent.bottom
+        anchors.fill: parent
         model: sitemapModel
-        //header: PageHeader { title: qsTr(pageTitle) }
+        header: toolbarComp
+
+        PullDownMenu {
+            id: actualMenu
+
+            //Component.onCompleted: {
+            //    root.pullDownMenu = actualMenu
+            //}
+
+            MenuItem {
+                text: qsTr("Refresh Sitemap")
+                onClicked: {
+                    // fetch current sitemap
+                    fetchSitemap()
+                }
+            }
+        }
 
         PushUpMenu {
             MenuItem {
@@ -1738,10 +1751,19 @@ Page {
             WebView {
                 id: webViewItem
                 anchors.fill: parent
-                // URL comes from the widget REST property
                 url: widget.url || ""
-                // Only load when the page is active to save resources
-                active: page.status === PageStatus.Active
+                active: false
+
+                Component.onCompleted: {
+                    active = (page.status === PageStatus.Active)
+                }
+
+                Connections {
+                    target: page
+                    onStatusChanged: {
+                        webViewItem.active = (page.status === PageStatus.Active)
+                    }
+                }
             }
         }
     }

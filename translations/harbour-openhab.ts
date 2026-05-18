@@ -111,10 +111,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Configure Item-IDs and commands for the app cover quick actions. Leave empty to hide an action.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Left button</source>
         <translation type="unfinished"></translation>
     </message>
@@ -171,19 +167,43 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Server username – leave empty to send no credentials.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Enter username</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Server password – leave empty to send no credentials.</source>
+        <source>Enter password</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Enter password</source>
+        <source>OPTIONAL: Server username – leave empty to send no credentials.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>OPTIONAL: Server password – leave empty to send no credentials.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cover Items</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>e.g. item_id2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Configure Item-IDs and commands for the app cover quick actions. Leave empty to hide an action.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cover item refresh time (milliseconds)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>30000</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Configure Item-IDs for app cover display. Leave empty to do not display item states.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -243,6 +263,10 @@
     </message>
     <message>
         <source>Every %1 min.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Refresh Sitemap</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
