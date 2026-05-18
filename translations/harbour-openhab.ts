@@ -188,15 +188,15 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Cover item refresh time (milliseconds)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>30000</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Configure Item-IDs for app cover display. Leave empty to do not display item states.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cover item refresh time (milliseconds)</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

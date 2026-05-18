@@ -90,13 +90,13 @@ CoverBackground {
         if (item1 !== "") {
             fetchItemData(item1, function(d) {
                 itemData1 = d;
-                console.log("[CoverPage] fetched data for item: " + item1 + ": " + JSON.stringify(d));
+                console.log("[CoverPage] fetched data for item: " + item1 + ": " + itemData1.state);
             });
         }
         if (item2 !== "") {
             fetchItemData(item2, function(d) {
                 itemData2 = d;
-                console.log("[CoverPage] fetched data for item: " + item2 + ": " + JSON.stringify(d));
+                console.log("[CoverPage] fetched data for item: " + item2 + ": " + itemData2.state);
             });
         }
     }

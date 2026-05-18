@@ -153,51 +153,51 @@
     </message>
     <message>
         <source>Username</source>
-        <translation type="unfinished"></translation>
+        <translation>Benutzername</translation>
     </message>
     <message>
         <source>Password</source>
-        <translation type="unfinished"></translation>
+        <translation>Passwort</translation>
     </message>
     <message>
         <source>Enter username</source>
-        <translation type="unfinished"></translation>
+        <translation>Benutzernamen eingeben</translation>
     </message>
     <message>
         <source>Enter password</source>
-        <translation type="unfinished"></translation>
+        <translation>Passwort eingeben</translation>
     </message>
     <message>
         <source>OPTIONAL: Server username – leave empty to send no credentials.</source>
-        <translation type="unfinished"></translation>
+        <translation>OPTIONAL: Server-Benutzername - Freilassen, wenn keine Authentifizierung erforderlich ist.</translation>
     </message>
     <message>
         <source>OPTIONAL: Server password – leave empty to send no credentials.</source>
-        <translation type="unfinished"></translation>
+        <translation>OPTIONAL: Server-Passwort - Freilassen, wenn keine Authentifizierung erforderlich ist.</translation>
     </message>
     <message>
         <source>Cover Items</source>
-        <translation type="unfinished"></translation>
+        <translation>Cover-Items</translation>
     </message>
     <message>
         <source>e.g. item_id2</source>
-        <translation type="unfinished">z.B. item_id2</translation>
+        <translation>z.B. item_id2</translation>
     </message>
     <message>
         <source>Configure Item-IDs and commands for the app cover quick actions. Leave empty to hide an action.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Cover item refresh time (milliseconds)</source>
-        <translation type="unfinished"></translation>
+        <translation>Hier können Item-IDs und Commands für Quick-Actions auf dem App-Cover konfiguriert werden. Die Actions werden ausgeblendet, sofern keine Werte befüllt sind.</translation>
     </message>
     <message>
         <source>30000</source>
-        <translation type="unfinished"></translation>
+        <translation>30000</translation>
     </message>
     <message>
         <source>Configure Item-IDs for app cover display. Leave empty to do not display item states.</source>
-        <translation type="unfinished"></translation>
+        <translation>Hier können Item-IDs für die Anzeige auf dem App-Cover konfiguriert werden. Items werden nicht angezeigt, sofern keine Werte befüllt sind.</translation>
+    </message>
+    <message>
+        <source>Cover item refresh time (milliseconds)</source>
+        <translation>Aktualisierungszeit des Cover-Elements (Millisekunden)</translation>
     </message>
 </context>
 <context>
@@ -260,7 +260,7 @@
     </message>
     <message>
         <source>Refresh Sitemap</source>
-        <translation type="unfinished"></translation>
+        <translation>Sitemap aktualisieren</translation>
     </message>
 </context>
 <context>

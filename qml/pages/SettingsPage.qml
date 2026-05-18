@@ -67,7 +67,7 @@ Dialog {
 
                 EnterKey.enabled: text.length > 0
                 EnterKey.iconSource: "image://theme/icon-m-enter-next"
-                EnterKey.onClicked: focus = false
+                EnterKey.onClicked: usernameLocalField.focus = true
             }
 
             TextField {
@@ -93,8 +93,8 @@ Dialog {
                 // Decode the base64-obfuscated value stored in settings
                 text: settings.decodePassword(settings.password_local)
 
-                EnterKey.iconSource: "image://theme/icon-m-enter-close"
-                EnterKey.onClicked: focus = false
+                EnterKey.iconSource: "image://theme/icon-m-enter-next"
+                EnterKey.onClicked: coverAction1Field.focus = true
             }
 
             // ── Cloud Service ────────────────────────────
@@ -179,7 +179,7 @@ Dialog {
                 text: settings.coverAction2_command
 
                 EnterKey.enabled: text.length > 0
-                EnterKey.iconSource: "image://theme/icon-m-enter-close"
+                EnterKey.iconSource: "image://theme/icon-m-enter-next"
                 EnterKey.onClicked: coverItem1Field.focus = true
             }
 
@@ -228,9 +228,11 @@ Dialog {
                 label: qsTr("Cover item refresh time (milliseconds)")
                 placeholderText: qsTr("30000")
                 text: settings.coverItemRefreshTime
+                inputMethodHints: Qt.ImhDigitsOnly
+                validator: IntValidator { bottom: 1000; top: 3600000 }
 
                 EnterKey.enabled: text.length > 0
-                EnterKey.iconSource: "image://theme/icon-m-enter-next"
+                EnterKey.iconSource: "image://theme/icon-m-enter-close"
                 EnterKey.onClicked: focus = false
             }
 
@@ -380,7 +382,10 @@ Dialog {
             settings.coverAction2_command = coverAction2CommandField.text
             settings.coverItem1 = coverItem1Field.text
             settings.coverItem2 = coverItem2Field.text
-            settings.coverItemRefreshTime = coverItemRefreshTimeField.text
+            var refreshMs = parseInt(coverItemRefreshTimeField.text, 10)
+            if (isNaN(refreshMs) || refreshMs < 1000)  refreshMs = 1000
+            if (refreshMs > 3600000) refreshMs = 3600000
+            settings.coverItemRefreshTime = refreshMs
 
             settings.username_local = usernameLocalField.text
             // Encode password as base64-obfuscated value before storing in dconf

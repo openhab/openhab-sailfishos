@@ -372,12 +372,12 @@ Page {
 
         delegate: Item {
             width: listView.width
-            height: type === "Image"                  ? componentLoader.height
-                  : type === "Video"                  ? componentLoader.height
-                  : type === "Mapview"                ? componentLoader.height
-                  : type === "Webview"                ? componentLoader.height
-                  : type === "Buttongrid"             ? componentLoader.height
-                  : type === "Chart"                  ? componentLoader.height
+            height: type === "Image"                  ? componentLoader.implicitHeight
+                  : type === "Video"                  ? componentLoader.implicitHeight
+                  : type === "Mapview"                ? componentLoader.implicitHeight
+                  : type === "Webview"                ? componentLoader.implicitHeight
+                  : type === "Buttongrid"             ? componentLoader.implicitHeight
+                  : type === "Chart"                  ? componentLoader.implicitHeight
                   : type === "Header"                 ? Theme.itemSizeSmall
                   : type === "Slider"                 ? Theme.itemSizeLarge
                   : type === "Colortemperaturepicker" ? Theme.itemSizeLarge
@@ -387,6 +387,7 @@ Page {
             Loader {
                 id: componentLoader
                 width: parent.width
+                height: implicitHeight
                 anchors.top: parent.top
                 property var widget: itemData
                 property string currentState: model.itemState || ""

@@ -37,7 +37,7 @@ void SSEManager::connectToOpenHAB(const QString &baseUrl, const QString &usernam
     if (!username.isEmpty() && !password.isEmpty()) {
         QByteArray credentials = (username + ":" + password).toUtf8().toBase64();
         request.setRawHeader("Authorization", "Basic " + credentials);
-        qDebug() << "SSE connecting with Basic Auth for user:" << username;
+        qDebug() << "SSE connecting with Basic Auth.";
     }
 
     m_reply = m_nam.get(request);

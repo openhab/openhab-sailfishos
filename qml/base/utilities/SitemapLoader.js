@@ -50,7 +50,7 @@ function loadAvailableSitemaps(baseUrl, model, onSuccess, onError, username, pas
     // Add Basic Auth header when both username and password are provided
     if (username && username !== "" && password && password !== "") {
         xhr.setRequestHeader("Authorization", "Basic " + Qt.btoa(username + ":" + password))
-        console.log("[SitemapLoader] Using Basic Auth for user: " + username)
+        console.log("[SitemapLoader] Using Basic Auth.")
     }
     xhr.send()
 }
