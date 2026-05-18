@@ -5,46 +5,46 @@
     <name>ColorPickerPage</name>
     <message>
         <source>Color Picker</source>
-        <translation type="unfinished"></translation>
+        <translation>Färgväljare</translation>
     </message>
     <message>
         <source>Hue</source>
-        <translation type="unfinished"></translation>
+        <translation>Nyans</translation>
     </message>
     <message>
         <source>Saturation</source>
-        <translation type="unfinished"></translation>
+        <translation>Mättnad</translation>
     </message>
     <message>
         <source>Brightness</source>
-        <translation type="unfinished"></translation>
+        <translation>Ljusstyrka</translation>
     </message>
     <message>
         <source>Preset Colors</source>
-        <translation type="unfinished"></translation>
+        <translation>Förinställda färger</translation>
     </message>
 </context>
 <context>
     <name>InputDialog</name>
     <message>
         <source>Set value</source>
-        <translation type="unfinished"></translation>
+        <translation>Ange värde</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>Avbryt</translation>
     </message>
     <message>
         <source>Current value: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktuellt värde: %1</translation>
     </message>
     <message>
         <source>(not set)</source>
-        <translation type="unfinished"></translation>
+        <translation>(ej angivet)</translation>
     </message>
     <message>
         <source>Enter new value</source>
-        <translation type="unfinished"></translation>
+        <translation>Ange nytt värde</translation>
     </message>
 </context>
 <context>
@@ -113,7 +113,7 @@
     </message>
     <message>
         <source>Item-ID</source>
-        <translation>Artikel-ID</translation>
+        <translation>Objekt-ID</translation>
     </message>
     <message>
         <source>Command</source>
@@ -149,7 +149,7 @@
     </message>
     <message>
         <source>e.g. item_id1</source>
-        <translation>T.ex. artikel_id1</translation>
+        <translation>T.ex. objekt_id1</translation>
     </message>
     <message>
         <source>Report a bug or request a feature</source>
@@ -157,47 +157,47 @@
     </message>
     <message>
         <source>Username</source>
-        <translation type="unfinished"></translation>
+        <translation>Användarnamn</translation>
     </message>
     <message>
         <source>OPTIONAL: Server username – leave empty to send no credentials.</source>
-        <translation type="unfinished"></translation>
+        <translation>VALFRITT: Serveranvändarnamn – Lämnas tomt för att inte skicka några uppgifter.</translation>
     </message>
     <message>
         <source>Enter username</source>
-        <translation type="unfinished"></translation>
+        <translation>Ange användarnamn</translation>
     </message>
     <message>
         <source>Password</source>
-        <translation type="unfinished"></translation>
+        <translation>Lösenord</translation>
     </message>
     <message>
         <source>OPTIONAL: Server password – leave empty to send no credentials.</source>
-        <translation type="unfinished"></translation>
+        <translation>VALFRITT: Serverlösenord – Lämnas tomt för att inte skicka några uppgifter.</translation>
     </message>
     <message>
         <source>Enter password</source>
-        <translation type="unfinished"></translation>
+        <translation>Ange lösenord</translation>
     </message>
     <message>
         <source>Cover Items</source>
-        <translation type="unfinished"></translation>
+        <translation>Miniatyrobjekt</translation>
     </message>
     <message>
         <source>Configure Item-IDs for app cover display. Leave empty to do not display item states.</source>
-        <translation type="unfinished"></translation>
+        <translation>Konfigurera objekt-ID:n för appens miniatyrvisning. Lämnas tomt för att inte visa objektstatus.</translation>
     </message>
     <message>
         <source>e.g. item_id2</source>
-        <translation type="unfinished">T.ex. artikel_id2</translation>
+        <translation>T.ex. objekt_id2</translation>
     </message>
     <message>
         <source>30000</source>
-        <translation type="unfinished"></translation>
+        <translation>30000</translation>
     </message>
     <message>
         <source>Cover item refresh time (milliseconds)</source>
-        <translation type="unfinished"></translation>
+        <translation>Miniatyrobjektets uppdateringstid (ms)</translation>
     </message>
 </context>
 <context>
@@ -208,59 +208,59 @@
     </message>
     <message>
         <source>Refresh Sitemap</source>
-        <translation type="unfinished"></translation>
+        <translation>Uppdatera sidkarta</translation>
     </message>
     <message>
         <source>Image format not supported</source>
-        <translation type="unfinished"></translation>
+        <translation>Bildformatet stöds inte</translation>
     </message>
     <message>
         <source>No image available</source>
-        <translation type="unfinished"></translation>
+        <translation>Ingen bild tillgänglig</translation>
     </message>
     <message>
         <source>Tap to play</source>
-        <translation type="unfinished"></translation>
+        <translation>Tryck för att spela</translation>
     </message>
     <message>
         <source>Video</source>
-        <translation type="unfinished"></translation>
+        <translation>Video</translation>
     </message>
     <message>
         <source>No video URL configured</source>
-        <translation type="unfinished"></translation>
+        <translation>Ingen video-URL konfigurerad</translation>
     </message>
     <message>
         <source>Open in browser</source>
-        <translation type="unfinished"></translation>
+        <translation>Öppna i webbläsaren</translation>
     </message>
     <message>
         <source>No location data</source>
-        <translation type="unfinished"></translation>
+        <translation>Ingen platsdata</translation>
     </message>
     <message>
         <source>Map tile could not be loaded</source>
-        <translation type="unfinished"></translation>
+        <translation>Kartruta kunde inte läsas in</translation>
     </message>
     <message>
         <source>No buttons configured</source>
-        <translation type="unfinished"></translation>
+        <translation>Inga knappar konfigurerade</translation>
     </message>
     <message>
         <source>Chart unavailable</source>
-        <translation type="unfinished"></translation>
+        <translation>Diagram ej tillgängligt</translation>
     </message>
     <message>
         <source>No item configured</source>
-        <translation type="unfinished"></translation>
+        <translation>Inget objekt konfigurerat</translation>
     </message>
     <message>
         <source>Period: </source>
-        <translation type="unfinished"></translation>
+        <translation>Period: </translation>
     </message>
     <message>
         <source>Every %1 min.</source>
-        <translation type="unfinished"></translation>
+        <translation>Varje %1 min.</translation>
     </message>
 </context>
 <context>
