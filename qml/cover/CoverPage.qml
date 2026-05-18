@@ -226,7 +226,7 @@ CoverBackground {
                 width: parent.width
                        - (itemIcon2.visible ? itemIcon2.width + parent.spacing : 0)
                        - stateLabel2.implicitWidth - parent.spacing
-                font.pixelSize: Theme.fontSizeMedium
+                font.pixelSize: Theme.fontSizeSmall
                 color: Theme.primaryColor
                 truncationMode: TruncationMode.Fade
             }
@@ -235,7 +235,7 @@ CoverBackground {
                 id: stateLabel2
                 text: itemData2 !== null ? itemData2.state : ""
                 anchors.verticalCenter: parent.verticalCenter
-                font.pixelSize: Theme.fontSizeMedium
+                font.pixelSize: Theme.fontSizeSmall
                 color: Theme.highlightColor
             }
         }

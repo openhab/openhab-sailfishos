@@ -66,13 +66,6 @@
     </message>
 </context>
 <context>
-    <name>PrivacyPolicyPage</name>
-    <message>
-        <source>Privacy Policy</source>
-        <translation>Datenschutzerklärung</translation>
-    </message>
-</context>
-<context>
     <name>SettingsPage</name>
     <message>
         <source>Save</source>
