@@ -48,6 +48,13 @@ If you want to contribute translations, please submit them as pull requests agai
   - Go back, click Add file -> Create new file
   - Enter openHAB-xx.ts replacing xx with your language code as the name. For example, de for german
   - Paste the copied file in the new file's contents
+  - Add new translation file to the project by adding the following line to [harbour-openhab.pro](/harbour-openhab.pro):
+
+    ```pro
+    TRANSLATIONS += translations/openHAB-xx.ts
+    ```
+
+   replacing xx with your language code as the name. For example, de for german.
 - replace:
 
   ```xml
@@ -131,6 +138,15 @@ sfdk build
 ```
 
 Repeat with `armv7hl` and `i486` targets to produce all three packages.
+
+## Add new widget/element type support
+
+If openHAB server adds support for a new widget/element type in the [sitemap](https://www.openhab.org/docs/ui/sitemaps.html), we need to develop and add the widget for the app as well.
+- Go to [SitemapPage.qml](/pages/SitemapPage.qml), scroll to the bottom of the page and copy one existing "component" block (eg. for Switch, Text, etc.) and paste it at the end of the last component.
+- Change the component-id to the new widget/element type and change the content based on your needs.
+- Add new component to 'componentLoader' in the same file (SitemapPage.qml) to make sure it is loaded when the app encounters the new widget/element type in the sitemap.
+- Add the new widget/element type to the list of supported types in [README.md](/README.md) and [USAGE.md](/docs/USAGE.md) and update the screenshots if needed.
+
 
 ## Checks to be done before submitting a pull request
 
