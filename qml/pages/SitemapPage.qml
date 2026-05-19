@@ -1746,8 +1746,9 @@ Page {
         id: webviewComp
         Item {
             width: listView.width
-            // Height is derived from widget.height (which is in rows, typ. 1 row = 40-50px). If undefined, fallback to roughly 400px.
-            height: (widget.height && widget.height > 0) ? widget.height * Theme.itemSizeMedium : 400
+            readonly property real _webviewHeight: (widget.height && widget.height > 0) ? widget.height * Theme.itemSizeMedium : 400
+            height: _webviewHeight
+            implicitHeight: _webviewHeight
 
             WebView {
                 id: webViewItem
