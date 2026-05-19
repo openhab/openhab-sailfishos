@@ -93,7 +93,6 @@ Allows you to set two items for app cover display. The state of these items will
 Note: If you don't want to display item values on your app cover, please leave the fields empty.
 You can also use one item only, just leave the other item configuration empty.
 
-
 ## Navigation, Main UI and Sitemap Usage
 
 Tap the hamburger menu at the top right to open the menu and navigate to the Main UI, sitemaps or settings.
