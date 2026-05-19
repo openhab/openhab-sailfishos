@@ -74,6 +74,16 @@ private slots:
     void pf_formatNumber_withText();
     void pf_formatNumber_negative();
 
+    // ── PatternFormatter: formatNumber – SI unit conversion ──
+    void pf_formatNumber_siWattToKiloWatt();
+    void pf_formatNumber_siKiloWattToWatt();
+    void pf_formatNumber_siCrossPrefix();
+    void pf_formatNumber_siMilliToBase();
+
+    // ── PatternFormatter: formatNumber – exponent notation ──
+    void pf_formatNumber_exponentNotation();
+    void pf_formatNumber_exponentWithUnit();
+
     // ── PatternFormatter: formatDateTime ──
     void pf_formatDateTime_dayMonthYear();
     void pf_formatDateTime_hourMinute();
@@ -184,6 +194,44 @@ void tst_JsLogic::pf_formatNumber_unitKwh()         { QCOMPARE(engine.evaluate("
 void tst_JsLogic::pf_formatNumber_literalPercent()  { QCOMPARE(engine.evaluate("formatState('%d %%', '50')").toString(),           QStringLiteral("50 %")); }
 void tst_JsLogic::pf_formatNumber_withText()        { QCOMPARE(engine.evaluate("formatState('Power: %.1f %unit%', '11.1 W')").toString(), QStringLiteral("Power: 11.1 W")); }
 void tst_JsLogic::pf_formatNumber_negative()        { QCOMPARE(engine.evaluate("formatState('%d', '-5.2')").toString(),           QStringLiteral("-5")); }
+
+// ════════════════════════════════════════════════
+//  PatternFormatter – formatNumber: SI unit conversion
+// ════════════════════════════════════════════════
+
+// "1000 W" with pattern "%.1f kW"  → W÷1000 = 1.0 kW
+void tst_JsLogic::pf_formatNumber_siWattToKiloWatt() {
+    QCOMPARE(engine.evaluate("formatState('%.1f kW', '1000 W')").toString(), QStringLiteral("1.0 kW"));
+}
+
+// "1 kW" with pattern "%.0f W"  → kW×1000 = 1000 W
+void tst_JsLogic::pf_formatNumber_siKiloWattToWatt() {
+    QCOMPARE(engine.evaluate("formatState('%.0f W', '1 kW')").toString(), QStringLiteral("1000 W"));
+}
+
+// "374.0 kWh" with pattern "%.2f MWh"  → kWh×1e3÷1e6 = 0.37 MWh
+void tst_JsLogic::pf_formatNumber_siCrossPrefix() {
+    QCOMPARE(engine.evaluate("formatState('%.2f MWh', '374.0 kWh')").toString(), QStringLiteral("0.37 MWh"));
+}
+
+// "500 mW" with pattern "%.2f W"  → mW×1e-3 = 0.50 W
+void tst_JsLogic::pf_formatNumber_siMilliToBase() {
+    QCOMPARE(engine.evaluate("formatState('%.2f W', '500 mW')").toString(), QStringLiteral("0.50 W"));
+}
+
+// ════════════════════════════════════════════════
+//  PatternFormatter – formatNumber: exponent notation
+// ════════════════════════════════════════════════
+
+// Pure exponent input "1e3" → parseFloat gives 1000
+void tst_JsLogic::pf_formatNumber_exponentNotation() {
+    QCOMPARE(engine.evaluate("formatState('%.0f', '1e3')").toString(), QStringLiteral("1000"));
+}
+
+// Exponent WITH unit: "1.5e3 W" + pattern "%.1f kW"  → 1500 W ÷ 1000 = 1.5 kW
+void tst_JsLogic::pf_formatNumber_exponentWithUnit() {
+    QCOMPARE(engine.evaluate("formatState('%.1f kW', '1.5e3 W')").toString(), QStringLiteral("1.5 kW"));
+}
 
 // ════════════════════════════════════════════════
 //  PatternFormatter – formatDateTime
