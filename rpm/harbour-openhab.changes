@@ -14,7 +14,7 @@
 
 * Sun May 17 2026 Dominik Heidinger <dominikh@atomicmail.io> 0.3-1
 - New supported sitemap widgets: Colorpicker, Setpoint, Image, Mapview, Input, Webview, Video, Colortemperaturepicker, Buttongrid, Chart.
-- ADDED: Local authentification - if enabled on openHAB server.
+- ADDED: Local authentication - if enabled on openHAB server.
 - ADDED: PullDown menu to refresh sitemap manually.
 - FIX: MainUI and Privacy page not loaded correctly and with fixed size.
 - ADDED: Item states (max. 2 items) can be displayed on coverpage.

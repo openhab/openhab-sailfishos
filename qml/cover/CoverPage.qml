@@ -110,7 +110,7 @@ CoverBackground {
     // Periodically refresh item states while items are configured
     Timer {
         id: itemRefreshTimer
-        interval: settings.coverItemRefreshTime
+        interval: parseInt(settings.coverItemRefreshTime, 10)
         running: (settings.coverItem1 && settings.coverItem1.trim() !== "")
                  || (settings.coverItem2 && settings.coverItem2.trim() !== "")
         repeat: true

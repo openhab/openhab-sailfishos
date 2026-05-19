@@ -19,7 +19,7 @@ The app follows the basic principles of the other openHAB UIs, like Basic UI, an
 ## Features
 
 - Demo Mode: Explore the app without connecting to an openHAB server
-- Local authentification supported - if enabled on openHAB server.
+- Local authentication supported - if enabled on openHAB server.
 - Display your Main UI Webview
 - Display your sitemaps and widgets and control your devices from your mobile device
 - Supported widgets/element-types within sitemap: Frame, Text, Group, Switch, Switches with Button-Mappings, Selections, Slider, Rollershutter, Colorpicker, Setpoint, Image, Mapview, Input, Webview, Video, Colortemperaturepicker, Buttongrid, Chart
@@ -55,7 +55,7 @@ Example:
 `https://testdomain.com`
 
 - Username: The username of your openHAB user (if authentication is enabled on your openHAB server).
-- Password: The password of your openHAB user (if authentication is enabled on your openHAB server). Your password will be stored securely and encrypted on your device and is not shared with anyone.
+- Password: The password of your openHAB user (if authentication is enabled on your openHAB server). Your password will be saved obfuscated on your device and is not shared with anyone.
 
 ### Cover Actions
 

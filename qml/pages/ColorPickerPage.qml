@@ -82,11 +82,11 @@ Page {
             var cmd = Math.round(currentHue) + ","
                     + Math.round(currentSaturation) + ","
                     + Math.round(currentBrightness);
-            console.log("[ColorPicker] Sending command: " + cmd + " to " + itemName);
+            //console.log("[ColorPicker] Sending command: " + cmd + " to " + itemName);
             var xhr = new XMLHttpRequest();
             xhr.onreadystatechange = function() {
                 if (xhr.readyState === XMLHttpRequest.DONE) {
-                    console.log("[ColorPicker] Response: " + xhr.status);
+                    //console.log("[ColorPicker] Response: " + xhr.status);
                 }
             };
             xhr.open("POST", baseUrl + "/rest/items/" + itemName, true);

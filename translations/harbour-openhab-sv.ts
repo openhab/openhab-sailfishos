@@ -192,10 +192,6 @@
         <translation>T.ex. objekt_id2</translation>
     </message>
     <message>
-        <source>30000</source>
-        <translation>30000</translation>
-    </message>
-    <message>
         <source>Cover item refresh time (milliseconds)</source>
         <translation>Miniatyrobjektets uppdateringstid (ms)</translation>
     </message>

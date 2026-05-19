@@ -38,20 +38,20 @@ Please also check out the official documentation on [Sailfish OS - Your first ap
 ## Localization
 
 All language/regional translations are managed here [translations/*](/translations/) in the GitHub repository.
-If you want to contribute translations, please submit them as pull requests against the `translations/*/openHAB-{language-code}.ts` files directly.
+If you want to contribute translations, please submit them as pull requests against the `translations/harbour-openhab-{language-code}.ts` files directly.
 
 - Go to folder translations.
 - If there is a file with your language code, click on it and select the edit icon
 - If not:
-  - Click on harbour-openHAB.ts file
+  - Click on harbour-openhab.ts file
   - Select copy icon (Copy raw file)
   - Go back, click Add file -> Create new file
-  - Enter openHAB-xx.ts replacing xx with your language code as the name. For example, de for german
+  - Enter harbour-openhab-xx.ts replacing xx with your language code as the name. For example, de for german
   - Paste the copied file in the new file's contents
   - Add new translation file to the project by adding the following line to [harbour-openhab.pro](/harbour-openhab.pro):
 
     ```pro
-    TRANSLATIONS += translations/openHAB-xx.ts
+    TRANSLATIONS += translations/harbour-openhab-xx.ts
     ```
 
    replacing xx with your language code as the name. For example, de for german.

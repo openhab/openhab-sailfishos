@@ -163,7 +163,7 @@ Page {
                                 });
                             }
                             var buttonsJson = JSON.stringify(btnArr);
-                            console.log("[Buttongrid] buttons found: " + btnArr.length + " json: " + buttonsJson.substring(0, 200));
+                            //console.log("[Buttongrid] buttons found: " + btnArr.length + " json: " + buttonsJson.substring(0, 200));
                             sitemapModel.append({
                                 "type": "Buttongrid",
                                 "itemName": name,

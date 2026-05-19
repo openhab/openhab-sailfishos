@@ -226,7 +226,6 @@ Dialog {
                 id: coverItemRefreshTimeField
                 width: parent.width
                 label: qsTr("Cover item refresh time (milliseconds)")
-                placeholderText: qsTr("30000")
                 text: settings.coverItemRefreshTime
                 inputMethodHints: Qt.ImhDigitsOnly
                 validator: IntValidator { bottom: 1000; top: 3600000 }

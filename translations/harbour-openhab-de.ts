@@ -188,10 +188,6 @@
         <translation>Hier können Item-IDs und Commands für Quick-Actions auf dem App-Cover konfiguriert werden. Die Actions werden ausgeblendet, sofern keine Werte befüllt sind.</translation>
     </message>
     <message>
-        <source>30000</source>
-        <translation>30000</translation>
-    </message>
-    <message>
         <source>Configure Item-IDs for app cover display. Leave empty to do not display item states.</source>
         <translation>Hier können Item-IDs für die Anzeige auf dem App-Cover konfiguriert werden. Items werden nicht angezeigt, sofern keine Werte befüllt sind.</translation>
     </message>

@@ -39,7 +39,7 @@ ConfigurationGroup {
     property string username_local: ""
     property string coverItem1: ""
     property string coverItem2: ""
-    property string coverItemRefreshTime: "30000"
+    property int coverItemRefreshTime: 30000
     // Stored as base64-obfuscated string (prefix "b64")
     property string password_local: ""
 
