@@ -39,9 +39,13 @@ DISTFILES += qml/harbour-openhab.qml \
     qml/pages/SettingsPage.qml \
     qml/pages/SitemapPage.qml \
     qml/pages/SelectionPage.qml \
+    qml/pages/ColorPickerPage.qml \
+    qml/pages/InputDialog.qml \
     qml/base/utilities/SitemapLoader.js \
     qml/base/utilities/SseEvents.js \
     qml/base/utilities/PatternFormatter.js \
+    qml/base/utilities/ColorUtils.js \
+    qml/base/utilities/ImageUtils.js \
     rpm/harbour-openhab.changes \
     rpm/harbour-openhab.changes.run.in \
     rpm/harbour-openhab.spec \
@@ -49,7 +53,7 @@ DISTFILES += qml/harbour-openhab.qml \
 
 SAILFISHAPP_ICONS = 86x86 108x108 128x128 172x172
 
-VERSION = 0.2
+VERSION = 0.3
 RELEASE = 1
 DEFINES += APP_VERSION=\\\"$$VERSION\\\"
 DEFINES += APP_RELEASE=\\\"$$RELEASE\\\"
@@ -62,7 +66,8 @@ CONFIG += sailfishapp_i18n
 # planning to localize your app, remember to comment out the
 # following TRANSLATIONS line. And also do not forget to
 # modify the localized app name in the the .desktop file.
-TRANSLATIONS += translations/harbour-openhab-de.ts
+TRANSLATIONS += translations/harbour-openhab-de.ts \
+    translations/harbour-openhab-sv.ts
 
 #support the browser engine
 PKGCONFIG += qt5embedwidget

@@ -118,22 +118,89 @@ function formatDateTime(pattern, rawState) {
 }
 
 /**
+ * SI prefix conversion table.
+ * Maps a unit string to { base: baseUnit, factor: multiplierToBase }
+ * e.g. "kW" → { base: "W", factor: 1000 }
+ */
+var _siPrefixes = {
+    "k": 1e3, "M": 1e6, "G": 1e9, "T": 1e12,
+    "m": 1e-3, "µ": 1e-6, "n": 1e-9
+};
+
+/**
+ * Try to convert numVal from stateUnit to targetUnit using SI prefixes.
+ * Returns the converted value, or NaN if conversion is not possible.
+ */
+function convertUnit(numVal, stateUnit, targetUnit) {
+    if (!stateUnit || !targetUnit || stateUnit === targetUnit) return numVal;
+
+    // Try to find a common base unit by stripping SI prefix from both
+    function parseSI(unit) {
+        if (!unit || unit.length < 2) return null;
+        var prefix = unit.charAt(0);
+        var base = unit.slice(1);
+        if (_siPrefixes[prefix] !== undefined) {
+            return { base: base, factor: _siPrefixes[prefix] };
+        }
+        return null;
+    }
+
+    var from = parseSI(stateUnit);
+    var to = parseSI(targetUnit);
+
+    // Case: "kW" → "W": stateUnit has prefix, targetUnit is the base
+    if (from && from.base === targetUnit) {
+        return numVal * from.factor;
+    }
+    // Case: "W" → "kW": targetUnit has prefix, stateUnit is the base
+    if (to && to.base === stateUnit) {
+        return numVal / to.factor;
+    }
+    // Case: both have a prefix, same base (e.g. "kWh" → "MWh")
+    if (from && to && from.base === to.base) {
+        return numVal * from.factor / to.factor;
+    }
+
+    return NaN; // Cannot convert
+}
+
+/**
  * Format a Number or String state using a Java number pattern.
  * Handles: %d, %.Nf, %s, %unit% and patterns with surrounding text (e.g. "%.1f %unit%", "%d %%")
  *
  * rawState may be a pure number ("23.5") or include a unit ("23.5 W", "374.0 kWh").
+ * If the unit in rawState differs from the unit in pattern, SI prefix conversion is attempted.
  */
 function formatNumber(pattern, rawState) {
     // Split rawState into numeric part and unit part
     // Examples: "11.1 W" → num="11.1", unit="W"
     //           "374.0 kWh" → num="374.0", unit="kWh"
     //           "23" → num="23", unit=""
-    var parts = rawState.match(/^(-?[\d.]+)\s*(.*)$/);
+    var parts = rawState.match(/^(-?[\d.]+(?:[eE][+-]?\d+)?)\s*(.*)$/);
     var numVal = NaN;
     var unit = "";
     if (parts) {
         numVal = parseFloat(parts[1]);
-        unit = parts[2] || "";
+        unit = parts[2] ? parts[2].trim() : "";
+    }
+
+    // Extract the literal unit from the pattern (the text after the format specifier, excluding %unit%)
+    // e.g. "%.0f W" → patternUnit = "W"
+    //      "%.1f kWh" → patternUnit = "kWh"
+    //      "%.1f %unit%" → patternUnit = "" (use unit from state)
+    var patternUnit = "";
+    if (unit !== "") {
+        var patUnitMatch = pattern.match(/%(?:\d*\.?\d+)?[dfs]\s+(\S+)/);
+        if (patUnitMatch && patUnitMatch[1] !== "%unit%") {
+            patternUnit = patUnitMatch[1];
+        }
+        // If patternUnit differs from state unit, try SI conversion
+        if (patternUnit && patternUnit !== unit) {
+            var converted = convertUnit(numVal, unit, patternUnit);
+            if (!isNaN(converted)) {
+                numVal = converted;
+            }
+        }
     }
 
     var result = pattern;

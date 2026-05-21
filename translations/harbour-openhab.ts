@@ -2,6 +2,52 @@
 <!DOCTYPE TS>
 <TS version="2.1">
 <context>
+    <name>ColorPickerPage</name>
+    <message>
+        <source>Color Picker</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hue</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Saturation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Brightness</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Preset Colors</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>InputDialog</name>
+    <message>
+        <source>Set value</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Current value: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(not set)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enter new value</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>LegalPage</name>
     <message>
         <source>Legal</source>
@@ -16,13 +62,6 @@
     <name>MainUiPage</name>
     <message>
         <source>openHAB Main UI</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>PrivacyPolicyPage</name>
-    <message>
-        <source>Privacy Policy</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -62,10 +101,6 @@
     </message>
     <message>
         <source>Cover actions</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Configure Item-IDs and commands for the app cover quick actions. Leave empty to hide an action.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -116,11 +151,111 @@
         <source>Report a bug or request a feature</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Username</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Password</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enter username</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enter password</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>OPTIONAL: Server username – leave empty to send no credentials.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>OPTIONAL: Server password – leave empty to send no credentials.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cover Items</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>e.g. item_id2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Configure Item-IDs and commands for the app cover quick actions. Leave empty to hide an action.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Configure Item-IDs for app cover display. Leave empty to do not display item states.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cover item refresh time (milliseconds)</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>SitemapPage</name>
     <message>
         <source>Scroll to top</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No image available</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Image format not supported</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No location data</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Map tile could not be loaded</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No video URL configured</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Tap to play</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Video</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open in browser</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No buttons configured</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Chart unavailable</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No item configured</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Period: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Every %1 min.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Refresh Sitemap</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

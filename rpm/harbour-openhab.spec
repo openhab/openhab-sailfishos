@@ -3,7 +3,7 @@
 Name:       harbour-openhab
 
 Summary:    openHAB client for Sailfish OS
-Version:    0.2
+Version:    0.3
 Release:    1
 License:    EPL-2.0
 URL:        www.openhab.org
@@ -11,6 +11,8 @@ Source0:    %{name}-%{version}.tar.bz2
 Requires:   sailfishsilica-qt5 >= 0.10.9
 Requires:   nemo-qml-plugin-configuration-qt5
 Requires:   sailfish-components-webview-qt5
+#Requires:   qt5-qtimageformats-plugin-webp - maybe required for displaying of item type "Image", but should be installed automatically.
+#Requires:   qt5-qtmultimedia-plugin-mediaservice-gstmediaplayer #If a future implementation switches back to QtMultimedia's Video QML type, add this line
 BuildRequires:  pkgconfig(sailfishapp) >= 1.0.2
 BuildRequires:  pkgconfig(Qt5Core)
 BuildRequires:  pkgconfig(Qt5Qml)

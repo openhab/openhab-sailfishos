@@ -36,4 +36,34 @@ ConfigurationGroup {
     property string coverAction1_command: ""
     property string coverAction2: ""
     property string coverAction2_command: ""
+    property string username_local: ""
+    property string coverItem1: ""
+    property string coverItem2: ""
+    property int coverItemRefreshTime: 30000
+    // Stored as base64-obfuscated string (prefix "b64")
+    property string password_local: ""
+
+    // Encodes a plain-text password for storage in dconf.
+    function encodePassword(plain) {
+        if (!plain || plain === "") return ""
+        try {
+            return "b64:" + Qt.btoa(plain)
+        } catch(e) {
+            console.warn("[Settings] encodePassword failed: " + e)
+            return plain
+        }
+    }
+
+    // Decodes a stored password value back to plain text.
+    // Falls back to the raw value for migration compatibility (old plain-text entries).
+    function decodePassword(enc) {
+        if (!enc || enc === "") return ""
+        if (enc.indexOf("b64:") !== 0) return enc   // plain-text fallback (migration)
+        try {
+            return Qt.atob(enc.substring(4))
+        } catch(e) {
+            console.warn("[Settings] decodePassword failed: " + e)
+            return ""
+        }
+    }
 }

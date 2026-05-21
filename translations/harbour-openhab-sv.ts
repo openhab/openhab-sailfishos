@@ -2,6 +2,52 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="sv">
 <context>
+    <name>ColorPickerPage</name>
+    <message>
+        <source>Color Picker</source>
+        <translation>Färgväljare</translation>
+    </message>
+    <message>
+        <source>Hue</source>
+        <translation>Nyans</translation>
+    </message>
+    <message>
+        <source>Saturation</source>
+        <translation>Mättnad</translation>
+    </message>
+    <message>
+        <source>Brightness</source>
+        <translation>Ljusstyrka</translation>
+    </message>
+    <message>
+        <source>Preset Colors</source>
+        <translation>Förinställda färger</translation>
+    </message>
+</context>
+<context>
+    <name>InputDialog</name>
+    <message>
+        <source>Set value</source>
+        <translation>Ange värde</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Avbryt</translation>
+    </message>
+    <message>
+        <source>Current value: %1</source>
+        <translation>Aktuellt värde: %1</translation>
+    </message>
+    <message>
+        <source>(not set)</source>
+        <translation>(ej angivet)</translation>
+    </message>
+    <message>
+        <source>Enter new value</source>
+        <translation>Ange nytt värde</translation>
+    </message>
+</context>
+<context>
     <name>LegalPage</name>
     <message>
         <source>Legal</source>
@@ -17,13 +63,6 @@
     <message>
         <source>openHAB Main UI</source>
         <translation>openHAB Huvudgränssnitt</translation>
-    </message>
-</context>
-<context>
-    <name>PrivacyPolicyPage</name>
-    <message>
-        <source>Privacy Policy</source>
-        <translation>Integritetspolicy</translation>
     </message>
 </context>
 <context>
@@ -74,7 +113,7 @@
     </message>
     <message>
         <source>Item-ID</source>
-        <translation>Artikel-ID</translation>
+        <translation>Objekt-ID</translation>
     </message>
     <message>
         <source>Command</source>
@@ -110,11 +149,51 @@
     </message>
     <message>
         <source>e.g. item_id1</source>
-        <translation>T.ex. artikel_id1</translation>
+        <translation>T.ex. objekt_id1</translation>
     </message>
     <message>
         <source>Report a bug or request a feature</source>
         <translation>Rapportera ett fel eller be om en funktion</translation>
+    </message>
+    <message>
+        <source>Username</source>
+        <translation>Användarnamn</translation>
+    </message>
+    <message>
+        <source>OPTIONAL: Server username – leave empty to send no credentials.</source>
+        <translation>VALFRITT: Serveranvändarnamn – Lämnas tomt för att inte skicka några uppgifter.</translation>
+    </message>
+    <message>
+        <source>Enter username</source>
+        <translation>Ange användarnamn</translation>
+    </message>
+    <message>
+        <source>Password</source>
+        <translation>Lösenord</translation>
+    </message>
+    <message>
+        <source>OPTIONAL: Server password – leave empty to send no credentials.</source>
+        <translation>VALFRITT: Serverlösenord – Lämnas tomt för att inte skicka några uppgifter.</translation>
+    </message>
+    <message>
+        <source>Enter password</source>
+        <translation>Ange lösenord</translation>
+    </message>
+    <message>
+        <source>Cover Items</source>
+        <translation>Miniatyrobjekt</translation>
+    </message>
+    <message>
+        <source>Configure Item-IDs for app cover display. Leave empty to do not display item states.</source>
+        <translation>Konfigurera objekt-ID:n för appens miniatyrvisning. Lämnas tomt för att inte visa objektstatus.</translation>
+    </message>
+    <message>
+        <source>e.g. item_id2</source>
+        <translation>T.ex. objekt_id2</translation>
+    </message>
+    <message>
+        <source>Cover item refresh time (milliseconds)</source>
+        <translation>Miniatyrobjektets uppdateringstid (ms)</translation>
     </message>
 </context>
 <context>
@@ -122,6 +201,62 @@
     <message>
         <source>Scroll to top</source>
         <translation>Skrolla till toppen</translation>
+    </message>
+    <message>
+        <source>Refresh Sitemap</source>
+        <translation>Uppdatera sidkarta</translation>
+    </message>
+    <message>
+        <source>Image format not supported</source>
+        <translation>Bildformatet stöds inte</translation>
+    </message>
+    <message>
+        <source>No image available</source>
+        <translation>Ingen bild tillgänglig</translation>
+    </message>
+    <message>
+        <source>Tap to play</source>
+        <translation>Tryck för att spela</translation>
+    </message>
+    <message>
+        <source>Video</source>
+        <translation>Video</translation>
+    </message>
+    <message>
+        <source>No video URL configured</source>
+        <translation>Ingen video-URL konfigurerad</translation>
+    </message>
+    <message>
+        <source>Open in browser</source>
+        <translation>Öppna i webbläsaren</translation>
+    </message>
+    <message>
+        <source>No location data</source>
+        <translation>Ingen platsdata</translation>
+    </message>
+    <message>
+        <source>Map tile could not be loaded</source>
+        <translation>Kartruta kunde inte läsas in</translation>
+    </message>
+    <message>
+        <source>No buttons configured</source>
+        <translation>Inga knappar konfigurerade</translation>
+    </message>
+    <message>
+        <source>Chart unavailable</source>
+        <translation>Diagram ej tillgängligt</translation>
+    </message>
+    <message>
+        <source>No item configured</source>
+        <translation>Inget objekt konfigurerat</translation>
+    </message>
+    <message>
+        <source>Period: </source>
+        <translation>Period: </translation>
+    </message>
+    <message>
+        <source>Every %1 min.</source>
+        <translation>Varje %1 min.</translation>
     </message>
 </context>
 <context>

@@ -1,10 +1,13 @@
 import QtQuick 2.0
 import QtQuick.Layouts 1.1
 import Sailfish.Silica 1.0
+import Sailfish.WebView 1.0
 import "../base"
 import "../components"
 import "../base/utilities/SseEvents.js" as SseEvents
 import "../base/utilities/PatternFormatter.js" as PatternFormatter
+import "../base/utilities/ColorUtils.js" as ColorUtils
+import "../base/utilities/ImageUtils.js" as ImageUtils
 
 Page {
     id: page
@@ -29,11 +32,24 @@ Page {
 
     // --- Logic ---
 
+    // Returns the Basic Auth header value when both username and password are set,
+    // otherwise returns null. Credentials are only sent when BOTH values are non-empty.
+    function getAuthHeader() {
+        var u = settings.username_local
+        var p = settings.decodePassword(settings.password_local)
+        if (u && u !== "" && p && p !== "") {
+            return "Basic " + Qt.btoa(u + ":" + p)
+        }
+        return null
+    }
+
     function sendCommand(itemName, command) {
         if (!itemName) return;
         var xhr = new XMLHttpRequest();
         xhr.open("POST", settings.base_url + "/rest/items/" + itemName, true);
         xhr.setRequestHeader("Content-Type", "text/plain");
+        var auth = getAuthHeader()
+        if (auth) xhr.setRequestHeader("Authorization", auth)
         xhr.onreadystatechange = function() {
             if (xhr.readyState === XMLHttpRequest.DONE && xhr.status >= 200 && xhr.status < 300) {
                 //refreshTimer.restart();
@@ -56,7 +72,13 @@ Page {
                     widgetList.forEach(function(widget) {
                         // Extract item name and state as top-level roles for reliable access
                         var name = (widget.item && widget.item.name) ? widget.item.name : "";
-                        var state = (widget.state !== undefined && widget.state !== null) ? widget.state.toString() : "";
+                        // widget.state is the sitemap-formatted display state; widget.item.state is the raw item state.
+                        var state = "";
+                        if (widget.state !== undefined && widget.state !== null && widget.state !== "") {
+                            state = widget.state.toString();
+                        } else if (widget.item && widget.item.state !== undefined && widget.item.state !== null && widget.item.state !== "") {
+                            state = widget.item.state.toString();
+                        }
                         // Extract pattern: widget-level pattern takes priority, then stateDescription
                         var pat = widget.pattern || (widget.item && widget.item.stateDescription && widget.item.stateDescription.pattern) || "";
 
@@ -125,6 +147,32 @@ Page {
                                 "itemData": widget
                             });
                         }
+                        // Buttongrid: serialise the buttons array to JSON so it survives the ListModel storage
+                        else if (widget.type === "Buttongrid") {
+                            // Explicitly copy each button to plain JS objects to ensure correct serialisation
+                            // in Qt's JavaScript engine (QML list types would fail JSON.stringify otherwise)
+                            var rawBtns = widget.buttons || widget.mappings || [];
+                            var btnArr = [];
+                            for (var bi = 0; bi < rawBtns.length; bi++) {
+                                var b = rawBtns[bi];
+                                btnArr.push({
+                                    "row":     b.row     !== undefined ? b.row     : 1,
+                                    "column":  b.column  !== undefined ? b.column  : (bi + 1),
+                                    "label":   b.label   || "",
+                                    "command": b.command || ""
+                                });
+                            }
+                            var buttonsJson = JSON.stringify(btnArr);
+                            //console.log("[Buttongrid] buttons found: " + btnArr.length + " json: " + buttonsJson.substring(0, 200));
+                            sitemapModel.append({
+                                "type": "Buttongrid",
+                                "itemName": name,
+                                "itemState": state,
+                                "widgetPattern": pat,
+                                "mappingsJson": buttonsJson,
+                                "itemData": widget
+                            });
+                        }
                         // Default case for other widget types
                         else {
                             sitemapModel.append({
@@ -143,65 +191,21 @@ Page {
                 // After async model load, rebind SSE to this (now populated) model
                 SseEvents.rebindModel(sitemapModel);
                 console.log("[SitemapPage] Model populated with " + sitemapModel.count + " entries, SSE rebound");
-
-                fetchAllItemStates();
             }
         }
         xhr.open("GET", fullApiUrl);
+        var auth = getAuthHeader()
+        if (auth) xhr.setRequestHeader("Authorization", auth)
         xhr.send();
     }
-
-
-   function fetchAllItemStates() {
-       var itemNames = [];
-       // Collect all item names from the model using top-level itemName role
-       for (var i = 0; i < sitemapModel.count; i++) {
-           var entry = sitemapModel.get(i);
-           if (entry.itemName && entry.itemName !== "") {
-               itemNames.push(entry.itemName);
-           }
-       }
-
-       if (itemNames.length === 0) return;
-
-       var itemsUrl = settings.base_url + "/rest/items?fields=name,state";
-       var xhr = new XMLHttpRequest();
-       xhr.onreadystatechange = function() {
-           if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
-               var items = JSON.parse(xhr.responseText);
-               var itemStateMap = {};
-
-               // Build map: { "ItemName": "StateValue" }
-               items.forEach(function(item) {
-                   itemStateMap[item.name] = item.state;
-               });
-
-               // Update model using top-level itemName role
-               for (var i = 0; i < sitemapModel.count; i++) {
-                   var entry = sitemapModel.get(i);
-                   if (entry.itemName && entry.itemName !== "") {
-                       var newState = itemStateMap[entry.itemName];
-
-                       if (newState !== undefined) {
-                           var data = entry.itemData;
-                           data.state = newState.toString();
-                           sitemapModel.setProperty(i, "itemData", data);
-                           sitemapModel.setProperty(i, "itemState", newState.toString());
-                       }
-                   }
-               }
-           }
-       }
-       xhr.open("GET", itemsUrl);
-       xhr.send();
-   }
 
    Component.onCompleted: {
       fetchSitemap()
 
       if (!isSubPage && sseManager) {
           // Top-level sitemap: start SSE connection and bind to our model
-          SseEvents.startSSE(sseManager, settings.base_url, sitemapModel);
+          SseEvents.startSSE(sseManager, settings.base_url, sitemapModel,
+                             settings.username_local, settings.decodePassword(settings.password_local));
           console.log("[SitemapPage] SSE started (top-level sitemap)");
       } else if (isSubPage) {
           // Sub-page: rebind the existing SSE handler to our model
@@ -230,10 +234,11 @@ Page {
    onStatusChanged: {
        if (status === PageStatus.Active && _wasActive) {
            // Returning from a sub-page or overlay
-           if (!isSubPage && sseManager && !sseManager.active) {
-               // SSE was stopped (e.g. by navigating to MainUiPage) – restart it
-               SseEvents.startSSE(sseManager, settings.base_url, sitemapModel);
-               console.log("[SitemapPage] SSE restarted after returning to top-level sitemap");
+            if (!isSubPage && sseManager && !sseManager.active) {
+                // SSE was stopped (e.g. by navigating to MainUiPage) – restart it
+                SseEvents.startSSE(sseManager, settings.base_url, sitemapModel,
+                                   settings.username_local, settings.decodePassword(settings.password_local));
+                console.log("[SitemapPage] SSE restarted after returning to top-level sitemap");
            } else {
                // SSE still running – just rebind to our model
                SseEvents.rebindModel(sitemapModel);
@@ -248,6 +253,69 @@ Page {
 
     // --- UI Components ---
     // Here you can define components per openHAB widget type to display them within the sitemap.
+
+    // Toolbar as a component so it can be used as SilicaListView header
+    Component {
+        id: toolbarComp
+        Item {
+            width: listView.width
+            height: Theme.itemSizeMedium
+
+            Rectangle {
+                anchors.fill: parent
+                color: Theme.rgba(Theme.highlightBackgroundColor, 0.15)
+            }
+
+            Label {
+                id: titleLabel
+                text: qsTr(pageTitle)
+                color: Theme.highlightColor
+                font.pixelSize: Theme.fontSizeLarge
+                anchors {
+                    verticalCenter: parent.verticalCenter
+                    left: parent.left
+                    leftMargin: Theme.horizontalPageMargin
+                    right: menuButtonHeader.left
+                    rightMargin: Theme.paddingMedium
+                }
+                horizontalAlignment: Text.AlignLeft
+                truncationMode: TruncationMode.Fade
+            }
+
+            // Sitemap/Navigation menu button
+            IconButton {
+                id: menuButtonHeader
+                icon.source: "image://theme/icon-m-menu"
+                anchors {
+                    verticalCenter: parent.verticalCenter
+                    right: parent.right
+                    rightMargin: Theme.horizontalPageMargin
+                }
+                onClicked: {
+                    // Open the sitemap selection page
+                    var selectionPage = pageStack.animatorPush(Qt.resolvedUrl("SitemapSelectionPage.qml"))
+                    selectionPage.pageCompleted.connect(function(selPage) {
+                        selPage.sitemapSelected.connect(function(name, label) {
+                            settings.lastVisitedPage = name
+                            console.log("[SitemapPage] Sitemap selected: " + settings.lastVisitedPage)
+
+                            // Pop the selection page first to return to this SitemapPage
+                            pageStack.pop()
+
+                            // Update the current SitemapPage in-place instead of pushing a new one
+                            page.sitemapName = name
+                            page.pageTitle = label
+
+                            // Restart SSE and re-fetch sitemap for the newly selected sitemap
+                            SseEvents.restartSSE(sseManager, settings.base_url, sitemapModel,
+                                                 settings.username_local, settings.decodePassword(settings.password_local))
+                            fetchSitemap()
+                        })
+                    })
+                }
+            }
+        }
+    }
 
     // Displays openHAB icons
     Component {
@@ -273,76 +341,27 @@ Page {
          }
     }
 
-    // Toolbar header with navigation icons
-    Item {
-        id: toolbar
-        anchors.top: parent.top
-        anchors.left: parent.left
-        anchors.right: parent.right
-        height: Theme.itemSizeMedium
-
-        Rectangle {
-            anchors.fill: parent
-            color: Theme.rgba(Theme.highlightBackgroundColor, 0.15)
-        }
-
-        Label {
-            id: titleLabel
-            text: qsTr(pageTitle)
-            color: Theme.highlightColor
-            font.pixelSize: Theme.fontSizeLarge
-            anchors {
-                verticalCenter: parent.verticalCenter
-                left: parent.left
-                leftMargin: Theme.horizontalPageMargin
-                right: menuButton.left
-                rightMargin: Theme.paddingMedium
-            }
-            horizontalAlignment: Text.AlignLeft
-            truncationMode: TruncationMode.Fade
-        }
-
-        // Sitemap/Navigation menu button
-        IconButton {
-            id: menuButton
-            icon.source: "image://theme/icon-m-menu"
-            anchors {
-                verticalCenter: parent.verticalCenter
-                right: parent.right
-                rightMargin: Theme.horizontalPageMargin
-            }
-            onClicked: {
-                // Open the sitemap selection page
-                var selectionPage = pageStack.animatorPush(Qt.resolvedUrl("SitemapSelectionPage.qml"))
-                selectionPage.pageCompleted.connect(function(selPage) {
-                    selPage.sitemapSelected.connect(function(name, label) {
-                        settings.lastVisitedPage = name
-                        console.log("[SitemapPage] Sitemap selected: " + settings.lastVisitedPage)
-
-                        // Pop the selection page first to return to this SitemapPage
-                        pageStack.pop()
-
-                        // Update the current SitemapPage in-place instead of pushing a new one
-                        page.sitemapName = name
-                        page.pageTitle = label
-
-                        // Restart SSE and re-fetch sitemap for the newly selected sitemap
-                        SseEvents.restartSSE(sseManager, settings.base_url, sitemapModel)
-                        fetchSitemap()
-                    })
-                })
-            }
-        }
-    }
-
     SilicaListView {
         id: listView
-        anchors.top: toolbar.bottom
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.bottom: parent.bottom
+        anchors.fill: parent
         model: sitemapModel
-        //header: PageHeader { title: qsTr(pageTitle) }
+        header: toolbarComp
+
+        PullDownMenu {
+            id: actualMenu
+
+            //Component.onCompleted: {
+            //    root.pullDownMenu = actualMenu
+            //}
+
+            MenuItem {
+                text: qsTr("Refresh Sitemap")
+                onClicked: {
+                    // fetch current sitemap
+                    fetchSitemap()
+                }
+            }
+        }
 
         PushUpMenu {
             MenuItem {
@@ -353,28 +372,48 @@ Page {
 
         delegate: Item {
             width: listView.width
-            height: type === "Header" ? Theme.itemSizeSmall :
-                    (type === "Slider" ? Theme.itemSizeLarge : Theme.itemSizeMedium)
+            height: type === "Image"                  ? componentLoader.implicitHeight
+                  : type === "Video"                  ? componentLoader.implicitHeight
+                  : type === "Mapview"                ? componentLoader.implicitHeight
+                  : type === "Webview"                ? componentLoader.implicitHeight
+                  : type === "Buttongrid"             ? componentLoader.implicitHeight
+                  : type === "Chart"                  ? componentLoader.implicitHeight
+                  : type === "Header"                 ? Theme.itemSizeSmall
+                  : type === "Slider"                 ? Theme.itemSizeLarge
+                  : type === "Colortemperaturepicker" ? Theme.itemSizeLarge
+                  : Theme.itemSizeMedium
 
             // If new widget types are added, add them as new cases in the switch statement below and create corresponding components
             Loader {
                 id: componentLoader
-                anchors.fill: parent
+                width: parent.width
+                height: implicitHeight
+                anchors.top: parent.top
                 property var widget: itemData
                 property string currentState: model.itemState || ""
                 property string pattern: model.widgetPattern || ""
                 property string mappingsJson: model.mappingsJson || ""
                 sourceComponent: {
                     switch(type) {
-                        case "Header":              return headerComp;
-                        case "Switch":              return switchComp;
-                        case "SwitchWithMappings":  return switchWithMappingsComp;
-                        case "Rollershutter":       return rollershutterButtonsComp;
-                        case "Slider":              return sliderComp;
-                        case "Selection":           return selectionComp;
-                        case "Group":               return groupComp;
-                        case "Text":                return widget.linkedPage ? groupComp : textComp;
-                        default:                    return textComp;
+                        case "Header":                      return headerComp;
+                        case "Switch":                      return switchComp;
+                        case "SwitchWithMappings":          return switchWithMappingsComp;
+                        case "Rollershutter":               return rollershutterButtonsComp;
+                        case "Slider":                      return sliderComp;
+                        case "Selection":                   return selectionComp;
+                        case "Colorpicker":                 return colorpickerComp;
+                        case "Colortemperaturepicker":      return colortemperaturepickerComp;
+                        case "Setpoint":                    return setpointComp;
+                        case "Image":                       return imageComp;
+                        case "Video":                       return videoComp;
+                        case "Mapview":                     return mapviewComp;
+                        case "Input":                       return inputComp;
+                        case "Webview":                     return webviewComp;
+                        case "Buttongrid":                  return buttongridComp;
+                        case "Chart":                       return chartComp;
+                        case "Group":                       return groupComp;
+                        case "Text":                        return widget.linkedPage ? groupComp : textComp;
+                        default:                            return textComp;
                     }
                 }
             }
@@ -423,7 +462,8 @@ Page {
                 }
 
                 Label {
-                    text: widget.label || ""
+                    property string _switchLabel: widget.label ? widget.label.replace(/\s*\[.*\]/, "") : ""
+                    text: _switchLabel || ""
                     anchors.verticalCenter: parent.verticalCenter
                     width: parent.width - (iconLoader.visible ? iconLoader.width + parent.spacing : 0)
                                         - statusLabel.width - parent.spacing
@@ -453,7 +493,13 @@ Page {
             implicitHeight: Theme.itemSizeLarge
 
             // React to SSE-driven state changes instead of polling with a Timer
-            property int _externalValue: (currentState !== undefined && currentState !== "") ? (Number(currentState) || 0) : 0
+            property real _externalValue: {
+                if (currentState !== undefined && currentState !== "") {
+                    var v = parseFloat(currentState);
+                    return isNaN(v) ? 0 : v;
+                }
+                return 0;
+            }
             on_ExternalValueChanged: {
                 if (!slider.pressed) {
                     slider.value = _externalValue;
@@ -474,7 +520,8 @@ Page {
                 valueText: Math.round(value) + "%"
 
                 Component.onCompleted: {
-                    value = Number(currentState) || 0;
+                    var v = parseFloat(currentState);
+                    value = isNaN(v) ? 0 : v;
                 }
 
                 onReleased: {
@@ -758,6 +805,1353 @@ Page {
         }
     }
 
+    // Colorpicker component – shows current color as circle, opens ColorPickerPage on tap
+    Component {
+        id: colorpickerComp
+        ListItem {
+            id: colorpickerListItem
+            width: listView.width
+            contentHeight: Theme.itemSizeMedium
+
+            readonly property string displayLabel: (widget.label || "").replace(/\s*\[.*\]/, "")
+            readonly property var hsb: ColorUtils.parseHsb(currentState)
+            readonly property color displayColor: ColorUtils.hsbToColor(hsb.h, hsb.s, hsb.b)
+
+            onClicked: {
+                pageStack.animatorPush(Qt.resolvedUrl("ColorPickerPage.qml"), {
+                    "itemName":           widget.item ? widget.item.name : "",
+                    "itemLabel":          displayLabel,
+                    "initialHue":         hsb.h,
+                    "initialSaturation":  hsb.s,
+                    "initialBrightness":  hsb.b,
+                    "baseUrl":            settings.base_url,
+                    "username":           settings.username_local,
+                    "password":           settings.decodePassword(settings.password_local)
+                });
+            }
+
+            Row {
+                anchors.fill: parent
+                anchors.leftMargin: Theme.horizontalPageMargin
+                anchors.rightMargin: Theme.horizontalPageMargin
+                spacing: Theme.paddingMedium
+
+                Loader {
+                    id: iconLoader
+                    sourceComponent: smartIcon
+                    anchors.verticalCenter: parent.verticalCenter
+                    onLoaded: if (item) item.iconName = widget.icon || ""
+                    visible: widget.icon !== undefined && widget.icon !== "" && widget.icon !== "none"
+                    width: visible ? Theme.iconSizeSmall : 0
+                }
+
+                Label {
+                    text: displayLabel
+                    anchors.verticalCenter: parent.verticalCenter
+                    width: parent.width
+                        - (iconLoader.visible ? iconLoader.width + parent.spacing : 0)
+                        - colorIndicator.width - parent.spacing
+                        - navArrow.width - parent.spacing
+                    color: colorpickerListItem.highlighted ? Theme.highlightColor : Theme.primaryColor
+                    truncationMode: TruncationMode.Fade
+                }
+
+                Rectangle {
+                    id: colorIndicator
+                    width: Theme.iconSizeMedium
+                    height: width
+                    radius: width / 2
+                    color: displayColor
+                    border.width: 2
+                    border.color: Theme.rgba(Theme.primaryColor, 0.3)
+                    anchors.verticalCenter: parent.verticalCenter
+                }
+
+                Icon {
+                    id: navArrow
+                    source: "image://theme/icon-m-right"
+                    anchors.verticalCenter: parent.verticalCenter
+                }
+            }
+        }
+    }
+
+    // Colortemperaturepicker component – iOS-style color temperature slider (warm ↔ cool)
+    // The openHAB item state is a numeric Kelvin value, optionally formatted as "4500 °C".
+    Component {
+        id: colortemperaturepickerComp
+        ListItem {
+            id: ctpItem
+            width: listView.width
+            contentHeight: Theme.itemSizeLarge
+            highlighted: false
+
+            readonly property string displayLabel: (widget.label || "").replace(/\s*\[.*\]/, "")
+
+            // Range: prefer widget.minValue / maxValue, fall back to 2000–6500 K
+            readonly property real minTemp: (widget.minValue !== undefined && widget.minValue !== null
+                                             && widget.minValue >= 1000) ? widget.minValue : 1000
+            readonly property real maxTemp: (widget.maxValue !== undefined && widget.maxValue !== null
+                                             && widget.maxValue > minTemp)  ? widget.maxValue : 10000
+
+            // Computed property bound to currentState – fires on every SSE update.
+            // parseFloat handles "4500 °C" → 4500 correctly (stops at first non-numeric char).
+            readonly property real _parsedTemp: {
+                var v = parseFloat(currentState);
+                return isNaN(v) ? (minTemp + maxTemp) * 0.5
+                                : Math.max(minTemp, Math.min(maxTemp, v));
+            }
+
+            // Mutable slider value – initialised once, then kept in sync via the handler below
+            property real sliderValue: _parsedTemp
+
+            // SSE-driven update: only overwrite when the user is not currently dragging
+            on_ParsedTempChanged: {
+                if (!ctMouseArea.pressed) {
+                    sliderValue = _parsedTemp;
+                }
+            }
+
+            Column {
+                anchors {
+                    left:   parent.left
+                    right:  parent.right
+                    leftMargin:  Theme.horizontalPageMargin
+                    rightMargin: Theme.horizontalPageMargin
+                    verticalCenter: parent.verticalCenter
+                }
+                spacing: Theme.paddingMedium
+
+                // ── Label row ────────────────────────────────────────────────────────
+                Row {
+                    width: parent.width
+                    spacing: Theme.paddingMedium
+
+                    Loader {
+                        id: ctIconLoader
+                        sourceComponent: smartIcon
+                        anchors.verticalCenter: parent.verticalCenter
+                        onLoaded: if (item) item.iconName = widget.icon || ""
+                        visible: widget.icon !== undefined && widget.icon !== "" && widget.icon !== "none"
+                        width: visible ? Theme.iconSizeSmall : 0
+                    }
+
+                    Label {
+                        text: displayLabel
+                        anchors.verticalCenter: parent.verticalCenter
+                        width: parent.width
+                            - (ctIconLoader.visible ? ctIconLoader.width + parent.spacing : 0)
+                            - ctValueLabel.implicitWidth - parent.spacing
+                        truncationMode: TruncationMode.Fade
+                        color: ctpItem.highlighted ? Theme.highlightColor : Theme.primaryColor
+                    }
+
+                    Label {
+                        id: ctValueLabel
+                        anchors.verticalCenter: parent.verticalCenter
+                        text: Math.round(ctpItem.sliderValue) + " K"
+                        color: Theme.highlightColor
+                        font.pixelSize: Theme.fontSizeSmall
+                        font.bold: true
+                    }
+                }
+
+                // ── Gradient track + thumb ────────────────────────────────────────────
+                Item {
+                    id: ctTrack
+                    width:  parent.width
+                    height: Theme.paddingLarge + Theme.paddingMedium
+
+                    Canvas {
+                        id: ctCanvas
+                        anchors.fill: parent
+
+                        onWidthChanged:  requestPaint()
+                        onHeightChanged: requestPaint()
+                        Component.onCompleted: requestPaint()
+
+                        onPaint: {
+                            var ctx = getContext("2d");
+                            ctx.clearRect(0, 0, width, height);
+
+                            // Horizontal warm → neutral → cool gradient
+                            var grad = ctx.createLinearGradient(0, 0, width, 0);
+                            grad.addColorStop(0.00, "#FF8800");   // warm amber
+                            grad.addColorStop(0.40, "#FFD580");   // warm yellow
+                            grad.addColorStop(0.60, "#FFF8F0");   // neutral white
+                            grad.addColorStop(1.00, "#9EC5FF");   // cool blue-white
+                            ctx.fillStyle = grad;
+
+                            // Rounded rectangle (pill shape)
+                            var r = height / 2;
+                            var w = width, h = height;
+                            ctx.beginPath();
+                            ctx.moveTo(r, 0);
+                            ctx.lineTo(w - r, 0);
+                            ctx.arc(w - r, r, r, -Math.PI / 2, 0);
+                            ctx.lineTo(w, h - r);
+                            ctx.arc(w - r, h - r, r, 0, Math.PI / 2);
+                            ctx.lineTo(r, h);
+                            ctx.arc(r, h - r, r, Math.PI / 2, Math.PI);
+                            ctx.lineTo(0, r);
+                            ctx.arc(r, r, r, Math.PI, 3 * Math.PI / 2);
+                            ctx.closePath();
+                            ctx.fill();
+                        }
+                    }
+
+                    // Thumb circle (white disk with subtle border)
+                    Rectangle {
+                        id: ctThumb
+                        width:  ctTrack.height + Theme.paddingSmall
+                        height: width
+                        radius: width / 2
+                        color:  "white"
+                        border.color: Qt.rgba(0, 0, 0, 0.22)
+                        border.width: 1
+                        anchors.verticalCenter: parent.verticalCenter
+
+                        // Fractional position [0..1] derived from current slider value
+                        readonly property real fraction: (ctpItem.maxTemp > ctpItem.minTemp)
+                            ? (ctpItem.sliderValue - ctpItem.minTemp) / (ctpItem.maxTemp - ctpItem.minTemp)
+                            : 0
+
+                        x: Math.max(0, Math.min(ctTrack.width - width,
+                               fraction * (ctTrack.width - width)))
+
+                        // Inner glow: tinted dot that reflects the current temperature colour
+                        Rectangle {
+                            anchors.centerIn: parent
+                            width:  parent.width  * 0.45
+                            height: parent.height * 0.45
+                            radius: width / 2
+                            opacity: 0.65
+                            // Interpolate between warm amber and cool blue based on fraction
+                            color: Qt.rgba(
+                                (1 - ctThumb.fraction) + 0.62 * ctThumb.fraction,
+                                0.53 * (1 - ctThumb.fraction) + 0.77 * ctThumb.fraction,
+                                ctThumb.fraction,
+                                1.0
+                            )
+                        }
+                    }
+
+                    // MouseArea covering the full track item for drag interaction
+                    MouseArea {
+                        id: ctMouseArea
+                        anchors.fill: parent
+
+                        function posToValue(mx) {
+                            var clamped = Math.max(0, Math.min(ctTrack.width, mx));
+                            return ctpItem.minTemp + (clamped / ctTrack.width) * (ctpItem.maxTemp - ctpItem.minTemp);
+                        }
+
+                        onPressed:          ctpItem.sliderValue = posToValue(mouseX)
+                        onPositionChanged:  if (pressed) ctpItem.sliderValue = posToValue(mouseX)
+                        onReleased: {
+                            if (widget.item && widget.item.name) {
+                                sendCommand(widget.item.name,
+                                            Math.round(ctpItem.sliderValue).toString());
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // Setpoint component with MINUS/PLUS buttons for numeric items (e.g. temperature)
+    // Respects minValue, maxValue and step from the openHAB widget definition.
+    Component {
+        id: setpointComp
+        ListItem {
+            id: setpointItem
+            width: listView.width
+            contentHeight: Theme.itemSizeMedium
+            implicitHeight: Theme.itemSizeMedium
+            highlighted: false
+
+            // Parse the numeric value from state (e.g. "21.5 °C" → 21.5)
+            readonly property real numericValue: {
+                var s = currentState || "";
+                var num = parseFloat(s);
+                return isNaN(num) ? 0 : num;
+            }
+
+            // Widget boundaries and step from REST API
+            readonly property real minValue: (widget.minValue !== undefined && widget.minValue !== null) ? widget.minValue : 0
+            readonly property real maxValue: (widget.maxValue !== undefined && widget.maxValue !== null) ? widget.maxValue : 100
+            readonly property real stepValue: (widget.step !== undefined && widget.step !== null) ? widget.step : 1
+
+            // Label text without [...] part
+            readonly property string displayLabel: (widget.label || "").replace(/\s*\[.*\]/, "")
+
+            // Formatted display value using pattern or raw state
+            readonly property string displayState: {
+                if (currentState && currentState !== "") {
+                    if (pattern && pattern !== "") {
+                        return PatternFormatter.formatState(pattern, currentState);
+                    }
+                    return currentState;
+                }
+                var lbl = widget.label || "";
+                var match = lbl.match(/\[([^[]*)\]/);
+                if (match) return match[1];
+                return "N/A";
+            }
+
+            Row {
+                x: Theme.horizontalPageMargin
+                y: 0
+                width: parent.width - (Theme.horizontalPageMargin * 2)
+                height: parent.height
+                spacing: Theme.paddingMedium
+
+                Loader {
+                    id: iconLoader
+                    sourceComponent: smartIcon
+                    anchors.verticalCenter: parent.verticalCenter
+                    onLoaded: if (item) item.iconName = widget.icon || ""
+                    visible: widget.icon !== "" && widget.icon !== "none" && widget.icon !== undefined
+                    width: visible ? Theme.iconSizeSmall : 0
+                }
+
+                Label {
+                    id: setpointLabel
+                    text: displayLabel
+                    width: parent.width
+                        - (iconLoader.visible ? iconLoader.width + parent.spacing : 0)
+                        - minusBtn.width - parent.spacing
+                        - valueLabel.width - parent.spacing
+                        - plusBtn.width
+                    height: parent.height
+                    verticalAlignment: Text.AlignVCenter
+                    truncationMode: TruncationMode.Fade
+                }
+
+                IconButton {
+                    id: minusBtn
+                    width: Theme.iconSizeMedium
+                    anchors.verticalCenter: parent.verticalCenter
+                    icon.source: "image://theme/icon-m-remove"
+                    enabled: numericValue > minValue
+                    opacity: enabled ? 1.0 : 0.4
+                    onClicked: {
+                        if (widget.item && widget.item.name) {
+                            var newVal = numericValue - stepValue;
+                            if (newVal < minValue) newVal = minValue;
+                            // Round to avoid floating-point precision issues
+                            var decimals = (stepValue.toString().split('.')[1] || '').length;
+                            newVal = parseFloat(newVal.toFixed(decimals));
+                            sendCommand(widget.item.name, newVal.toString());
+                        }
+                    }
+                }
+
+                Label {
+                    id: valueLabel
+                    text: displayState
+                    anchors.verticalCenter: parent.verticalCenter
+                    color: Theme.highlightColor
+                    font.pixelSize: Theme.fontSizeMedium
+                }
+
+                IconButton {
+                    id: plusBtn
+                    width: Theme.iconSizeMedium
+                    anchors.verticalCenter: parent.verticalCenter
+                    icon.source: "image://theme/icon-m-add"
+                    enabled: numericValue < maxValue
+                    opacity: enabled ? 1.0 : 0.4
+                    onClicked: {
+                        if (widget.item && widget.item.name) {
+                            var newVal = numericValue + stepValue;
+                            if (newVal > maxValue) newVal = maxValue;
+                            var decimals = (stepValue.toString().split('.')[1] || '').length;
+                            newVal = parseFloat(newVal.toFixed(decimals));
+                            sendCommand(widget.item.name, newVal.toString());
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    Component {
+        id: imageComp
+        ListItem {
+            width: listView.width
+            contentHeight: imgColumn.height + Theme.paddingMedium
+            implicitHeight: contentHeight
+            enabled: false
+
+            readonly property string displayLabel: (widget.label || "").replace(/\s*\[.*\]/, "")
+
+            // Build image source from currentState (data:image/…;base64,…) or item state
+            readonly property string imageSource: {
+                var st = currentState || "";
+                if (st === "") {
+                    // Try to extract from label [...] as fallback
+                    var lbl = widget.label || "";
+                    var m = lbl.match(/\[([^[]*)\]/);
+                    if (m) st = m[1];
+                }
+                return ImageUtils.imageSourceFromState(st);
+            }
+
+            Column {
+                id: imgColumn
+                width: parent.width
+                spacing: Theme.paddingSmall
+
+                // Header row with icon + label
+                Row {
+                    x: Theme.horizontalPageMargin
+                    width: parent.width - 2 * Theme.horizontalPageMargin
+                    height: Theme.itemSizeSmall
+                    spacing: Theme.paddingMedium
+                    visible: displayLabel !== ""
+
+                    Loader {
+                        sourceComponent: smartIcon
+                        onLoaded: if(item) item.iconName = widget.icon
+                        anchors.verticalCenter: parent.verticalCenter
+                    }
+
+                    Label {
+                        text: displayLabel
+                        anchors.verticalCenter: parent.verticalCenter
+                        truncationMode: TruncationMode.Fade
+                        width: parent.width - Theme.iconSizeSmall - Theme.paddingMedium
+                    }
+                }
+
+                // The actual image
+                Image {
+                    id: itemImage
+                    width: parent.width - 2 * Theme.horizontalPageMargin
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    fillMode: Image.PreserveAspectFit
+                    source: imageSource
+                    visible: imageSource !== ""
+                    asynchronous: true
+                    cache: false
+
+                    BusyIndicator {
+                        anchors.centerIn: parent
+                        running: itemImage.status === Image.Loading
+                        size: BusyIndicatorSize.Medium
+                    }
+                }
+
+                // Error placeholder when image decoding fails (e.g. missing webp plugin)
+                Label {
+                    visible: imageSource !== "" && itemImage.status === Image.Error
+                    text: qsTr("Image format not supported")
+                    color: Theme.errorColor || Theme.secondaryColor
+                    font.pixelSize: Theme.fontSizeSmall
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    height: Theme.itemSizeMedium
+                    verticalAlignment: Text.AlignVCenter
+                }
+
+                // Placeholder when no image available
+                Label {
+                    visible: imageSource === ""
+                    text: qsTr("No image available")
+                    color: Theme.secondaryColor
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    height: Theme.itemSizeMedium
+                    verticalAlignment: Text.AlignVCenter
+                }
+            }
+        }
+    }
+
+    // Video component – plays video streams from openHAB Video widget elements.
+    // Supports MJPEG streams (encoding="mjpeg") via periodic image polling and
+    // regular video sources (mp4, HLS, etc.) via QtMultimedia Video player.
+    // The video URL comes from widget.url as defined in the openHAB sitemap API.
+    Component {
+        id: videoComp
+        ListItem {
+            id: videoListItem
+            width: listView.width
+            contentHeight: videoColumn.height + Theme.paddingMedium
+            implicitHeight: contentHeight
+            enabled: false
+
+            readonly property string displayLabel: (widget.label || "").replace(/\s*\[.*\]/, "")
+
+            // Video URL comes from widget.url (openHAB sitemap API for Video elements)
+            readonly property string videoUrl: widget.url || ""
+
+            // MJPEG streams need special handling (periodic image polling with cache-busting)
+            readonly property bool isMjpeg: (widget.encoding || "").toLowerCase() === "mjpeg"
+
+            // 16:9 aspect ratio height based on available content width
+            readonly property int videoAreaWidth: listView.width - 2 * Theme.horizontalPageMargin
+            readonly property int videoAreaHeight: Math.round(videoAreaWidth * 9 / 16)
+
+            Column {
+                id: videoColumn
+                width: parent.width
+                spacing: Theme.paddingSmall
+
+                // Header row with icon + label
+                Row {
+                    x: Theme.horizontalPageMargin
+                    width: parent.width - 2 * Theme.horizontalPageMargin
+                    height: Theme.itemSizeSmall
+                    spacing: Theme.paddingMedium
+                    visible: displayLabel !== ""
+
+                    Loader {
+                        sourceComponent: smartIcon
+                        onLoaded: if(item) item.iconName = widget.icon
+                        anchors.verticalCenter: parent.verticalCenter
+                    }
+
+                    Label {
+                        text: displayLabel
+                        anchors.verticalCenter: parent.verticalCenter
+                        truncationMode: TruncationMode.Fade
+                        width: parent.width - Theme.iconSizeSmall - Theme.paddingMedium
+                    }
+                }
+
+                // ── MJPEG stream ──────────────────────────────────────────────────────────
+                // MJPEG (Motion JPEG) is an HTTP multipart stream of JPEG frames.
+                // QML Image cannot decode multipart streams directly, so we poll
+                // the URL every 500 ms with a cache-busting timestamp query param.
+                Item {
+                    id: mjpegContainer
+                    visible: isMjpeg && videoUrl !== ""
+                    width: videoAreaWidth
+                    height: visible ? videoAreaHeight : 0
+                    x: Theme.horizontalPageMargin
+
+                    Image {
+                        id: mjpegImage
+                        anchors.fill: parent
+                        fillMode: Image.PreserveAspectFit
+                        cache: false
+                        asynchronous: true
+                        // Append timestamp to bust HTTP cache on every tick
+                        source: (isMjpeg && videoUrl !== "" && mjpegTimer.running)
+                            ? (videoUrl + (videoUrl.indexOf("?") >= 0 ? "&" : "?") + "_sfos_ts=" + mjpegTimer.tick)
+                            : ""
+                    }
+
+                    BusyIndicator {
+                        anchors.centerIn: parent
+                        running: mjpegImage.status === Image.Loading && mjpegTimer.running
+                        size: BusyIndicatorSize.Medium
+                    }
+
+                    // Semi-transparent play button overlay (shown when paused)
+                    Rectangle {
+                        anchors.centerIn: parent
+                        width: Theme.iconSizeLarge + Theme.paddingLarge
+                        height: width
+                        radius: width / 2
+                        color: Qt.rgba(0, 0, 0, 0.55)
+                        visible: !mjpegTimer.running
+
+                        Image {
+                            anchors.centerIn: parent
+                            source: "image://theme/icon-m-play"
+                            width: Theme.iconSizeMedium
+                            height: Theme.iconSizeMedium
+                        }
+                    }
+
+                    // Tap toggles stream on/off
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: {
+                            if (mjpegTimer.running)
+                                mjpegTimer.stop()
+                            else
+                                mjpegTimer.start()
+                        }
+                    }
+
+                    // Refresh timer: increments tick to trigger Image source re-evaluation
+                    Timer {
+                        id: mjpegTimer
+                        property int tick: 0
+                        interval: 500
+                        running: isMjpeg && videoUrl !== ""
+                        repeat: true
+                        onTriggered: tick++
+                    }
+                }
+
+                // ── Regular video (mp4 / HLS / MPEG-TS etc.) ─────────────────────────────
+                // Sailfish OS only supports one active WebView per page-stack level.
+                // Having a second WebView here (alongside webviewComp) causes the
+                // Gecko renderer to display the wrong content (see: shared renderer).
+                //
+                // Solution: Show a black placeholder with a play button. Tapping
+                // pushes a dedicated full-screen VideoPlayerPage (defined below as
+                // videoPlayerPageComp) which owns its own single WebView.
+                Item {
+                    id: videoContainer
+                    visible: !isMjpeg && videoUrl !== ""
+                    width: videoAreaWidth
+                    height: visible ? videoAreaHeight : 0
+                    x: Theme.horizontalPageMargin
+
+                    Rectangle {
+                        anchors.fill: parent
+                        color: "#000000"
+                        radius: Theme.paddingSmall
+
+                        // Play icon
+                        Image {
+                            anchors.centerIn: parent
+                            source: "image://theme/icon-m-play"
+                            width: Theme.iconSizeLarge
+                            height: Theme.iconSizeLarge
+                        }
+
+                        // Stream type hint (HLS / VIDEO / …)
+                        Label {
+                            anchors.bottom: parent.bottom
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            anchors.bottomMargin: Theme.paddingSmall
+                            text: widget.encoding
+                                  ? widget.encoding.toUpperCase()
+                                  : qsTr("Tap to play")
+                            font.pixelSize: Theme.fontSizeExtraSmall
+                            color: Theme.secondaryHighlightColor
+                        }
+
+                        // Tap → push dedicated video player page
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked: pageStack.animatorPush(videoPlayerPageComp, {
+                                "videoSrc":   videoUrl,
+                                "videoTitle": displayLabel || qsTr("Video")
+                            })
+                        }
+                    }
+                }
+
+                // ── No URL configured ─────────────────────────────────────────────────────
+                Label {
+                    visible: videoUrl === ""
+                    text: qsTr("No video URL configured")
+                    color: Theme.secondaryColor
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    height: Theme.itemSizeMedium
+                    verticalAlignment: Text.AlignVCenter
+                }
+            }
+        }
+    }
+
+    // Dedicated full-screen video player page.
+    // Pushed by videoComp when the user taps the video placeholder.
+    // Keeping the video in its own Page ensures that only ONE WebView is
+    // active at a time in the page stack, which is required by Sailfish OS's
+    // Gecko renderer (multiple concurrent active WebViews cause bleed-through).
+    Component {
+        id: videoPlayerPageComp
+
+        Page {
+            id: videoPage
+            allowedOrientations: Orientation.All
+
+            // Properties injected by pageStack.animatorPush(…, { … })
+            property string videoSrc: ""
+            property string videoTitle: ""
+
+            // Pull-down menu gives a quick way to open the stream in the browser
+            SilicaFlickable {
+                anchors.fill: parent
+                contentHeight: height   // non-scrollable; only used for PullDownMenu
+
+                PullDownMenu {
+                    MenuItem {
+                        text: qsTr("Open in browser")
+                        onClicked: Qt.openUrlExternally(videoPage.videoSrc)
+                    }
+                }
+
+                // Header with back-navigation hint
+                PageHeader { title: videoPage.videoTitle || qsTr("Video") }
+
+                // Full-width/height WebView – the only active WebView on this page
+                WebView {
+                    id: videoPlayerWebView
+                    anchors {
+                        top: parent.top
+                        bottom: parent.bottom
+                        left: parent.left
+                        right: parent.right
+                    }
+                    // Load the video URL directly – Gecko renders video inline
+                    url: videoPage.videoSrc
+
+                    // Only consume resources while this page is actually visible
+                    active: videoPage.status === PageStatus.Active
+                }
+            }
+        }
+    }
+
+    // Displays Location Item states as an OpenStreetMap tile image.
+    // The item state is expected to be "lat,lng" (e.g. "52.4077,13.1882").
+    // Uses CartoDB Voyager tiles – free for open-source apps, no API key needed
+    Component {
+        id: mapviewComp
+
+        Column {
+            width: listView.width
+            spacing: 0
+
+            // Parse coordinates from "lat,lng" state string
+            readonly property var coords: {
+                var s = currentState || "";
+                if (s === "") {
+                    var lbl = widget.label || "";
+                    var m = lbl.match(/\[([^[]*)\]/);
+                    if (m) s = m[1];
+                }
+                var parts = s.split(",");
+                if (parts.length >= 2) {
+                    var lat = parseFloat(parts[0]);
+                    var lng = parseFloat(parts[1]);
+                    if (!isNaN(lat) && !isNaN(lng)) return { lat: lat, lng: lng, valid: true };
+                }
+                return { lat: 0, lng: 0, valid: false };
+            }
+
+            // OSM tile calculation (zoom 15)
+            readonly property int tileZ: 15
+            readonly property int tileX: {
+                if (!coords.valid) return 0;
+                return Math.floor((coords.lng + 180) / 360 * Math.pow(2, tileZ));
+            }
+            readonly property int tileY: {
+                if (!coords.valid) return 0;
+                var latRad = coords.lat * Math.PI / 180;
+                return Math.floor((1 - Math.log(Math.tan(latRad) + 1 / Math.cos(latRad)) / Math.PI) / 2 * Math.pow(2, tileZ));
+            }
+            readonly property string tileUrl: coords.valid
+                ? "https://a.basemaps.cartocdn.com/rastertiles/voyager/" + tileZ + "/" + tileX + "/" + tileY + ".png"
+                : ""
+
+            // Pixel position of the coordinate within the 256×256 tile (scaled to mapImage width)
+            readonly property real markerFracX: {
+                if (!coords.valid) return 0;
+                return (coords.lng + 180) / 360 * Math.pow(2, tileZ) - tileX;
+            }
+            readonly property real markerFracY: {
+                if (!coords.valid) return 0;
+                var latRad = coords.lat * Math.PI / 180;
+                return (1 - Math.log(Math.tan(latRad) + 1 / Math.cos(latRad)) / Math.PI) / 2 * Math.pow(2, tileZ) - tileY;
+            }
+
+            readonly property string displayLabel: (widget.label || "").replace(/\s*\[.*\]/, "")
+
+            // Header row: icon + label + coordinates text
+            ListItem {
+                width: parent.width
+                contentHeight: Theme.itemSizeMedium
+                enabled: false
+
+                Row {
+                    anchors.fill: parent
+                    anchors.leftMargin: Theme.horizontalPageMargin
+                    anchors.rightMargin: Theme.horizontalPageMargin
+                    spacing: Theme.paddingMedium
+
+                    Loader {
+                        sourceComponent: smartIcon
+                        onLoaded: if (item) item.iconName = widget.icon || ""
+                        anchors.verticalCenter: parent.verticalCenter
+                        visible: widget.icon !== undefined && widget.icon !== "" && widget.icon !== "none"
+                        width: visible ? Theme.iconSizeSmall : 0
+                    }
+
+                    Label {
+                        text: displayLabel
+                        anchors.verticalCenter: parent.verticalCenter
+                        width: parent.width
+                               - (widget.icon && widget.icon !== "" && widget.icon !== "none"
+                                  ? Theme.iconSizeSmall + parent.spacing : 0)
+                               - coordLabel.implicitWidth - parent.spacing
+                        truncationMode: TruncationMode.Fade
+                        color: Theme.primaryColor
+                    }
+
+                    Label {
+                        id: coordLabel
+                        text: coords.valid
+                              ? coords.lat.toFixed(5) + ", " + coords.lng.toFixed(5)
+                              : "N/A"
+                        color: Theme.secondaryColor
+                        font.pixelSize: Theme.fontSizeExtraSmall
+                        anchors.verticalCenter: parent.verticalCenter
+                    }
+                }
+            }
+
+            // Tile map + marker overlay
+            Item {
+                width: parent.width
+                height: width   // OSM tiles are square (256×256)
+
+                Image {
+                    id: mapImage
+                    anchors.fill: parent
+                    fillMode: Image.Stretch
+                    asynchronous: true
+                    cache: true
+                    source: tileUrl
+
+                    BusyIndicator {
+                        anchors.centerIn: parent
+                        running: mapImage.status === Image.Loading
+                        size: BusyIndicatorSize.Medium
+                    }
+
+                    Label {
+                        anchors.centerIn: parent
+                        visible: !coords.valid
+                        text: qsTr("No location data")
+                        color: Theme.secondaryColor
+                    }
+
+                    Label {
+                        anchors.centerIn: parent
+                        visible: coords.valid && mapImage.status === Image.Error
+                        text: qsTr("Map tile could not be loaded")
+                        color: Theme.secondaryColor
+                        font.pixelSize: Theme.fontSizeSmall
+                    }
+                }
+
+                // Marker dot at the exact coordinate position within the tile
+                Rectangle {
+                    visible: coords.valid && mapImage.status === Image.Ready
+                    width: Theme.paddingLarge
+                    height: Theme.paddingLarge
+                    radius: width / 2
+                    color: Theme.highlightColor
+                    border.color: "white"
+                    border.width: 2
+                    x: markerFracX * parent.width - width / 2
+                    y: markerFracY * parent.height - height / 2
+
+                    Rectangle {
+                        anchors.centerIn: parent
+                        width: parent.width * 0.4
+                        height: width
+                        radius: width / 2
+                        color: "white"
+                        opacity: 0.9
+                    }
+                }
+            }
+        }
+    }
+
+    // Input component: shows current state with SSE updates, opens InputDialog on tap.
+    Component {
+        id: inputComp
+        ListItem {
+            id: inputListItem
+            width: listView.width
+            contentHeight: Theme.itemSizeMedium
+
+            readonly property string displayState: {
+                if (currentState && currentState !== "") {
+                    if (pattern && pattern !== "") {
+                        return PatternFormatter.formatState(pattern, currentState);
+                    }
+                    return currentState;
+                }
+                var lbl = widget.label || "";
+                var match = lbl.match(/\[([^[]*)\]/);
+                if (match) return match[1];
+                return "N/A";
+            }
+
+            readonly property string displayLabel: (widget.label || "").replace(/\s*\[.*\]/, "")
+
+            onClicked: {
+                var dlgPage = pageStack.animatorPush(Qt.resolvedUrl("InputDialog.qml"), {
+                    "itemName":     widget.item ? widget.item.name : "",
+                    "itemLabel":    displayLabel,
+                    "currentValue": currentState || "",
+                    "inputHint":    widget.inputHint || "text"
+                })
+                dlgPage.pageCompleted.connect(function(dlg) {
+                    dlg.commandSent.connect(function(value) {
+                        if (widget.item && widget.item.name) {
+                            sendCommand(widget.item.name, value)
+                        }
+                    })
+                })
+            }
+
+            Row {
+                anchors.fill: parent
+                anchors.leftMargin: Theme.horizontalPageMargin
+                anchors.rightMargin: Theme.horizontalPageMargin
+                spacing: Theme.paddingMedium
+
+                Loader {
+                    id: inputIconLoader
+                    sourceComponent: smartIcon
+                    anchors.verticalCenter: parent.verticalCenter
+                    onLoaded: if (item) item.iconName = widget.icon || ""
+                    visible: widget.icon !== undefined && widget.icon !== "" && widget.icon !== "none"
+                    width: visible ? Theme.iconSizeSmall : 0
+                }
+
+                Label {
+                    text: displayLabel
+                    anchors.verticalCenter: parent.verticalCenter
+                    width: parent.width
+                        - (inputIconLoader.visible ? inputIconLoader.width + parent.spacing : 0)
+                        - inputStateLabel.implicitWidth - parent.spacing
+                        - inputEditIcon.width - parent.spacing
+                    truncationMode: TruncationMode.Fade
+                    color: inputListItem.highlighted ? Theme.highlightColor : Theme.primaryColor
+                }
+
+                Label {
+                    id: inputStateLabel
+                    text: displayState
+                    color: Theme.secondaryColor
+                    anchors.verticalCenter: parent.verticalCenter
+                }
+
+                Icon {
+                    id: inputEditIcon
+                    source: "image://theme/icon-m-edit"
+                    anchors.verticalCenter: parent.verticalCenter
+                }
+            }
+        }
+    }
+
+    // Webview component for embedded web content
+    Component {
+        id: webviewComp
+        Item {
+            width: listView.width
+            readonly property real _webviewHeight: (widget.height && widget.height > 0) ? widget.height * Theme.itemSizeMedium : 400
+            height: _webviewHeight
+            implicitHeight: _webviewHeight
+
+            WebView {
+                id: webViewItem
+                anchors.fill: parent
+                url: widget.url || ""
+                active: false
+
+                Component.onCompleted: {
+                    active = (page.status === PageStatus.Active)
+                }
+
+                Connections {
+                    target: page
+                    onStatusChanged: {
+                        webViewItem.active = (page.status === PageStatus.Active)
+                    }
+                }
+            }
+        }
+    }
+
+    // Buttongrid component – displays openHAB Buttongrid widget as a responsive button grid.
+    Component {
+        id: buttongridComp
+        ListItem {
+            id: buttongridItem
+            width: listView.width
+            contentHeight: bgColumn.height + Theme.paddingMedium
+            implicitHeight: contentHeight
+            highlighted: false
+
+            // Buttons parsed from the serialised JSON string in mappingsJson
+            readonly property var buttons: {
+                if (mappingsJson && mappingsJson !== "" && mappingsJson !== "[]") {
+                    try {
+                        var parsed = JSON.parse(mappingsJson);
+                        if (parsed && parsed.length > 0) {
+                            //console.log("[buttongridComp] buttons from mappingsJson: " + parsed.length);
+                            return parsed;
+                        }
+                    } catch (e) {
+                        console.log("[buttongridComp] JSON parse error: " + e);
+                    }
+                }
+                // Fallback: try widget.buttons directly (plain JS array from initial JSON parse may survive)
+                var wb = widget ? (widget.buttons || widget.mappings) : null;
+                if (wb && wb.length > 0) {
+                    console.log("[buttongridComp] buttons from widget.buttons fallback: " + wb.length);
+                    return wb;
+                }
+                console.log("[buttongridComp] No buttons found. mappingsJson='" + mappingsJson + "'");
+                return [];
+            }
+
+            readonly property string displayLabel: (widget.label || "").replace(/\s*\[.*\]/, "")
+
+            readonly property var buttonsByRow: {
+                var rowMap = {};
+                var rowOrder = [];
+                for (var i = 0; i < buttons.length; i++) {
+                    var btn = buttons[i];
+                    var r = btn.row !== undefined ? btn.row : 1;
+                    if (rowMap[r] === undefined) {
+                        rowMap[r] = [];
+                        rowOrder.push(r);
+                    }
+                    rowMap[r].push(btn);
+                }
+                rowOrder.sort(function(a, b) { return a - b; });
+                var result = [];
+                for (var j = 0; j < rowOrder.length; j++) {
+                    var row = rowMap[rowOrder[j]].slice();
+                    row.sort(function(a, b) { return a.column - b.column; });
+                    result.push(row);
+                }
+                return result;
+            }
+
+            Column {
+                id: bgColumn
+                width: parent.width
+                spacing: Theme.paddingSmall
+
+                // ── Header row: icon + label ──────────────────────────────────────────
+                Row {
+                    x: Theme.horizontalPageMargin
+                    width: parent.width - 2 * Theme.horizontalPageMargin
+                    height: Theme.itemSizeMedium
+                    spacing: Theme.paddingMedium
+
+                    Loader {
+                        id: bgIconLoader
+                        sourceComponent: smartIcon
+                        anchors.verticalCenter: parent.verticalCenter
+                        onLoaded: if (item) item.iconName = widget.icon || ""
+                        visible: widget.icon !== undefined && widget.icon !== "" && widget.icon !== "none"
+                        width: visible ? Theme.iconSizeSmall : 0
+                    }
+
+                    Label {
+                        text: buttongridItem.displayLabel
+                        anchors.verticalCenter: parent.verticalCenter
+                        width: parent.width - (bgIconLoader.visible ? bgIconLoader.width + parent.spacing : 0)
+                        truncationMode: TruncationMode.Fade
+                        color: Theme.primaryColor
+                    }
+                }
+
+                // ── Button grid: iOS-style card container ────────────────────────────
+                Rectangle {
+                    x: Theme.horizontalPageMargin
+                    width: parent.width - 2 * Theme.horizontalPageMargin
+                    height: btnGridInner.height + Theme.paddingMedium * 2
+                    radius: Theme.paddingLarge
+                    color: Qt.rgba(Theme.highlightColor.r, Theme.highlightColor.g, Theme.highlightColor.b, 0.07)
+                    border.width: 1
+                    border.color: Qt.rgba(Theme.highlightColor.r, Theme.highlightColor.g, Theme.highlightColor.b, 0.18)
+
+                    // Placeholder when no buttons are configured
+                    Label {
+                        visible: buttongridItem.buttonsByRow.length === 0
+                        anchors.centerIn: parent
+                        width: parent.width - Theme.paddingMedium * 2
+                        height: Theme.itemSizeSmall
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                        text: qsTr("No buttons configured")
+                        color: Theme.secondaryColor
+                        font.pixelSize: Theme.fontSizeSmall
+                    }
+
+                    Column {
+                        id: btnGridInner
+                        x: Theme.paddingMedium
+                        y: Theme.paddingMedium
+                        width: parent.width - 2 * Theme.paddingMedium
+                        spacing: Theme.paddingSmall
+
+                        Repeater {
+                            model: buttongridItem.buttonsByRow
+
+                            // One horizontal row of buttons
+                            Row {
+                                id: btnRow
+                                property var rowButtons: modelData
+                                width: parent.width
+                                // Compact iOS-like button height
+                                height: Theme.itemSizeExtraSmall + Theme.paddingSmall
+                                spacing: Theme.paddingSmall
+
+                                Repeater {
+                                    model: btnRow.rowButtons
+
+                                    Rectangle {
+                                        id: btnRect
+                                        property var btn: modelData
+                                        property bool isActive: currentState !== "" && currentState === btn.command
+                                        property bool isPressed: btnMouseArea.pressed
+
+                                        width: Math.max(0,
+                                                   (btnRow.width - (btnRow.rowButtons.length - 1) * btnRow.spacing)
+                                                   / Math.max(1, btnRow.rowButtons.length))
+                                        height: btnRow.height
+                                        radius: height * 0.32
+
+                                        color: isActive
+                                            ? (isPressed
+                                               ? Qt.darker(Theme.highlightColor, 1.25)
+                                               : Theme.highlightColor)
+                                            : (isPressed
+                                               ? Qt.rgba(Theme.highlightColor.r, Theme.highlightColor.g, Theme.highlightColor.b, 0.28)
+                                               : Qt.rgba(Theme.highlightColor.r, Theme.highlightColor.g, Theme.highlightColor.b, 0.11))
+
+                                        border.width: isActive ? 0 : 1
+                                        border.color: Qt.rgba(Theme.highlightColor.r, Theme.highlightColor.g, Theme.highlightColor.b, 0.38)
+
+                                        scale: isPressed ? 0.94 : 1.0
+                                        Behavior on scale { NumberAnimation { duration: 80; easing.type: Easing.OutCubic } }
+                                        Behavior on color  { ColorAnimation  { duration: 100 } }
+
+                                        Label {
+                                            anchors.centerIn: parent
+                                            width: parent.width - Theme.paddingSmall * 2
+                                            text: btn.label || btn.command || ""
+                                            font.pixelSize: Theme.fontSizeSmall
+                                            font.bold: isActive
+                                            // White text on filled active button (iOS pattern)
+                                            color: isActive ? "white" : Theme.primaryColor
+                                            horizontalAlignment: Text.AlignHCenter
+                                            truncationMode: TruncationMode.Fade
+                                            elide: Text.ElideRight
+                                        }
+
+                                        MouseArea {
+                                            id: btnMouseArea
+                                            anchors.fill: parent
+                                            onClicked: {
+                                                if (widget.item && widget.item.name) {
+                                                    sendCommand(widget.item.name, btn.command);
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // Bottom padding
+                Item { width: parent.width; height: Theme.paddingSmall }
+            }
+        }
+    }
+
+    // Chart component – fetches the openHAB chart as an image from the /chart endpoint.
+    // URL pattern: {base_url}/chart?items={item.name}&period={period}&legend={legend}
+    // The image is automatically reloaded when the refresh timer expires.
+    Component {
+        id: chartComp
+        ListItem {
+            id: chartListItem
+            width: listView.width
+            contentHeight: chartColumn.height + Theme.paddingMedium
+            implicitHeight: contentHeight
+            enabled: false
+
+            readonly property string displayLabel: (widget.label || "").replace(/\s*\[.*\]/, "")
+
+            // Cache-busting timestamp – updated by the refresh timer
+            property int _cacheBust: Math.floor(Date.now() / 1000)
+
+            property int _refreshMs: {
+                var r = widget.refresh !== undefined ? widget.refresh : 0;
+                if (r <= 0) return 600000;
+                if (r < 10000) return r * 1000;  // looks like seconds → convert to ms
+                return r;
+            }
+
+            readonly property string chartUrl: {
+                var params = [];
+
+                if (widget.item && widget.item.name && widget.item.name !== "") {
+                    params.push("items=" + encodeURIComponent(widget.item.name));
+                } else if (widget.items && widget.items.length > 0) {
+                    for (var i = 0; i < widget.items.length; i++) {
+                        if (widget.items[i] && widget.items[i].name)
+                            params.push("items=" + encodeURIComponent(widget.items[i].name));
+                    }
+                }
+
+                // Time period (e.g. "D", "W", "M", "Y", "h", "3W-h")
+                if (widget.period && widget.period !== "")
+                    params.push("period=" + encodeURIComponent(widget.period));
+
+                if (widget.legend !== undefined && widget.legend !== null && widget.legend !== "")
+                    params.push("legend=" + widget.legend);
+
+                // Persistence service (optional)
+                if (widget.service && widget.service !== "")
+                    params.push("service=" + encodeURIComponent(widget.service));
+
+                // Dark theme to match Sailfish OS appearance
+                params.push("theme=dark");
+
+                // Cache-busting: forces image reload after timer fires
+                params.push("t=" + _cacheBust);
+
+                return settings.base_url + "/chart?" + params.join("&");
+            }
+
+            // Refresh timer
+            Timer {
+                id: chartRefreshTimer
+                interval: chartListItem._refreshMs
+                running: true
+                repeat: true
+                onTriggered: {
+                    chartListItem._cacheBust = Math.floor(Date.now() / 1000);
+                    console.log("[Chart] Image refreshed: " + chartListItem.chartUrl);
+                }
+            }
+
+            Column {
+                id: chartColumn
+                width: parent.width
+                spacing: 0
+
+                Row {
+                    x: Theme.horizontalPageMargin
+                    width: parent.width - 2 * Theme.horizontalPageMargin
+                    height: Theme.itemSizeSmall
+                    spacing: Theme.paddingMedium
+                    visible: chartListItem.displayLabel !== ""
+
+                    Loader {
+                        sourceComponent: smartIcon
+                        onLoaded: if (item) item.iconName = widget.icon
+                        anchors.verticalCenter: parent.verticalCenter
+                    }
+
+                    Label {
+                        text: chartListItem.displayLabel
+                        anchors.verticalCenter: parent.verticalCenter
+                        truncationMode: TruncationMode.Fade
+                        width: parent.width - Theme.iconSizeSmall - Theme.paddingMedium
+                        color: Theme.primaryColor
+                    }
+                }
+
+                Rectangle {
+                    visible: chartListItem.displayLabel !== ""
+                    width: parent.width - 2 * Theme.horizontalPageMargin
+                    height: 1
+                    x: Theme.horizontalPageMargin
+                    color: Theme.rgba(Theme.primaryColor, 0.12)
+                }
+
+                Item {
+                    width: parent.width - 2 * Theme.horizontalPageMargin
+                    height: Math.round(width * 9 / 16)
+                    x: Theme.horizontalPageMargin
+
+                    Rectangle {
+                        anchors.fill: parent
+                        color: Theme.rgba(Theme.overlayBackgroundColor, 0.6)
+                        radius: Theme.paddingSmall
+                    }
+
+                    Image {
+                        id: chartImage
+                        anchors.fill: parent
+                        anchors.margins: Theme.paddingSmall
+                        fillMode: Image.PreserveAspectFit
+                        source: chartListItem.chartUrl
+                        asynchronous: true
+                        cache: false
+                        smooth: true
+                    }
+
+                    BusyIndicator {
+                        anchors.centerIn: parent
+                        running: chartImage.status === Image.Loading
+                        size: BusyIndicatorSize.Medium
+                    }
+
+                    Column {
+                        anchors.centerIn: parent
+                        spacing: Theme.paddingSmall
+                        visible: chartImage.status === Image.Error
+
+                        Image {
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            source: "image://theme/icon-m-warning"
+                            width: Theme.iconSizeMedium
+                            height: Theme.iconSizeMedium
+                        }
+
+                        Label {
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            text: qsTr("Chart unavailable")
+                            color: Theme.secondaryColor
+                            font.pixelSize: Theme.fontSizeSmall
+                        }
+                    }
+
+                    Label {
+                        anchors.centerIn: parent
+                        visible: !widget.item && !(widget.items && widget.items.length > 0)
+                        text: qsTr("No item configured")
+                        color: Theme.secondaryColor
+                        font.pixelSize: Theme.fontSizeSmall
+                    }
+                }
+                
+                Row {
+                    x: Theme.horizontalPageMargin
+                    width: parent.width - 2 * Theme.horizontalPageMargin
+                    height: Theme.itemSizeExtraSmall
+                    spacing: Theme.paddingMedium
+
+                    Label {
+                        anchors.verticalCenter: parent.verticalCenter
+                        text: widget.period ? qsTr("Period: ") + widget.period : ""
+                        color: Theme.secondaryColor
+                        font.pixelSize: Theme.fontSizeExtraSmall
+                        visible: widget.period && widget.period !== ""
+                    }
+
+                    Label {
+                        anchors.verticalCenter: parent.verticalCenter
+                        text: qsTr("Every %1 min.").arg(Math.round(chartListItem._refreshMs / 60000))
+                        color: Theme.secondaryColor
+                        font.pixelSize: Theme.fontSizeExtraSmall
+                        visible: chartListItem._refreshMs >= 60000
+                    }
+                }
+
+                Item { width: parent.width; height: Theme.paddingSmall }
+            }
+        }
+    }
+
     // Group component that navigates to a linked page if available, otherwise shows as disabled text
     Component {
         id: groupComp
@@ -766,11 +2160,12 @@ Page {
             width: listView.width
             contentHeight: Theme.itemSizeMedium
             enabled: !!(widget.linkedPage)
+            property string _groupLabel: widget.label ? widget.label.replace(/\s*\[.*\]/, "") : ""
             onClicked: {
                 if (widget.linkedPage) {
                     pageStack.animatorPush(Qt.resolvedUrl("SitemapPage.qml"), {
                         "sitemapName": widget.linkedPage.link,
-                        "pageTitle": widget.label
+                        "pageTitle": _groupLabel
                     });
                 }
             }
@@ -788,7 +2183,8 @@ Page {
                 }
 
                 Label {
-                    text: widget.label || ""
+
+                    text: _groupLabel || ""
                     anchors.verticalCenter: parent.verticalCenter
                     color: groupItem.enabled ? Theme.primaryColor : Theme.secondaryColor
                     width: parent.width - (Theme.iconSizeSmall * 2 + Theme.paddingMedium * 4) - Theme.paddingLarge

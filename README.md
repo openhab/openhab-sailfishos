@@ -19,12 +19,14 @@ The documentation is available at [www.openhab.org/docs/](https://www.openhab.or
 ## Features
 
 - Demo Mode: Explore the app without connecting to an openHAB server
+- Local authentication supported - if enabled on openHAB server.
 - Display your Main UI Webview
 - Display your sitemaps and widgets and control your devices from your mobile device
-- Supported widgets/element-types within sitemap: Frame, Text, Group, Switch, Switches with Button-Mappings, Selections, Slider, Rollershutter
-- Customizable CoverActions via Settings
+- Supported widgets/element-types within sitemap: Frame, Text, Group, Switch, Switches with Button-Mappings, Selections, Slider, Rollershutter, Colorpicker, Setpoint, Image, Mapview, Input, Webview, Video, Colortemperaturepicker, Buttongrid, Chart
+- Customizable CoverAction-Buttons via Settings
+- Customizable CoverPage (display of max. 2 item states) via Settings
 
-<img src="docs/images/main-ui.png" alt="Main UI" width=200px> <img src="docs/images/sitemap-1.png" alt="Settings" width=200px> <img src="docs/images/sitemap-2.png" alt="Sitemap view" width=200px>
+<img src="docs/images/main-ui.png" alt="Main UI" width=200px> <img src="docs/images/sitemap-1.png" alt="sitemap view" width=200px> <img src="docs/images/sitemap-2.png" alt="Sitemap view" width=200px>
 
 For more screenshots, see [docs/images/](docs/images/) in the GitHub repository.
 
@@ -35,14 +37,11 @@ For more screenshots, see [docs/images/](docs/images/) in the GitHub repository.
 
 ## Roadmap
 
-- Version 0.0.3 (planned):
-  - Add optional authentication for local servers
-  - Enhance supported widgets/element-types
-  - Management of translations via CrowdIn
-  - Customizable Text Items on CoverPage
-- Version 0.0.4 (planned):
+- Version 1.0.0 (planned):
   - Add support for remote access (via openHAB cloud)
   - Add App Notifications (via openHAB cloud)
+  - Add support for openHAB tiles (HABPanel, Basic UI, etc.)
+  - Management of translations via CrowdIn
 
 ## Contributing to the project
 

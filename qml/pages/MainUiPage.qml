@@ -79,10 +79,10 @@ Page {
 
     WebView {
         id: webView
-        anchors.top: toolbar.bottom
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.bottom: parent.bottom
+        x: 0
+        y: toolbar.height
+        width: mainUiPage.width
+        height: mainUiPage.height - toolbar.height
         url: settings.base_url
         active: false
     }

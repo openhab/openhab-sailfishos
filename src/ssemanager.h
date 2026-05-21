@@ -16,7 +16,9 @@ public:
     bool isActive() const;
 
 public slots:
-    void connectToOpenHAB(const QString &baseUrl);
+    void connectToOpenHAB(const QString &baseUrl,
+                          const QString &username = QString(),
+                          const QString &password = QString());
     void disconnectFromOpenHAB();
 
 signals:
@@ -34,6 +36,8 @@ private:
     QNetworkAccessManager m_nam;
     QNetworkReply *m_reply = nullptr;
     QString m_baseUrl;
+    QString m_username;
+    QString m_password;
     bool m_active = false;
     bool m_shouldReconnect = false;
 };
