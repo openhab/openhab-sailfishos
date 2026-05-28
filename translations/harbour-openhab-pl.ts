@@ -1,312 +1,312 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="sv-SE" sourcelanguage="en">
+<TS version="2.1" language="pl" sourcelanguage="en">
   <context>
     <name>ColorPickerPage</name>
     <message>
       <source>Color Picker</source>
-      <translation>Färgväljare</translation>
+      <translation type="unfinished">Color Picker</translation>
     </message>
     <message>
       <source>Hue</source>
-      <translation>Nyans</translation>
+      <translation type="unfinished">Hue</translation>
     </message>
     <message>
       <source>Saturation</source>
-      <translation>Mättnad</translation>
+      <translation type="unfinished">Saturation</translation>
     </message>
     <message>
       <source>Brightness</source>
-      <translation>Ljusstyrka</translation>
+      <translation type="unfinished">Brightness</translation>
     </message>
     <message>
       <source>Preset Colors</source>
-      <translation>Förinställda färger</translation>
+      <translation type="unfinished">Preset Colors</translation>
     </message>
   </context>
   <context>
     <name>InputDialog</name>
     <message>
       <source>Set value</source>
-      <translation>Ange värde</translation>
+      <translation type="unfinished">Set value</translation>
     </message>
     <message>
       <source>Cancel</source>
-      <translation>Avbryt</translation>
+      <translation type="unfinished">Cancel</translation>
     </message>
     <message>
       <source>Current value: %1</source>
-      <translation>Aktuellt värde: %1</translation>
+      <translation type="unfinished">Current value: %1</translation>
     </message>
     <message>
       <source>(not set)</source>
-      <translation>(ej angivet)</translation>
+      <translation type="unfinished">(not set)</translation>
     </message>
     <message>
       <source>Enter new value</source>
-      <translation>Ange nytt värde</translation>
+      <translation type="unfinished">Enter new value</translation>
     </message>
   </context>
   <context>
     <name>LegalPage</name>
     <message>
       <source>Legal</source>
-      <translation>Juridik</translation>
+      <translation type="unfinished">Legal</translation>
     </message>
     <message>
       <source>Copyright © 2026, Contributors to the openHAB project</source>
-      <translation>Copyright © 2026, Bidragsgivare till openHAB-projektet</translation>
+      <translation type="unfinished">Copyright © 2026, Contributors to the openHAB project</translation>
     </message>
   </context>
   <context>
     <name>MainUiPage</name>
     <message>
       <source>openHAB Main UI</source>
-      <translation>openHAB Huvudgränssnitt</translation>
+      <translation type="unfinished">openHAB Main UI</translation>
     </message>
   </context>
   <context>
     <name>SettingsPage</name>
     <message>
       <source>Save</source>
-      <translation>Spara</translation>
+      <translation type="unfinished">Save</translation>
     </message>
     <message>
       <source>Settings</source>
-      <translation>Inställningar</translation>
+      <translation type="unfinished">Settings</translation>
     </message>
     <message>
       <source>General</source>
-      <translation>Allmänt</translation>
+      <translation type="unfinished">General</translation>
     </message>
     <message>
       <source>Demo Mode</source>
-      <translation>Demoläge</translation>
+      <translation type="unfinished">Demo Mode</translation>
     </message>
     <message>
       <source>If selected, Demo SiteMaps and DemoPages will be shown.</source>
-      <translation>Om markerat kommer Demo-sidkartor och Demo-sidor att visas.</translation>
+      <translation type="unfinished">If selected, Demo SiteMaps and DemoPages will be shown.</translation>
     </message>
     <message>
       <source>Local server</source>
-      <translation>Lokal server</translation>
+      <translation type="unfinished">Local server</translation>
     </message>
     <message>
       <source>URL</source>
-      <translation>URL</translation>
+      <translation type="unfinished">URL</translation>
     </message>
     <message>
       <source>https://demo.openhab.org</source>
-      <translation>https://demo.openhab.org</translation>
+      <translation type="unfinished">https://demo.openhab.org</translation>
     </message>
     <message>
       <source>Cover actions</source>
-      <translation>Miniatyråtgärder</translation>
+      <translation type="unfinished">Cover actions</translation>
     </message>
     <message>
       <source>Left button</source>
-      <translation>Vänster knapp</translation>
+      <translation type="unfinished">Left button</translation>
     </message>
     <message>
       <source>Item-ID</source>
-      <translation>Objekt-ID</translation>
+      <translation type="unfinished">Item-ID</translation>
     </message>
     <message>
       <source>Command</source>
-      <translation>Kommando</translation>
+      <translation type="unfinished">Command</translation>
     </message>
     <message>
       <source>e.g. ON, OFF, TOGGLE</source>
-      <translation>T.ex. PÅ, AV, VÄXLA</translation>
+      <translation type="unfinished">e.g. ON, OFF, TOGGLE</translation>
     </message>
     <message>
       <source>Right button</source>
-      <translation>Höger knapp</translation>
+      <translation type="unfinished">Right button</translation>
     </message>
     <message>
       <source>Scroll to top</source>
-      <translation>Skrolla till toppen</translation>
+      <translation type="unfinished">Scroll to top</translation>
     </message>
     <message>
       <source>About</source>
-      <translation>Om</translation>
+      <translation type="unfinished">About</translation>
     </message>
     <message>
       <source>App Version</source>
-      <translation>Appversion</translation>
+      <translation type="unfinished">App Version</translation>
     </message>
     <message>
       <source>Legal</source>
-      <translation>Juridik</translation>
+      <translation type="unfinished">Legal</translation>
     </message>
     <message>
       <source>Privacy Policy</source>
-      <translation>Integritetspolicy</translation>
+      <translation type="unfinished">Privacy Policy</translation>
     </message>
     <message>
       <source>e.g. item_id1</source>
-      <translation>T.ex. objekt_id1</translation>
+      <translation type="unfinished">e.g. item_id1</translation>
     </message>
     <message>
       <source>Report a bug or request a feature</source>
-      <translation>Rapportera ett fel eller be om en funktion</translation>
+      <translation type="unfinished">Report a bug or request a feature</translation>
     </message>
     <message>
       <source>Username</source>
-      <translation>Användarnamn</translation>
+      <translation type="unfinished">Username</translation>
     </message>
     <message>
       <source>Password</source>
-      <translation>Lösenord</translation>
+      <translation type="unfinished">Password</translation>
     </message>
     <message>
       <source>Enter username</source>
-      <translation>Ange användarnamn</translation>
+      <translation type="unfinished">Enter username</translation>
     </message>
     <message>
       <source>Enter password</source>
-      <translation>Ange lösenord</translation>
+      <translation type="unfinished">Enter password</translation>
     </message>
     <message>
       <source>OPTIONAL: Server username – leave empty to send no credentials.</source>
-      <translation>VALFRITT: Serveranvändarnamn – Lämnas tomt för att inte skicka några uppgifter.</translation>
+      <translation type="unfinished">OPTIONAL: Server username – leave empty to send no credentials.</translation>
     </message>
     <message>
       <source>OPTIONAL: Server password – leave empty to send no credentials.</source>
-      <translation>VALFRITT: Serverlösenord – Lämnas tomt för att inte skicka några uppgifter.</translation>
+      <translation type="unfinished">OPTIONAL: Server password – leave empty to send no credentials.</translation>
     </message>
     <message>
       <source>Cover Items</source>
-      <translation>Miniatyrobjekt</translation>
+      <translation type="unfinished">Cover Items</translation>
     </message>
     <message>
       <source>e.g. item_id2</source>
-      <translation>T.ex. objekt_id2</translation>
+      <translation type="unfinished">e.g. item_id2</translation>
     </message>
     <message>
       <source>Configure Item-IDs and commands for the app cover quick actions. Leave empty to hide an action.</source>
-      <translation>Konfigurera artikel-ID:n och kommandon för appens miniatyr, för snabba åtgärder. Lämnas tomt för att dölja en åtgärd.</translation>
+      <translation type="unfinished">Configure Item-IDs and commands for the app cover quick actions. Leave empty to hide an action.</translation>
     </message>
     <message>
       <source>Configure Item-IDs for app cover display. Leave empty to do not display item states.</source>
-      <translation>Konfigurera objekt-ID:n för appens miniatyrvisning. Lämnas tomt för att inte visa objektstatus.</translation>
+      <translation type="unfinished">Configure Item-IDs for app cover display. Leave empty to do not display item states.</translation>
     </message>
     <message>
       <source>Cover item refresh time (milliseconds)</source>
-      <translation>Miniatyrobjektets uppdateringstid (ms)</translation>
+      <translation type="unfinished">Cover item refresh time (milliseconds)</translation>
     </message>
   </context>
   <context>
     <name>SitemapPage</name>
     <message>
       <source>Scroll to top</source>
-      <translation>Skrolla till toppen</translation>
+      <translation type="unfinished">Scroll to top</translation>
     </message>
     <message>
       <source>No image available</source>
-      <translation>Ingen bild tillgänglig</translation>
+      <translation type="unfinished">No image available</translation>
     </message>
     <message>
       <source>Image format not supported</source>
-      <translation>Bildformatet stöds inte</translation>
+      <translation type="unfinished">Image format not supported</translation>
     </message>
     <message>
       <source>No location data</source>
-      <translation>Ingen platsdata</translation>
+      <translation type="unfinished">No location data</translation>
     </message>
     <message>
       <source>Map tile could not be loaded</source>
-      <translation>Kartruta kunde inte läsas in</translation>
+      <translation type="unfinished">Map tile could not be loaded</translation>
     </message>
     <message>
       <source>No video URL configured</source>
-      <translation>Ingen video-URL konfigurerad</translation>
+      <translation type="unfinished">No video URL configured</translation>
     </message>
     <message>
       <source>Tap to play</source>
-      <translation>Tryck för att spela</translation>
+      <translation type="unfinished">Tap to play</translation>
     </message>
     <message>
       <source>Video</source>
-      <translation>Video</translation>
+      <translation type="unfinished">Video</translation>
     </message>
     <message>
       <source>Open in browser</source>
-      <translation>Öppna i webbläsaren</translation>
+      <translation type="unfinished">Open in browser</translation>
     </message>
     <message>
       <source>No buttons configured</source>
-      <translation>Inga knappar konfigurerade</translation>
+      <translation type="unfinished">No buttons configured</translation>
     </message>
     <message>
       <source>Chart unavailable</source>
-      <translation>Diagram ej tillgängligt</translation>
+      <translation type="unfinished">Chart unavailable</translation>
     </message>
     <message>
       <source>No item configured</source>
-      <translation>Inget objekt konfigurerat</translation>
+      <translation type="unfinished">No item configured</translation>
     </message>
     <message>
       <source>Period: </source>
-      <translation>Period: </translation>
+      <translation type="unfinished">Period: </translation>
     </message>
     <message>
       <source>Every %1 min.</source>
-      <translation>Varje %1 min.</translation>
+      <translation type="unfinished">Every %1 min.</translation>
     </message>
     <message>
       <source>Refresh Sitemap</source>
-      <translation>Uppdatera sidkarta</translation>
+      <translation type="unfinished">Refresh Sitemap</translation>
     </message>
   </context>
   <context>
     <name>SitemapPullDownMenu</name>
     <message>
       <source>Refresh Sitemaps</source>
-      <translation>Uppdatera sidkartor</translation>
+      <translation type="unfinished">Refresh Sitemaps</translation>
     </message>
     <message>
       <source>Settings</source>
-      <translation>Inställningar</translation>
+      <translation type="unfinished">Settings</translation>
     </message>
     <message>
       <source>─────────────────</source>
-      <translation>─────────────────</translation>
+      <translation type="unfinished">─────────────────</translation>
     </message>
     <message>
       <source>Main</source>
-      <translation>Viktigast</translation>
+      <translation type="unfinished">Main</translation>
     </message>
   </context>
   <context>
     <name>SitemapSelectionPage</name>
     <message>
       <source>Navigation</source>
-      <translation>Navigering</translation>
+      <translation type="unfinished">Navigation</translation>
     </message>
     <message>
       <source>Sitemaps</source>
-      <translation>Sidkartor</translation>
+      <translation type="unfinished">Sitemaps</translation>
     </message>
     <message>
       <source>Settings</source>
-      <translation>Inställningar</translation>
+      <translation type="unfinished">Settings</translation>
     </message>
     <message>
       <source>Refresh Sitemaps</source>
-      <translation>Uppdatera sidkartor</translation>
+      <translation type="unfinished">Refresh Sitemaps</translation>
     </message>
     <message>
       <source>Home</source>
-      <translation>Hem</translation>
+      <translation type="unfinished">Home</translation>
     </message>
     <message>
       <source>Main</source>
-      <translation>Viktigast</translation>
+      <translation type="unfinished">Main</translation>
     </message>
     <message>
       <source>System</source>
-      <translation>System</translation>
+      <translation type="unfinished">System</translation>
     </message>
   </context>
 </TS>
