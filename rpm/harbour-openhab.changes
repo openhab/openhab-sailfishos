@@ -12,6 +12,10 @@
 # * date Author's Name <author's email> version-release
 # - Summary of changes
 
+* Tue May 28 2026 Dominik Heidinger <dominikh@atomicmail.io> 1.0-1
+- CHANGED: translations migrated to crowdin.com
+- FIX: Added trigger when settings are changed, to update coverpage item states immediately.
+
 * Sun May 17 2026 Dominik Heidinger <dominikh@atomicmail.io> 0.3-1
 - New supported sitemap widgets: Colorpicker, Setpoint, Image, Mapview, Input, Webview, Video, Colortemperaturepicker, Buttongrid, Chart.
 - ADDED: Local authentication - if enabled on openHAB server.

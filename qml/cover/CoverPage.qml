@@ -117,6 +117,26 @@ CoverBackground {
         onTriggered: refreshItems()
     }
 
+    // Debounce timer: prevents multiple refreshItems() calls when several
+    // settings properties change at the same time (e.g. username + password).
+    Timer {
+        id: _settingsChangedTimer
+        interval: 300
+        repeat: false
+        onTriggered: refreshItems()
+    }
+
+    // React to settings changes (e.g. after the SettingsPage is closed)
+    // and update the cover immediately without waiting for the next timer tick.
+    Connections {
+        target: settings
+        onUsername_localChanged:        _settingsChangedTimer.restart()
+        onPassword_localChanged:        _settingsChangedTimer.restart()
+        onBase_urlChanged:              _settingsChangedTimer.restart()
+        onCoverItem1Changed:            _settingsChangedTimer.restart()
+        onCoverItem2Changed:            _settingsChangedTimer.restart()
+    }
+
     Column {
         anchors {
             top: parent.top
