@@ -93,11 +93,11 @@
     </message>
     <message>
       <source>URL</source>
-      <translation type="unfinished">URL</translation>
+      <translation>URL</translation>
     </message>
     <message>
       <source>https://demo.openhab.org</source>
-      <translation type="unfinished">https://demo.openhab.org</translation>
+      <translation>https://demo.openhab.org</translation>
     </message>
     <message>
       <source>Cover actions</source>
@@ -228,7 +228,7 @@
     </message>
     <message>
       <source>Video</source>
-      <translation type="unfinished">Video</translation>
+      <translation>Video</translation>
     </message>
     <message>
       <source>Open in browser</source>
@@ -248,7 +248,7 @@
     </message>
     <message>
       <source>Period: </source>
-      <translation type="unfinished">Period: </translation>
+      <translation>Period: </translation>
     </message>
     <message>
       <source>Every %1 min.</source>
@@ -271,7 +271,7 @@
     </message>
     <message>
       <source>─────────────────</source>
-      <translation type="unfinished">─────────────────</translation>
+      <translation>─────────────────</translation>
     </message>
     <message>
       <source>Main</source>
@@ -306,7 +306,7 @@
     </message>
     <message>
       <source>System</source>
-      <translation type="unfinished">System</translation>
+      <translation>System</translation>
     </message>
   </context>
 </TS>
