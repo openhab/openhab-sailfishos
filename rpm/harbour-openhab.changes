@@ -12,7 +12,7 @@
 # * date Author's Name <author's email> version-release
 # - Summary of changes
 
-* Tue May 28 2026 Dominik Heidinger <dominikh@atomicmail.io> 1.0-1
+* Tue May 28 2026 Dominik Heidinger <dominikh@atomicmail.io> 0.3-2
 - CHANGED: translations migrated to crowdin.com
 - FIX: Added trigger when settings are changed, to update coverpage item states immediately.
 
