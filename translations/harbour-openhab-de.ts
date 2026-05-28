@@ -21,7 +21,7 @@
     </message>
     <message>
       <source>Preset Colors</source>
-      <translation>voreingestellte Farben</translation>
+      <translation>Voreingestellte Farben</translation>
     </message>
   </context>
   <context>
@@ -51,18 +51,18 @@
     <name>LegalPage</name>
     <message>
       <source>Legal</source>
-      <translation type="unfinished">Legal</translation>
+      <translation>Legal</translation>
     </message>
     <message>
       <source>Copyright © 2026, Contributors to the openHAB project</source>
-      <translation type="unfinished">Copyright © 2026, Contributors to the openHAB project</translation>
+      <translation>Copyright © 2026, Mitwirkende des openHAB-Projekts</translation>
     </message>
   </context>
   <context>
     <name>MainUiPage</name>
     <message>
       <source>openHAB Main UI</source>
-      <translation type="unfinished">openHAB Main UI</translation>
+      <translation>openHAB  Main-UI</translation>
     </message>
   </context>
   <context>
@@ -93,11 +93,11 @@
     </message>
     <message>
       <source>URL</source>
-      <translation type="unfinished">URL</translation>
+      <translation>URL</translation>
     </message>
     <message>
       <source>https://demo.openhab.org</source>
-      <translation type="unfinished">https://demo.openhab.org</translation>
+      <translation>https://demo.openhab.org</translation>
     </message>
     <message>
       <source>Cover actions</source>
@@ -109,11 +109,11 @@
     </message>
     <message>
       <source>Item-ID</source>
-      <translation type="unfinished">Item-ID</translation>
+      <translation>Item-ID</translation>
     </message>
     <message>
       <source>Command</source>
-      <translation type="unfinished">Command</translation>
+      <translation>Kommando</translation>
     </message>
     <message>
       <source>e.g. ON, OFF, TOGGLE</source>
@@ -137,7 +137,7 @@
     </message>
     <message>
       <source>Legal</source>
-      <translation type="unfinished">Legal</translation>
+      <translation>Legal</translation>
     </message>
     <message>
       <source>Privacy Policy</source>
@@ -204,31 +204,31 @@
     </message>
     <message>
       <source>No image available</source>
-      <translation>Kein Bild verfügbar.</translation>
+      <translation>Kein Bild verfügbar</translation>
     </message>
     <message>
       <source>Image format not supported</source>
-      <translation>Bildformat nicht unterstützt.</translation>
+      <translation>Bildformat nicht unterstützt</translation>
     </message>
     <message>
       <source>No location data</source>
-      <translation>Keine GPS Positionsdaten vorhanden.</translation>
+      <translation>Keine GPS Positionsdaten vorhanden</translation>
     </message>
     <message>
       <source>Map tile could not be loaded</source>
-      <translation>Karte konnte nicht geladen werden.</translation>
+      <translation>Karte konnte nicht geladen werden</translation>
     </message>
     <message>
       <source>No video URL configured</source>
-      <translation>Keine Video URL konfiguriert.</translation>
+      <translation>Keine Video-URL konfiguriert</translation>
     </message>
     <message>
       <source>Tap to play</source>
-      <translation>zum Abspielen tippen</translation>
+      <translation>Zum Abspielen tippen</translation>
     </message>
     <message>
       <source>Video</source>
-      <translation type="unfinished">Video</translation>
+      <translation>Video</translation>
     </message>
     <message>
       <source>Open in browser</source>
@@ -248,7 +248,7 @@
     </message>
     <message>
       <source>Period: </source>
-      <translation>Zeitspanne: </translation>
+      <translation>Zeitspanne:</translation>
     </message>
     <message>
       <source>Every %1 min.</source>
@@ -271,7 +271,7 @@
     </message>
     <message>
       <source>─────────────────</source>
-      <translation type="unfinished">─────────────────</translation>
+      <translation>─────────────────</translation>
     </message>
     <message>
       <source>Main</source>
@@ -282,11 +282,11 @@
     <name>SitemapSelectionPage</name>
     <message>
       <source>Navigation</source>
-      <translation type="unfinished">Navigation</translation>
+      <translation>Navigation</translation>
     </message>
     <message>
       <source>Sitemaps</source>
-      <translation type="unfinished">Sitemaps</translation>
+      <translation>Sitemaps</translation>
     </message>
     <message>
       <source>Settings</source>
@@ -298,7 +298,7 @@
     </message>
     <message>
       <source>Home</source>
-      <translation type="unfinished">Home</translation>
+      <translation>Home</translation>
     </message>
     <message>
       <source>Main</source>
@@ -306,7 +306,7 @@
     </message>
     <message>
       <source>System</source>
-      <translation type="unfinished">System</translation>
+      <translation>System</translation>
     </message>
   </context>
 </TS>
