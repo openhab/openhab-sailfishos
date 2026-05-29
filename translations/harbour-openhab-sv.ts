@@ -195,6 +195,10 @@
         <source>Cover item refresh time (milliseconds)</source>
         <translation>Miniatyrobjektets uppdateringstid (ms)</translation>
     </message>
+    <message>
+        <source>Add a translation</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>SitemapPage</name>

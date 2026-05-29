@@ -37,37 +37,12 @@ Please also check out the official documentation on [Sailfish OS - Your first ap
 
 ## Localization
 
-All language/regional translations are managed here [translations/*](/translations/) in the GitHub repository.
-If you want to contribute translations, please submit them as pull requests against the `translations/harbour-openhab-{language-code}.ts` files directly.
+Concerning all [translations/*](translations/) files in the GitHub repository:
 
-- Go to folder translations.
-- If there is a file with your language code, click on it and select the edit icon
-- If not:
-  - Click on harbour-openhab.ts file
-  - Select copy icon (Copy raw file)
-  - Go back, click Add file -> Create new file
-  - Enter harbour-openhab-xx.ts replacing xx with your language code as the name. For example, de for german
-  - Paste the copied file in the new file's contents
-  - Add new translation file to the project by adding the following line to [harbour-openhab.pro](/harbour-openhab.pro):
+All language/regional translations are managed with [Crowdin](https://crowdin.com).
+Please do NOT contribute translations as pull requests against the [translations/*](translations/) files directly, but submit them through the Crowdin web service:
 
-    ```pro
-    TRANSLATIONS += translations/harbour-openhab-xx.ts
-    ```
-
-   replacing xx with your language code as the name. For example, de for german.
-- replace:
-
-  ```xml
-  <source>Save</source>
-  <translation type="unfinished"></translation>
-  ```
-
-  with the correct translation for your language (remove "type="unfinished" and add the translation in between the <translation> tags). For example, for german:
-
-  ```xml
-  <source>Save</source>
-  <translation>Speichern</translation>
-  ```
+- [https://crowdin.com/project/openhab-sailfishos](https://crowdin.com/project/openhab-sailfishos)
 
 Thanks for your consideration and contribution!
 

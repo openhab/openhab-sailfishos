@@ -298,6 +298,34 @@ Dialog {
             ListItem {
                 contentHeight: Theme.itemSizeMedium
 
+                onClicked: Qt.openUrlExternally("https://crowdin.com/project/openhab-sailfishos")
+
+                Label {
+                    anchors.left: parent.left
+                    anchors.leftMargin: Theme.horizontalPageMargin
+                    anchors.verticalCenter: parent.verticalCenter
+                    text: qsTr("Add a translation")
+                    color: Theme.primaryColor
+                }
+                Image {
+                    anchors.right: parent.right
+                    anchors.rightMargin: Theme.horizontalPageMargin
+                    anchors.verticalCenter: parent.verticalCenter
+                    source: "image://theme/icon-m-right"
+                    width: Theme.iconSizeSmall
+                    height: Theme.iconSizeSmall
+                }
+            }
+
+            Separator {
+                width: parent.width
+                color: Theme.primaryColor
+                horizontalAlignment: Qt.AlignHCenter
+            }
+
+            ListItem {
+                contentHeight: Theme.itemSizeMedium
+
                 onClicked: pageStack.push(Qt.resolvedUrl("LegalPage.qml"))
 
                 Label {
