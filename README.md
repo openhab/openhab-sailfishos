@@ -1,6 +1,7 @@
 <!-- markdownlint-disable MD041 -->
 <p align="center">
     <a href="https://github.com/openhab/openhab-sailfishos/actions/workflows/build.yaml"><img alt="GitHub Action" src="https://github.com/openhab/openhab-sailfishos/actions/workflows/build.yaml/badge.svg"></a>
+    <a href="https://crowdin.com/project/openhab-sailfishos"><img alt="Crowdin" src="https://badges.crowdin.net/openhab-sailfishos/localized.svg"></a>
     <br>
     <img alt="Logo" src="icons/harbour-openhab.svg" width="100">
     <br>
@@ -51,30 +52,12 @@ Please check out our [Developer Guide](docs/DEV-GUIDE.md) for more information o
 
 ## Localization
 
-All language/regional translations are managed here [translations/*](translations/) in the GitHub repository.
-If you want to contribute translations, please submit them as pull requests against the `translations/*/openHAB-{language-code}.ts` files directly.
+Concerning all [translations/*](translations/) files in the GitHub repository:
 
-- Go to folder translations.
-- If there is a file with your language code, click on it and select the edit icon
-- If not:
-  - Click on harbour-openHAB.ts file
-  - Select copy icon (Copy raw file)
-  - Go back, click Add file -> Create new file
-  - Enter openHAB-xx.ts replacing xx with your language code as the name. For example, de for german
-  - Paste the copied file in the new file's contents
-- replace:
+All language/regional translations are managed with [Crowdin](https://crowdin.com).
+Please do NOT contribute translations as pull requests against the [translations/*](translations/) files directly, but submit them through the Crowdin web service:
 
-  ```xml
-  <source>Save</source>
-  <translation type="unfinished"></translation>
-  ```
-
-  with the correct translation for your language (remove "type="unfinished" and add the translation in between the <translation> tags). For example, for german:
-
-  ```xml
-  <source>Save</source>
-  <translation>Speichern</translation>
-  ```
+- [https://crowdin.com/project/openhab-sailfishos](https://crowdin.com/project/openhab-sailfishos)
 
 Thanks for your consideration and contribution!
 

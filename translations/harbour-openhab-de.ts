@@ -195,6 +195,10 @@
         <source>Cover item refresh time (milliseconds)</source>
         <translation>Aktualisierungszeit des Cover-Elements (Millisekunden)</translation>
     </message>
+    <message>
+        <source>Add a translation</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>SitemapPage</name>
