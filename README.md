@@ -1,7 +1,7 @@
 <!-- markdownlint-disable MD041 -->
 <p align="center">
     <a href="https://github.com/openhab/openhab-sailfishos/actions/workflows/build.yaml"><img alt="GitHub Action" src="https://github.com/openhab/openhab-sailfishos/actions/workflows/build.yaml/badge.svg"></a>
-    <a href="https://crowdin.com/project/openhab-sailfishos"><img alt="Crowdin" src="https://badges.crowdin.net/openhab-sailfishos/localized.svg"></a>    
+    <a href="https://crowdin.com/project/openhab-sailfishos"><img alt="Crowdin" src="https://badges.crowdin.net/openhab-sailfishos/localized.svg"></a>
     <br>
     <img alt="Logo" src="icons/harbour-openhab.svg" width="100">
     <br>
