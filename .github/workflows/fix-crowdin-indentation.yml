@@ -1,0 +1,47 @@
+name: Fix Crowdin Indentation
+
+# Runs when Crowdin creates or updates a PR
+on:
+  pull_request:
+    types: [ opened, synchronize ]
+  workflow_dispatch:
+
+jobs:
+  fix-indentation:
+    name: Normalize .ts file indentation
+    runs-on: ubuntu-latest
+
+    # Only act on Crowdin's own branches
+    if: startsWith(github.head_ref, 'l10n_')
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout PR branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Install lxml
+        run: pip install lxml
+
+      - name: Normalize indentation of all .ts translation files
+        run: |
+          find . -name "*.ts" -not -path "./.git/*" \
+            -exec python3 .github/scripts/normalize_ts.py {} +
+
+      - name: Commit if anything changed
+        run: |
+          git diff --quiet && echo "No changes." && exit 0
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "style: normalize .ts indentation to Crowdin format [skip ci]"
+          git push
