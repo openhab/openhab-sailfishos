@@ -24,6 +24,7 @@ RESOURCES += \
 HEADERS += src/ssemanager.h
 
 DISTFILES += qml/harbour-openhab.qml \
+    .editorconfig \
     harbour-openhab.desktop \
     icons/108x108/harbour-openhab.png \
     icons/128x128/harbour-openhab.png \
