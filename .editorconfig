@@ -1,0 +1,26 @@
+# EditorConfig: https://editorconfig.org
+# Ensures that Sailfish IDE and other editors
+# use the same indentation as Crowdin exports.
+
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+# Qt Linguist .ts files – match Crowdin's export format (4-space, all levels)
+[*.ts]
+indent_style = space
+indent_size = 4
+
+# QML / C++ source files
+[*.{qml,cpp,h,hpp,pro}]
+indent_style = space
+indent_size = 4
+
+[*.{yml,yaml}]
+indent_style = space
+indent_size = 2
+
