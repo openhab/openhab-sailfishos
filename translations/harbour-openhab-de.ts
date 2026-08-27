@@ -55,7 +55,7 @@
     </message>
     <message>
         <source>Copyright © 2026, Contributors to the openHAB project</source>
-        <translation>Copyright © 2026, Mitwirkende des openHAB-Projekts</translation>
+        <translation>Copyright © 2026, Mitwirkende des openHAB Projekts</translation>
     </message>
 </context>
 <context>
@@ -197,7 +197,7 @@
     </message>
     <message>
         <source>Add a translation</source>
-        <translation type="unfinished"></translation>
+        <translation>Neue Übersetzung hinzufügen</translation>
     </message>
 </context>
 <context>
@@ -216,7 +216,7 @@
     </message>
     <message>
         <source>No location data</source>
-        <translation>Keine GPS Positionsdaten vorhanden</translation>
+        <translation>Keine Standortdaten verfügbar</translation>
     </message>
     <message>
         <source>Map tile could not be loaded</source>

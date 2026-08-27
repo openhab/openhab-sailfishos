@@ -197,7 +197,7 @@
     </message>
     <message>
         <source>Add a translation</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Add a translation</translation>
     </message>
 </context>
 <context>
