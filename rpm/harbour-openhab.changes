@@ -12,6 +12,9 @@
 # * date Author's Name <author's email> version-release
 # - Summary of changes
 
+* Tue Sep 01 2026 Dominik Heidinger <dominikh@atomicmail.io> 0.4-1
+- ADDED: NFC Tag support (write and read NFC tags to trigger openHAB actions)
+
 * Tue May 28 2026 Dominik Heidinger <dominikh@atomicmail.io> 0.3-2
 - CHANGED: translations migrated to crowdin.com
 - FIX: Added trigger when settings are changed, to update coverpage item states immediately.
