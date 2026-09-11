@@ -11,6 +11,10 @@ Page {
 
     property var sitemapModel: availableSitemapModel
 
+    // Own instance, like SitemapPage and CoverPage do, so the demo-mode check
+    // on the NFC entry does not depend on id lookup across components.
+    Settings { id: settings }
+
     SilicaFlickable {
         id: flickableSelectionPage
         anchors.fill: parent
@@ -98,6 +102,65 @@ Page {
                             text: model.label || model.name
                             color: sitemapItem.highlighted ? Theme.highlightColor : Theme.primaryColor
                             font.pixelSize: Theme.fontSizeMedium
+                            truncationMode: TruncationMode.Fade
+                        }
+                    }
+                }
+            }
+
+            // ── NFC ─────────────────────────────────────
+            SectionHeader {
+                text: qsTr("NFC")
+            }
+
+            ListItem {
+                id: nfcItem
+                contentHeight: Theme.itemSizeMedium
+                // Greyed out without a reader and in demo mode: a tag pointing
+                // at demo.openhab.org items would be worthless.
+                enabled: nfcManager.available && !settings.demoMode
+
+                onClicked: {
+                    SseEvents.stopSSE(sseManager)
+                    pageStack.animatorReplace(Qt.resolvedUrl("NfcPage.qml"))
+                }
+
+                Row {
+                    anchors {
+                        fill: parent
+                        leftMargin: Theme.horizontalPageMargin
+                        rightMargin: Theme.horizontalPageMargin
+                    }
+                    spacing: Theme.paddingMedium
+
+                    Icon {
+                        anchors.verticalCenter: parent.verticalCenter
+                        source: "image://theme/icon-m-nfc"
+                        opacity: nfcItem.enabled ? 1.0 : Theme.opacityLow
+                        color: nfcItem.highlighted ? Theme.highlightColor : Theme.primaryColor
+                    }
+
+                    Column {
+                        anchors.verticalCenter: parent.verticalCenter
+                        width: parent.width - Theme.iconSizeMedium - Theme.paddingMedium
+
+                        Label {
+                            width: parent.width
+                            text: qsTr("Write NFC Tag")
+                            color: nfcItem.highlighted ? Theme.highlightColor : Theme.primaryColor
+                            opacity: nfcItem.enabled ? 1.0 : Theme.opacityLow
+                            font.pixelSize: Theme.fontSizeMedium
+                            truncationMode: TruncationMode.Fade
+                        }
+
+                        Label {
+                            width: parent.width
+                            visible: !nfcItem.enabled
+                            text: !nfcManager.available
+                                  ? qsTr("No NFC reader on this device")
+                                  : qsTr("Not available in demo mode")
+                            color: Theme.secondaryColor
+                            font.pixelSize: Theme.fontSizeExtraSmall
                             truncationMode: TruncationMode.Fade
                         }
                     }

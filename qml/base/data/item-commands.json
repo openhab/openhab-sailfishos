@@ -1,0 +1,22 @@
+{
+  "_comment": [
+    "Fallback command list per openHAB item type, used by the NFC functionality to write commands to TAGs."
+  ],
+
+  "commands": {
+    "Switch":       ["ON", "OFF"],
+    "Dimmer":       ["ON", "OFF", "INCREASE", "DECREASE"],
+    "Rollershutter":["UP", "DOWN", "STOP"],
+    "Player":       ["PLAY", "PAUSE", "NEXT", "PREVIOUS", "REWIND", "FASTFORWARD"],
+    "Color":        ["ON", "OFF", "INCREASE", "DECREASE"],
+    "Number":       [],
+    "String":       [],
+    "DateTime":     [],
+    "Location":     [],
+    "Image":        []
+  },
+
+  "freeTextTypes": ["Number", "String", "DateTime", "Location", "Dimmer", "Rollershutter", "Color"],
+
+  "readOnlyTypes": ["Contact", "Image"]
+}

@@ -15,13 +15,20 @@ TARGET = harbour-openhab
 CONFIG += sailfishapp
 CONFIG += link_pkgconfig
 
+# NFC talks to nfcd over the D-Bus system bus
+QT += dbus
+
 SOURCES += src/harbour-openhab.cpp\
-    src/ssemanager.cpp
+    src/ssemanager.cpp \
+    src/nfccodec.cpp \
+    src/nfcmanager.cpp
 
 RESOURCES += \
     ressources.qrc
 
-HEADERS += src/ssemanager.h
+HEADERS += src/ssemanager.h \
+    src/nfccodec.h \
+    src/nfcmanager.h
 
 DISTFILES += qml/harbour-openhab.qml \
     .editorconfig \
@@ -36,12 +43,21 @@ DISTFILES += qml/harbour-openhab.qml \
     qml/cover/CoverPage.qml \
     qml/pages/LegalPage.qml \
     qml/pages/MainUiPage.qml \
-    qml/pages/PrivacyPolicyPage.qml \
     qml/pages/SettingsPage.qml \
     qml/pages/SitemapPage.qml \
     qml/pages/SelectionPage.qml \
     qml/pages/ColorPickerPage.qml \
     qml/pages/InputDialog.qml \
+    qml/pages/NfcPage.qml \
+    qml/pages/NfcWritePage.qml \
+    qml/pages/NfcCommandPage.qml \
+    qml/pages/SitemapSelectionPage.qml \
+    qml/components/NotificationManager.qml \
+    qml/components/SitemapPullDownMenu.qml \
+    qml/base/Settings.qml \
+    qml/base/data/item-commands.json \
+    qml/base/utilities/NfcUri.js \
+    qml/base/utilities/OpenHabApi.js \
     qml/base/utilities/SitemapLoader.js \
     qml/base/utilities/SseEvents.js \
     qml/base/utilities/PatternFormatter.js \

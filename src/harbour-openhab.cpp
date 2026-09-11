@@ -8,6 +8,7 @@
 #include <QQmlContext>
 #include <QQuickView>
 #include "ssemanager.h"
+#include "nfcmanager.h"
 #include <QNetworkAccessManager>
 
 int Q_DECL_EXPORT main(int argc, char *argv[])
@@ -20,6 +21,12 @@ int Q_DECL_EXPORT main(int argc, char *argv[])
     SSEManager sseManagerInstance;
     // Exposes the C++ instance as "sseManager" in QML
     view->rootContext()->setContextProperty("sseManager", &sseManagerInstance);
+
+    // NFC (nfcd via the D-Bus system bus). Constructing it is harmless on
+    // devices without NFC -- "available" simply stays false and the UI hides
+    // the feature.
+    NfcManager nfcManagerInstance;
+    view->rootContext()->setContextProperty("nfcManager", &nfcManagerInstance);
     view->setSource(SailfishApp::pathToMainQml());
     view->show();
 

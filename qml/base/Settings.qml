@@ -10,10 +10,26 @@ ConfigurationGroup {
     property string lastVisitedPage: ""
     property string base_url: "https://demo.openhab.org"
 
+    // "Detect NFC Actions": arms the NFC read path. Default off on purpose --
+    // while it is on, laying a tag on the phone sends a command even when the
+    // app is only in the background, so this switch is the single brake the
+    // user has.
+    property bool nfcEnabled: false
+
     onDemoModeChanged: {
         if (demoMode) {
             console.log("[Settings] demoMode activated – setting base_url to demo server")
             base_url = "https://demo.openhab.org"
+        }
+    }
+
+    // Bundles what OpenHabApi.js needs; a .js library cannot read these
+    // properties on its own.
+    function apiConfig() {
+        return {
+            baseUrl: base_url,
+            username: username_local,
+            password: decodePassword(password_local)
         }
     }
 

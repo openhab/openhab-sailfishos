@@ -52,6 +52,35 @@ Dialog {
                 description: qsTr("If selected, Demo SiteMaps and DemoPages will be shown.")
             }
 
+            // ── NFC ──────────────────────────────────────
+            SectionHeader {
+                text: qsTr("NFC")
+            }
+
+            TextSwitch {
+                id: nfcEnabledField
+                checked: settings.nfcEnabled && !demoModeField.checked
+                // Greyed out without a reader and in demo mode.
+                enabled: nfcManager.available && !demoModeField.checked
+                text: qsTr("Detect NFC Actions")
+                description: nfcManager.available
+                             ? qsTr("Lay an openHAB tag on the phone to send its command. Works while the app is running, also from the cover.")
+                             : qsTr("This device has no NFC reader.")
+            }
+
+            Label {
+                visible: nfcEnabledField.enabled && nfcEnabledField.checked
+                         && !nfcManager.systemEnabled
+                x: Theme.horizontalPageMargin
+                width: parent.width - 2 * Theme.horizontalPageMargin
+                font.pixelSize: Theme.fontSizeSmall
+                color: Theme.errorColor
+                wrapMode: Text.Wrap
+                // We only point at the system setting rather than flipping it
+                // ourselves -- decided in O-7.
+                text: qsTr("NFC is currently switched off in the system settings.")
+            }
+
             // ── Local Server ─────────────────────────────
             SectionHeader {
                 text: qsTr("Local server")
@@ -401,6 +430,10 @@ Dialog {
             if (!settings.demoMode) {
                 settings.base_url = settings.normalizeUrl(baseUrlField.text)
             }
+
+            // Demo mode wins: a tag pointing at demo server items is useless,
+            // so listening is forced off there.
+            settings.nfcEnabled = nfcEnabledField.checked && !settings.demoMode
 
             //settings.openhab_cloud_service = openhabCloudServiceField.checked
             settings.coverAction1 = coverAction1Field.text

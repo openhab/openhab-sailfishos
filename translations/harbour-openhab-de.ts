@@ -66,6 +66,135 @@
     </message>
 </context>
 <context>
+    <name>NfcCommandPage</name>
+    <message>
+        <source>Choose command</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Or enter a value</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enter a value</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Command</source>
+        <translation type="unfinished">Kommando</translation>
+    </message>
+</context>
+<context>
+    <name>NfcPage</name>
+    <message>
+        <source>Open a sitemap first, or show all items from the pulley menu.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This sitemap has no items that accept commands.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not read the sitemap.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show sitemap items</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show all items</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reload</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Write NFC Tag</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All items</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sitemap %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This device has no NFC reader.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>NFC is switched off. Enable it in the system settings.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Search item</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No items</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>NfcWritePage</name>
+    <message>
+        <source>No tag was detected. Please try again.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This tag type cannot be written.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The tag could not be read. Hold it still against the phone.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The tag is too small for this command.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Writing failed. The tag may be write protected.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The tag was removed too early. Its content may be incomplete.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancelled.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Writing failed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Tag written.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Write NFC Tag</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hold the tag against the back of the phone.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Done</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Try again</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>SettingsPage</name>
     <message>
         <source>Save</source>
@@ -199,6 +328,26 @@
         <source>Add a translation</source>
         <translation>Neue Übersetzung hinzufügen</translation>
     </message>
+    <message>
+        <source>NFC</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Detect NFC Actions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Lay an openHAB tag on the phone to send its command. Works while the app is running, also from the cover.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This device has no NFC reader.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>NFC is currently switched off in the system settings.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>SitemapPage</name>
@@ -262,6 +411,18 @@
         <source>Refresh Sitemap</source>
         <translation>Sitemap aktualisieren</translation>
     </message>
+    <message>
+        <source>Sitemap %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Write this Sitemap to NFC Tag</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Write Command to NFC Tag</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>SitemapPullDownMenu</name>
@@ -311,6 +472,65 @@
     <message>
         <source>System</source>
         <translation>System</translation>
+    </message>
+    <message>
+        <source>NFC</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Write NFC Tag</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No NFC reader on this device</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Not available in demo mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>harbour-openhab</name>
+    <message>
+        <source>Command sent to openHAB</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Command failed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Item &quot;%1&quot; does not exist on this server.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sitemap not opened</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This sitemap does not exist on this server.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server not reachable.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Not authorized. Check user name and password.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Not found on this server.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The server reported an error (%1).</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Request failed (%1).</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

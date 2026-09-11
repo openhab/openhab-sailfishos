@@ -2,33 +2,21 @@ import QtQuick 2.0
 import Sailfish.Silica 1.0
 import "../base"
 import "../base/utilities/PatternFormatter.js" as PatternFormatter
+import "../base/utilities/OpenHabApi.js" as OpenHabApi
 
 CoverBackground {
     Settings { id: settings }
 
+    // Delegating to the shared OpenHabApi.js. Behaviour of the cover
+    // actions is unchanged: still fire and forget, no callbacks passed.
+
     // Returns the Basic Auth header value when both credentials are set
     function getAuthHeader() {
-        var u = settings.username_local
-        var p = settings.decodePassword(settings.password_local)
-        if (u && u !== "" && p && p !== "") {
-            return "Basic " + Qt.btoa(u + ":" + p)
-        }
-        return null
+        return OpenHabApi.authHeader(settings.apiConfig())
     }
 
     function sendCommand(itemName, command) {
-        if (!itemName) return;
-        var xhr = new XMLHttpRequest();
-        xhr.open("POST", settings.base_url + "/rest/items/" + itemName, true);
-        xhr.setRequestHeader("Content-Type", "text/plain");
-        var auth = getAuthHeader()
-        if (auth) xhr.setRequestHeader("Authorization", auth)
-        xhr.onreadystatechange = function() {
-            if (xhr.readyState === XMLHttpRequest.DONE && xhr.status >= 200 && xhr.status < 300) {
-                //refreshTimer.restart();
-            }
-        }
-        xhr.send(command);
+        OpenHabApi.sendCommand(settings.apiConfig(), itemName, command)
     }
 
     property string label1: ""
