@@ -13,9 +13,12 @@
 This app is a native client for openHAB which allows easy access to your sitemaps.
 The documentation is available at [www.openhab.org/docs/](https://www.openhab.org/docs/).
 
-<a href="https://github.com/openhab/openhab-sailfishos/releases"><img src="docs/images/get-it-on-logos/get-it-on-jollaStore.png" alt="Get it on Jolla Store" height="80"></a>
+<p align="center">
+<a href="https://github.com/openhab/openhab-sailfishos/releases"><img src="docs/images/get-it-on-logos/get-it-on-jollaStore.png" alt="Get it on the Jolla Store" height="55"></a>
 <a href="https://openrepos.net/content/openhabfoundationev/openhab-smart-home-automation"><img src="docs/images/get-it-on-logos/get-it-on-openrepos.png" alt="Get it on OpenRepos" height="55"></a>
-<a href="https://github.com/openhab/openhab-sailfishos/releases"><img src="docs/images/get-it-on-logos/direct-apk-download.png" alt="Get it on GitHub" height="80"></a>
+<!--<a href="https://sailfishos-chum.github.io/apps/harbour-ferry/"><img src="docs/images/get-it-on-logos/get-it-on-chum.png" alt="Get it on CHUM" height="55"></a>-->
+<a href="https://github.com/openhab/openhab-sailfishos/releases"><img src="docs/images/get-it-on-logos/direct-rpm-download.png" alt="Direct RPM Download" height="55"></a>
+</p>
 
 ## Features
 

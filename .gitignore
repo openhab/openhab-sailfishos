@@ -30,3 +30,7 @@ tst_ssemanager
 /RPMS/
 
 /.claude/
+
+nfc-feature-requirements.md
+
+*__pycache__*
