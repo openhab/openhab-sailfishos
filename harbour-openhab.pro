@@ -33,6 +33,7 @@ DISTFILES += qml/harbour-openhab.qml \
     icons/cover-background.png \
     icons/cover-background1.png \
     icons/harbour-openhab.svg \
+    qml/components/CoverActionIconComboBox.qml \
     qml/cover/CoverPage.qml \
     qml/pages/LegalPage.qml \
     qml/pages/MainUiPage.qml \

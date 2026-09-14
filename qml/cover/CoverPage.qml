@@ -1,31 +1,78 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
+import Nemo.Notifications 1.0
 import "../base"
 import "../base/utilities/PatternFormatter.js" as PatternFormatter
 
 CoverBackground {
     Settings { id: settings }
 
+    function cleanSetting(value) {
+        return value && typeof value === "string" ? value.trim() : ""
+    }
+
+    function itemUrl(itemName) {
+        return settings.normalizeUrl(settings.base_url) + "/rest/items/" + encodeURIComponent(itemName)
+    }
+
+    function actionConfigured(itemName, command) {
+        return cleanSetting(itemName) !== "" && cleanSetting(command) !== ""
+    }
+
+    function actionIcon(command, fallbackIcon) {
+        var c = cleanSetting(command).toUpperCase()
+        if (c === "ON") return "image://theme/icon-cover-play"
+        if (c === "OFF") return "image://theme/icon-cover-pause"
+        if (c === "STOP") return "image://theme/icon-cover-cancel"
+        if (c === "REFRESH" || c === "UPDATE") return "image://theme/icon-cover-refresh"
+        if (c === "SYNC") return "image://theme/icon-cover-sync"
+        return "image://theme/" + fallbackIcon
+    }
+
+    function configuredActionIcon(command, selectedIcon, fallbackIcon) {
+        selectedIcon = cleanSetting(selectedIcon)
+        return selectedIcon !== "" ? "image://theme/" + selectedIcon : actionIcon(command, fallbackIcon)
+    }
+
+    function itemIconUrl(iconName) {
+        return settings.normalizeUrl(settings.base_url) + "/icon/" + iconName + "?format=png&anyFormat=true"
+    }
+
+    function showCommandFailure(itemName, status) {
+        var reason = status === 0 ? qsTr("Network error") : qsTr("HTTP %1").arg(status)
+        commandFailureNotification.summary = qsTr("Cover action failed")
+        commandFailureNotification.body = qsTr("Could not send command to %1 (%2).").arg(itemName).arg(reason)
+        commandFailureNotification.previewSummary = commandFailureNotification.summary
+        commandFailureNotification.previewBody = commandFailureNotification.body
+        commandFailureNotification.publish()
+    }
+
     // Returns the Basic Auth header value when both credentials are set
     function getAuthHeader() {
-        var u = settings.username_local
+        var u = cleanSetting(settings.username_local)
         var p = settings.decodePassword(settings.password_local)
-        if (u && u !== "" && p && p !== "") {
+        if (u !== "" && p && p !== "") {
             return "Basic " + Qt.btoa(u + ":" + p)
         }
         return null
     }
 
     function sendCommand(itemName, command) {
-        if (!itemName) return;
+        itemName = cleanSetting(itemName)
+        command = cleanSetting(command)
+        if (itemName === "" || command === "") return;
         var xhr = new XMLHttpRequest();
-        xhr.open("POST", settings.base_url + "/rest/items/" + itemName, true);
+        xhr.open("POST", itemUrl(itemName), true);
         xhr.setRequestHeader("Content-Type", "text/plain");
         var auth = getAuthHeader()
         if (auth) xhr.setRequestHeader("Authorization", auth)
         xhr.onreadystatechange = function() {
             if (xhr.readyState === XMLHttpRequest.DONE && xhr.status >= 200 && xhr.status < 300) {
-                //refreshTimer.restart();
+                refreshItems()
+            } else if (xhr.readyState === XMLHttpRequest.DONE) {
+                console.warn("[CoverPage] sendCommand failed for item " + itemName
+                             + " with status " + xhr.status + ": " + xhr.responseText)
+                showCommandFailure(itemName, xhr.status)
             }
         }
         xhr.send(command);
@@ -37,11 +84,27 @@ CoverBackground {
     // Fetched item data: { label, state, icon } or null
     property var itemData1: null
     property var itemData2: null
+    property int visibleStatusItemCount: (cleanSetting(settings.coverItem1) !== "" && itemData1 !== null ? 1 : 0)
+                                         + (cleanSetting(settings.coverItem2) !== "" && itemData2 !== null ? 1 : 0)
+
+    Notification {
+        id: commandFailureNotification
+        appName: "openHAB"
+        appIcon: "harbour-openhab"
+        icon: "image://theme/icon-lock-warning"
+        expireTimeout: 5000
+        isTransient: true
+        urgency: Notification.Normal
+    }
 
     function getItemLabel(itemName, callback) {
-        if (!itemName) return;
+        itemName = cleanSetting(itemName)
+        if (itemName === "") {
+            if (callback) callback("")
+            return
+        }
         var xhr = new XMLHttpRequest();
-        xhr.open("GET", settings.base_url + "/rest/items/" + itemName, true);
+        xhr.open("GET", itemUrl(itemName), true);
         xhr.setRequestHeader("Accept", "application/json");
         var auth = getAuthHeader()
         if (auth) xhr.setRequestHeader("Authorization", auth)
@@ -57,9 +120,10 @@ CoverBackground {
 
     // Fetches item data from REST API and stores { label, state, icon }
     function fetchItemData(itemName, callback) {
-        if (!itemName || itemName.toString().trim() === "") return;
+        itemName = cleanSetting(itemName)
+        if (itemName === "") return;
         var xhr = new XMLHttpRequest();
-        xhr.open("GET", settings.base_url + "/rest/items/" + itemName, true);
+        xhr.open("GET", itemUrl(itemName), true);
         xhr.setRequestHeader("Accept", "application/json");
         var auth = getAuthHeader()
         if (auth) xhr.setRequestHeader("Authorization", auth)
@@ -85,8 +149,10 @@ CoverBackground {
     }
 
     function refreshItems() {
-        var item1 = (settings.coverItem1 && typeof settings.coverItem1 === "string") ? settings.coverItem1.trim() : "";
-        var item2 = (settings.coverItem2 && typeof settings.coverItem2 === "string") ? settings.coverItem2.trim() : "";
+        var item1 = cleanSetting(settings.coverItem1)
+        var item2 = cleanSetting(settings.coverItem2)
+        if (item1 === "") itemData1 = null
+        if (item2 === "") itemData2 = null
         if (item1 !== "") {
             fetchItemData(item1, function(d) {
                 itemData1 = d;
@@ -101,9 +167,13 @@ CoverBackground {
         }
     }
 
-    Component.onCompleted: {
+    function refreshActionLabels() {
         getItemLabel(settings.coverAction1, function(l) { label1 = l; })
         getItemLabel(settings.coverAction2, function(l) { label2 = l; })
+    }
+
+    Component.onCompleted: {
+        refreshActionLabels()
         refreshItems()
     }
 
@@ -123,7 +193,10 @@ CoverBackground {
         id: _settingsChangedTimer
         interval: 300
         repeat: false
-        onTriggered: refreshItems()
+        onTriggered: {
+            refreshActionLabels()
+            refreshItems()
+        }
     }
 
     // React to settings changes (e.g. after the SettingsPage is closed)
@@ -133,130 +206,161 @@ CoverBackground {
         onUsername_localChanged:        _settingsChangedTimer.restart()
         onPassword_localChanged:        _settingsChangedTimer.restart()
         onBase_urlChanged:              _settingsChangedTimer.restart()
+        onCoverAction1Changed:          _settingsChangedTimer.restart()
+        onCoverAction1_commandChanged:  _settingsChangedTimer.restart()
+        onCoverAction1_iconChanged:     _settingsChangedTimer.restart()
+        onCoverAction2Changed:          _settingsChangedTimer.restart()
+        onCoverAction2_commandChanged:  _settingsChangedTimer.restart()
+        onCoverAction2_iconChanged:     _settingsChangedTimer.restart()
         onCoverItem1Changed:            _settingsChangedTimer.restart()
         onCoverItem2Changed:            _settingsChangedTimer.restart()
     }
 
-    Column {
+    Image {
         anchors {
-            top: parent.top
-            topMargin: parent.height * 0.05
-            horizontalCenter: parent.horizontalCenter
+            centerIn: parent
         }
-        width: parent.width
-        spacing: 16
-
-        Image {
-            anchors.horizontalCenter: parent.horizontalCenter
-            width: parent.width * 0.8
-            height: width
-            fillMode: Image.PreserveAspectFit
-            smooth: true
-            source: "qrc:///cover/cover-background"
-        }
-
-        Label {
-            anchors.horizontalCenter: parent.horizontalCenter
-            text: Qt.application.version !== "" ? "v " + Qt.application.version : "v?.?.?"
-            font.pixelSize: 20
-            color: Theme.secondaryColor
-        }
+        width: parent.width * 1.22
+        height: width
+        fillMode: Image.PreserveAspectFit
+        smooth: true
+        opacity: 0.12
+        source: "qrc:///cover/cover-background"
     }
 
     Column {
+        id: statusColumn
         anchors {
+            left: parent.left
+            leftMargin: Theme.paddingMedium
+            right: parent.right
+            rightMargin: Theme.paddingMedium
+            top: parent.top
+            topMargin: Theme.paddingLarge
             bottom: parent.bottom
-            bottomMargin: parent.height * 0.18
-            horizontalCenter: parent.horizontalCenter
+            bottomMargin: parent.height * 0.22
         }
-        width: parent.width * 0.95
-        spacing: 6
+        spacing: Theme.paddingSmall
 
         // ── Cover Item 1 display ──────────────────────────────────────────────
-        Row {
-            visible: settings.coverItem1 !== "" && itemData1 !== null
+        Item {
+            visible: cleanSetting(settings.coverItem1) !== "" && itemData1 !== null
             width: parent.width
-            height: visible ? implicitHeight : 0
-            spacing: Theme.paddingSmall
+            height: visible ? (parent.height - (visibleStatusItemCount - 1) * parent.spacing) / visibleStatusItemCount : 0
+
+            Rectangle {
+                anchors.fill: parent
+                color: Theme.rgba(Theme.overlayBackgroundColor, 0.28)
+                radius: Theme.paddingSmall
+            }
 
             Image {
                 id: itemIcon1
-                width: Theme.iconSizeSmall
-                height: Theme.iconSizeSmall
+                anchors {
+                    left: parent.left
+                    leftMargin: Theme.paddingSmall
+                    verticalCenter: parent.verticalCenter
+                }
+                width: Theme.iconSizeMedium
+                height: Theme.iconSizeMedium
                 fillMode: Image.PreserveAspectFit
                 smooth: true
-                anchors.verticalCenter: parent.verticalCenter
+                opacity: 0.9
                 visible: itemData1 !== null && itemData1.icon !== ""
-                source: (itemData1 !== null && itemData1.icon !== "")
-                        ? settings.base_url + "/icon/" + itemData1.icon + "?format=png&anyFormat=true"
-                        : ""
+                source: visible ? itemIconUrl(itemData1.icon) : ""
                 onStatusChanged: {
                     if (status === Image.Error && source.toString().indexOf("format=png") !== -1)
-                        source = settings.base_url + "/icon/" + itemData1.icon + "?format=svg"
+                        source = settings.normalizeUrl(settings.base_url) + "/icon/" + itemData1.icon + "?format=svg"
                 }
             }
 
-            Label {
-                text: itemData1 !== null ? itemData1.label : ""
-                anchors.verticalCenter: parent.verticalCenter
-                width: parent.width
-                       - (itemIcon1.visible ? itemIcon1.width + parent.spacing : 0)
-                       - stateLabel1.implicitWidth - parent.spacing
-                font.pixelSize: Theme.fontSizeSmall
-                color: Theme.primaryColor
-                truncationMode: TruncationMode.Fade
-            }
+            Column {
+                anchors {
+                    left: itemIcon1.visible ? itemIcon1.right : parent.left
+                    leftMargin: Theme.paddingSmall
+                    right: parent.right
+                    rightMargin: Theme.paddingSmall
+                    verticalCenter: parent.verticalCenter
+                }
+                spacing: 0
 
-            Label {
-                id: stateLabel1
-                text: itemData1 !== null ? itemData1.state : ""
-                anchors.verticalCenter: parent.verticalCenter
-                font.pixelSize: Theme.fontSizeSmall
-                color: Theme.highlightColor
+                Label {
+                    width: parent.width
+                    text: itemData1 !== null ? itemData1.label : ""
+                    font.pixelSize: Theme.fontSizeExtraSmall
+                    color: Theme.secondaryColor
+                    truncationMode: TruncationMode.Fade
+                }
+
+                Label {
+                    id: stateLabel1
+                    width: parent.width
+                    text: itemData1 !== null ? itemData1.state : ""
+                    font.pixelSize: Theme.fontSizeLarge
+                    color: Theme.highlightColor
+                    truncationMode: TruncationMode.Fade
+                }
             }
         }
 
         // ── Cover Item 2 display ──────────────────────────────────────────────
-        Row {
-            visible: settings.coverItem2 !== "" && itemData2 !== null
+        Item {
+            visible: cleanSetting(settings.coverItem2) !== "" && itemData2 !== null
             width: parent.width
-            height: visible ? implicitHeight : 0
-            spacing: Theme.paddingSmall
+            height: visible ? (parent.height - (visibleStatusItemCount - 1) * parent.spacing) / visibleStatusItemCount : 0
+
+            Rectangle {
+                anchors.fill: parent
+                color: Theme.rgba(Theme.overlayBackgroundColor, 0.28)
+                radius: Theme.paddingSmall
+            }
 
             Image {
                 id: itemIcon2
-                width: Theme.iconSizeSmall
-                height: Theme.iconSizeSmall
+                anchors {
+                    left: parent.left
+                    leftMargin: Theme.paddingSmall
+                    verticalCenter: parent.verticalCenter
+                }
+                width: Theme.iconSizeMedium
+                height: Theme.iconSizeMedium
                 fillMode: Image.PreserveAspectFit
                 smooth: true
-                anchors.verticalCenter: parent.verticalCenter
+                opacity: 0.9
                 visible: itemData2 !== null && itemData2.icon !== ""
-                source: (itemData2 !== null && itemData2.icon !== "")
-                        ? settings.base_url + "/icon/" + itemData2.icon + "?format=png&anyFormat=true"
-                        : ""
+                source: visible ? itemIconUrl(itemData2.icon) : ""
                 onStatusChanged: {
                     if (status === Image.Error && source.toString().indexOf("format=png") !== -1)
-                        source = settings.base_url + "/icon/" + itemData2.icon + "?format=svg"
+                        source = settings.normalizeUrl(settings.base_url) + "/icon/" + itemData2.icon + "?format=svg"
                 }
             }
 
-            Label {
-                text: itemData2 !== null ? itemData2.label : ""
-                anchors.verticalCenter: parent.verticalCenter
-                width: parent.width
-                       - (itemIcon2.visible ? itemIcon2.width + parent.spacing : 0)
-                       - stateLabel2.implicitWidth - parent.spacing
-                font.pixelSize: Theme.fontSizeSmall
-                color: Theme.primaryColor
-                truncationMode: TruncationMode.Fade
-            }
+            Column {
+                anchors {
+                    left: itemIcon2.visible ? itemIcon2.right : parent.left
+                    leftMargin: Theme.paddingSmall
+                    right: parent.right
+                    rightMargin: Theme.paddingSmall
+                    verticalCenter: parent.verticalCenter
+                }
+                spacing: 0
 
-            Label {
-                id: stateLabel2
-                text: itemData2 !== null ? itemData2.state : ""
-                anchors.verticalCenter: parent.verticalCenter
-                font.pixelSize: Theme.fontSizeSmall
-                color: Theme.highlightColor
+                Label {
+                    width: parent.width
+                    text: itemData2 !== null ? itemData2.label : ""
+                    font.pixelSize: Theme.fontSizeExtraSmall
+                    color: Theme.secondaryColor
+                    truncationMode: TruncationMode.Fade
+                }
+
+                Label {
+                    id: stateLabel2
+                    width: parent.width
+                    text: itemData2 !== null ? itemData2.state : ""
+                    font.pixelSize: Theme.fontSizeLarge
+                    color: Theme.highlightColor
+                    truncationMode: TruncationMode.Fade
+                }
             }
         }
 
@@ -265,11 +369,11 @@ CoverBackground {
             anchors.horizontalCenter: parent.horizontalCenter
             width: parent.width
             wrapMode: Text.WordWrap
-            text: "Left Action:  " + label1 + " - " + settings.coverAction1_command
-            font.pixelSize: 20
-            color: Theme.primaryColor
-            visible: settings.coverItem1 === "" && settings.coverItem2 === ""
-                     && settings.coverAction1 !== "" && settings.coverAction1_command !== ""
+            text: label1 + "  " + cleanSetting(settings.coverAction1_command)
+            font.pixelSize: Theme.fontSizeSmall
+            color: Theme.highlightColor
+            visible: cleanSetting(settings.coverItem1) === "" && cleanSetting(settings.coverItem2) === ""
+                     && actionConfigured(settings.coverAction1, settings.coverAction1_command)
             height: visible ? implicitHeight : 0
         }
 
@@ -277,42 +381,50 @@ CoverBackground {
             anchors.horizontalCenter: parent.horizontalCenter
             width: parent.width
             wrapMode: Text.WordWrap
-            text: "Right Action: " + label2  + " - " + settings.coverAction2_command
-            font.pixelSize: 20
-            color: Theme.primaryColor
-            visible: settings.coverItem1 === "" && settings.coverItem2 === ""
-                     && settings.coverAction2 !== "" && settings.coverAction2_command !== ""
+            text: label2 + "  " + cleanSetting(settings.coverAction2_command)
+            font.pixelSize: Theme.fontSizeSmall
+            color: Theme.highlightColor
+            visible: cleanSetting(settings.coverItem1) === "" && cleanSetting(settings.coverItem2) === ""
+                     && actionConfigured(settings.coverAction2, settings.coverAction2_command)
             height: visible ? implicitHeight : 0
         }
     }
 
     CoverActionList {
-        enabled: settings.coverAction1 !== "" && settings.coverAction1_command !== ""
-                 && settings.coverAction2 !== "" && settings.coverAction2_command !== ""
+        enabled: actionConfigured(settings.coverAction1, settings.coverAction1_command)
+                 && actionConfigured(settings.coverAction2, settings.coverAction2_command)
         CoverAction {
-            iconSource: "image://theme/icon-cover-previous"
+            iconSource: configuredActionIcon(settings.coverAction1_command,
+                                             settings.coverAction1_icon,
+                                             "icon-cover-sync")
             onTriggered: sendCommand(settings.coverAction1, settings.coverAction1_command)
         }
         CoverAction {
-            iconSource: "image://theme/icon-cover-next"
+            iconSource: configuredActionIcon(settings.coverAction2_command,
+                                             settings.coverAction2_icon,
+                                             "icon-cover-refresh")
             onTriggered: sendCommand(settings.coverAction2, settings.coverAction2_command)
         }
     }
 
     CoverActionList {
-        enabled: settings.coverAction1 !== "" && settings.coverAction1_command !== ""
-                 && (settings.coverAction2 === "" || settings.coverAction2_command === "")
+        enabled: actionConfigured(settings.coverAction1, settings.coverAction1_command)
+                 && !actionConfigured(settings.coverAction2, settings.coverAction2_command)
         CoverAction {
-            iconSource: "image://theme/icon-cover-previous"
+            iconSource: configuredActionIcon(settings.coverAction1_command,
+                                             settings.coverAction1_icon,
+                                             "icon-cover-sync")
             onTriggered: sendCommand(settings.coverAction1, settings.coverAction1_command)
         }
     }
 
     CoverActionList {
-        enabled: (settings.coverAction1 === "" || settings.coverAction1_command === "")
-                 && settings.coverAction2 !== "" && settings.coverAction2_command !== ""
+        enabled: !actionConfigured(settings.coverAction1, settings.coverAction1_command)
+                 && actionConfigured(settings.coverAction2, settings.coverAction2_command)
         CoverAction {
-            iconSource: "image://theme/icon-cover-next"
+            iconSource: configuredActionIcon(settings.coverAction2_command,
+                                             settings.coverAction2_icon,
+                                             "icon-cover-refresh")
             onTriggered: sendCommand(settings.coverAction2, settings.coverAction2_command)
         }
     }
