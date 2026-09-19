@@ -34,8 +34,10 @@ ConfigurationGroup {
     property bool openhab_cloud_service: false
     property string coverAction1: ""
     property string coverAction1_command: ""
+    property string coverAction1_icon: ""
     property string coverAction2: ""
     property string coverAction2_command: ""
+    property string coverAction2_icon: ""
     property string username_local: ""
     property string coverItem1: ""
     property string coverItem2: ""

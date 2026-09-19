@@ -14,6 +14,7 @@ Page {
     allowedOrientations: Orientation.All
     property string sitemapName: ""
     property string pageTitle: sitemapName
+    property var initialPageData: null
 
     // Subpages will be called with full URL (http...) → no own SSE start
     readonly property bool isSubPage: sitemapName.indexOf("http") === 0
@@ -22,7 +23,7 @@ Page {
 
 
     readonly property string fullApiUrl: sitemapName.indexOf("http") === 0
-        ? sitemapName
+        ? normalizeRestUrl(sitemapName)
         : settings.base_url + "/rest/sitemaps/" + sitemapName
 
     ListModel {
@@ -58,139 +59,155 @@ Page {
         xhr.send(command);
     }
 
+    function normalizeRestUrl(url) {
+        if (!url || url.indexOf("http") !== 0) return url;
+
+        var restIndex = url.indexOf("/rest/");
+        if (restIndex === -1) return url;
+
+        return settings.base_url + url.substring(restIndex);
+    }
+
+    function populateSitemap(data) {
+        sitemapModel.clear();
+
+        var rootWidgets = (data.homepage && data.homepage.widgets) ? data.homepage.widgets : (data.widgets ? data.widgets : []);
+
+        function unpackWidgets(widgetList) {
+            widgetList.forEach(function(widget) {
+                // Extract item name and state as top-level roles for reliable access
+                var name = (widget.item && widget.item.name) ? widget.item.name : "";
+                // widget.state is the sitemap-formatted display state; widget.item.state is the raw item state.
+                var state = "";
+                if (widget.state !== undefined && widget.state !== null && widget.state !== "") {
+                    state = widget.state.toString();
+                } else if (widget.item && widget.item.state !== undefined && widget.item.state !== null && widget.item.state !== "") {
+                    state = widget.item.state.toString();
+                }
+                // Extract pattern: widget-level pattern takes priority, then stateDescription
+                var pat = widget.pattern || (widget.item && widget.item.stateDescription && widget.item.stateDescription.pattern) || "";
+
+                // Handle different widget types and their specific data needs
+                if (widget.type === "Frame" && widget.widgets) {
+                    sitemapModel.append({
+                        "type": "Header",
+                        "itemName": "",
+                        "itemState": "",
+                        "widgetPattern": "",
+                        "mappingsJson": "",
+                        "itemData": { "label": (widget.label ? widget.label.toUpperCase() : ""), "state": "" }
+                    });
+                    unpackWidgets(widget.widgets);
+                }
+                else if (widget.item && widget.type === "Slider") {
+                    sitemapModel.append({
+                        "type": widget.type || "Unknown",
+                        "itemName": name,
+                        "itemState": state,
+                        "widgetPattern": pat,
+                        "mappingsJson": "",
+                        "itemData": widget
+                    });
+                }
+                else if (widget.item && widget.item.type === "Rollershutter") {
+                    sitemapModel.append({
+                        "type": "Rollershutter",
+                        "itemName": name,
+                        "itemState": state,
+                        "widgetPattern": pat,
+                        "mappingsJson": "",
+                        "itemData": widget
+                    });
+                }
+                // For Switch widgets with mappings, use a special type to indicate the presence of mappings
+                else if (widget.type === "Switch" && widget.mappings && widget.mappings.length > 0) {
+                    sitemapModel.append({
+                        "type": "SwitchWithMappings",
+                        "itemName": name,
+                        "itemState": state,
+                        "widgetPattern": pat,
+                        "mappingsJson": JSON.stringify(widget.mappings),
+                        "itemData": widget
+                    });
+                }
+                // For Selection widgets without explicit mappings, use command options from the linked item if available
+                else if (widget.item && widget.type === "Selection" && (!widget.mappings || widget.mappings.length === 0)) {
+                    var commandOptions = (widget.item.commandDescription && widget.item.commandDescription.commandOptions)
+                            ? widget.item.commandDescription.commandOptions : [];
+                    sitemapModel.append({
+                        "type": widget.type,
+                        "itemName": name,
+                        "itemState": state,
+                        "widgetPattern": pat,
+                        "mappingsJson": JSON.stringify(commandOptions),
+                        "itemData": widget
+                    });
+                }
+                // For Selection widgets with mappings, use the provided mappings
+                else if (widget.item && widget.type === "Selection") {
+                    sitemapModel.append({
+                        "type": widget.type,
+                        "itemName": name,
+                        "itemState": state,
+                        "widgetPattern": pat,
+                        "mappingsJson": JSON.stringify(widget.mappings),
+                        "itemData": widget
+                    });
+                }
+                // Buttongrid: serialise the buttons array to JSON so it survives the ListModel storage
+                else if (widget.type === "Buttongrid") {
+                    // Explicitly copy each button to plain JS objects to ensure correct serialisation
+                    // in Qt's JavaScript engine (QML list types would fail JSON.stringify otherwise)
+                    var rawBtns = widget.buttons || widget.mappings || [];
+                    var btnArr = [];
+                    for (var bi = 0; bi < rawBtns.length; bi++) {
+                        var b = rawBtns[bi];
+                        btnArr.push({
+                            "row":     b.row     !== undefined ? b.row     : 1,
+                            "column":  b.column  !== undefined ? b.column  : (bi + 1),
+                            "label":   b.label   || "",
+                            "command": b.command || ""
+                        });
+                    }
+                    var buttonsJson = JSON.stringify(btnArr);
+                    //console.log("[Buttongrid] buttons found: " + btnArr.length + " json: " + buttonsJson.substring(0, 200));
+                    sitemapModel.append({
+                        "type": "Buttongrid",
+                        "itemName": name,
+                        "itemState": state,
+                        "widgetPattern": pat,
+                        "mappingsJson": buttonsJson,
+                        "itemData": widget
+                    });
+                }
+                // Default case for other widget types
+                else {
+                    sitemapModel.append({
+                        "type": widget.type,
+                        "itemName": name,
+                        "itemState": state,
+                        "widgetPattern": pat,
+                        "mappingsJson": "",
+                        "itemData": widget
+                    });
+                }
+            });
+        }
+        unpackWidgets(rootWidgets);
+
+        // After async model load, rebind SSE to this (now populated) model
+        SseEvents.rebindModel(sitemapModel);
+        console.log("[SitemapPage] Model populated with " + sitemapModel.count + " entries, SSE rebound");
+    }
+
     function fetchSitemap() {
         var xhr = new XMLHttpRequest();
         xhr.onreadystatechange = function() {
             if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
                 var json = JSON.parse(xhr.responseText);
-
-                sitemapModel.clear();
-
-                var rootWidgets = (json.homepage && json.homepage.widgets) ? json.homepage.widgets : (json.widgets ? json.widgets : []);
-
-                function unpackWidgets(widgetList) {
-                    widgetList.forEach(function(widget) {
-                        // Extract item name and state as top-level roles for reliable access
-                        var name = (widget.item && widget.item.name) ? widget.item.name : "";
-                        // widget.state is the sitemap-formatted display state; widget.item.state is the raw item state.
-                        var state = "";
-                        if (widget.state !== undefined && widget.state !== null && widget.state !== "") {
-                            state = widget.state.toString();
-                        } else if (widget.item && widget.item.state !== undefined && widget.item.state !== null && widget.item.state !== "") {
-                            state = widget.item.state.toString();
-                        }
-                        // Extract pattern: widget-level pattern takes priority, then stateDescription
-                        var pat = widget.pattern || (widget.item && widget.item.stateDescription && widget.item.stateDescription.pattern) || "";
-
-                        // Handle different widget types and their specific data needs
-                        if (widget.type === "Frame" && widget.widgets) {
-                            sitemapModel.append({
-                                "type": "Header",
-                                "itemName": "",
-                                "itemState": "",
-                                "widgetPattern": "",
-                                "mappingsJson": "",
-                                "itemData": { "label": (widget.label ? widget.label.toUpperCase() : ""), "state": "" }
-                            });
-                            unpackWidgets(widget.widgets);
-                        }
-                        else if (widget.item && widget.type === "Slider") {
-                            sitemapModel.append({
-                                "type": widget.type || "Unknown",
-                                "itemName": name,
-                                "itemState": state,
-                                "widgetPattern": pat,
-                                "mappingsJson": "",
-                                "itemData": widget
-                            });
-                        }
-                        else if (widget.item && widget.item.type === "Rollershutter") {
-                            sitemapModel.append({
-                                "type": "Rollershutter",
-                                "itemName": name,
-                                "itemState": state,
-                                "widgetPattern": pat,
-                                "mappingsJson": "",
-                                "itemData": widget
-                            });
-                        }
-                        // For Switch widgets with mappings, use a special type to indicate the presence of mappings
-                        else if (widget.type === "Switch" && widget.mappings && widget.mappings.length > 0) {
-                            sitemapModel.append({
-                                "type": "SwitchWithMappings",
-                                "itemName": name,
-                                "itemState": state,
-                                "widgetPattern": pat,
-                                "mappingsJson": JSON.stringify(widget.mappings),
-                                "itemData": widget
-                            });
-                        }
-                        // For Selection widgets without explicit mappings, use command options from the linked item if available
-                        else if (widget.item && widget.type === "Selection" && widget.mappings.length === 0) {
-                            sitemapModel.append({
-                                "type": widget.type,
-                                "itemName": name,
-                                "itemState": state,
-                                "widgetPattern": pat,
-                                "mappingsJson": JSON.stringify(widget.item.commandDescription.commandOptions),
-                                "itemData": widget
-                            });
-                        }
-                        // For Selection widgets with mappings, use the provided mappings
-                        else if (widget.item && widget.type === "Selection") {
-                            sitemapModel.append({
-                                "type": widget.type,
-                                "itemName": name,
-                                "itemState": state,
-                                "widgetPattern": pat,
-                                "mappingsJson": JSON.stringify(widget.mappings),
-                                "itemData": widget
-                            });
-                        }
-                        // Buttongrid: serialise the buttons array to JSON so it survives the ListModel storage
-                        else if (widget.type === "Buttongrid") {
-                            // Explicitly copy each button to plain JS objects to ensure correct serialisation
-                            // in Qt's JavaScript engine (QML list types would fail JSON.stringify otherwise)
-                            var rawBtns = widget.buttons || widget.mappings || [];
-                            var btnArr = [];
-                            for (var bi = 0; bi < rawBtns.length; bi++) {
-                                var b = rawBtns[bi];
-                                btnArr.push({
-                                    "row":     b.row     !== undefined ? b.row     : 1,
-                                    "column":  b.column  !== undefined ? b.column  : (bi + 1),
-                                    "label":   b.label   || "",
-                                    "command": b.command || ""
-                                });
-                            }
-                            var buttonsJson = JSON.stringify(btnArr);
-                            //console.log("[Buttongrid] buttons found: " + btnArr.length + " json: " + buttonsJson.substring(0, 200));
-                            sitemapModel.append({
-                                "type": "Buttongrid",
-                                "itemName": name,
-                                "itemState": state,
-                                "widgetPattern": pat,
-                                "mappingsJson": buttonsJson,
-                                "itemData": widget
-                            });
-                        }
-                        // Default case for other widget types
-                        else {
-                            sitemapModel.append({
-                                "type": widget.type,
-                                "itemName": name,
-                                "itemState": state,
-                                "widgetPattern": pat,
-                                "mappingsJson": "",
-                                "itemData": widget
-                            });
-                        }
-                    });
-                }
-                unpackWidgets(rootWidgets);
-
-                // After async model load, rebind SSE to this (now populated) model
-                SseEvents.rebindModel(sitemapModel);
-                console.log("[SitemapPage] Model populated with " + sitemapModel.count + " entries, SSE rebound");
+                populateSitemap(json);
+            } else if (xhr.readyState === XMLHttpRequest.DONE) {
+                console.log("[SitemapPage] Failed to load sitemap from " + fullApiUrl + " status: " + xhr.status);
             }
         }
         xhr.open("GET", fullApiUrl);
@@ -200,7 +217,11 @@ Page {
     }
 
    Component.onCompleted: {
-      fetchSitemap()
+      if (initialPageData && initialPageData.widgets) {
+          populateSitemap(initialPageData);
+      } else {
+          fetchSitemap()
+      }
 
       if (!isSubPage && sseManager) {
           // Top-level sitemap: start SSE connection and bind to our model
@@ -2165,7 +2186,8 @@ Page {
                 if (widget.linkedPage) {
                     pageStack.animatorPush(Qt.resolvedUrl("SitemapPage.qml"), {
                         "sitemapName": widget.linkedPage.link,
-                        "pageTitle": _groupLabel
+                        "pageTitle": _groupLabel,
+                        "initialPageData": widget.linkedPage
                     });
                 }
             }
