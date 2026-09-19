@@ -1,382 +1,382 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
 <TS version="2.1" language="de" sourcelanguage="en">
-<context>
+  <context>
     <name>ColorPickerPage</name>
     <message>
-        <source>Color Picker</source>
-        <translation>Farbe</translation>
+      <source>Color Picker</source>
+      <translation>Farbe</translation>
     </message>
     <message>
-        <source>Hue</source>
-        <translation>Farbton</translation>
+      <source>Hue</source>
+      <translation>Farbton</translation>
     </message>
     <message>
-        <source>Saturation</source>
-        <translation>Sättigung</translation>
+      <source>Saturation</source>
+      <translation>Sättigung</translation>
     </message>
     <message>
-        <source>Brightness</source>
-        <translation>Helligkeit</translation>
+      <source>Brightness</source>
+      <translation>Helligkeit</translation>
     </message>
     <message>
-        <source>Preset Colors</source>
-        <translation>Voreingestellte Farben</translation>
+      <source>Preset Colors</source>
+      <translation>Voreingestellte Farben</translation>
     </message>
-</context>
-<context>
+  </context>
+  <context>
     <name>CoverActionIconComboBox</name>
     <message>
-        <source>Icon</source>
-        <translation type="unfinished"></translation>
+      <source>Icon</source>
+      <translation type="unfinished">Icon</translation>
     </message>
-</context>
-<context>
+  </context>
+  <context>
     <name>CoverPage</name>
     <message>
-        <source>Network error</source>
-        <translation type="unfinished"></translation>
+      <source>Network error</source>
+      <translation type="unfinished">Network error</translation>
     </message>
     <message>
-        <source>HTTP %1</source>
-        <translation type="unfinished"></translation>
+      <source>HTTP %1</source>
+      <translation type="unfinished">HTTP %1</translation>
     </message>
     <message>
-        <source>Cover action failed</source>
-        <translation type="unfinished"></translation>
+      <source>Cover action failed</source>
+      <translation type="unfinished">Cover action failed</translation>
     </message>
     <message>
-        <source>Could not send command to %1 (%2).</source>
-        <translation type="unfinished"></translation>
+      <source>Could not send command to %1 (%2).</source>
+      <translation type="unfinished">Could not send command to %1 (%2).</translation>
     </message>
-</context>
-<context>
+  </context>
+  <context>
     <name>InputDialog</name>
     <message>
-        <source>Set value</source>
-        <translation>Neuen Wert setzen</translation>
+      <source>Set value</source>
+      <translation>Neuen Wert setzen</translation>
     </message>
     <message>
-        <source>Cancel</source>
-        <translation>abbrechen</translation>
+      <source>Cancel</source>
+      <translation>abbrechen</translation>
     </message>
     <message>
-        <source>Current value: %1</source>
-        <translation>Aktueller Wert: %1</translation>
+      <source>Current value: %1</source>
+      <translation>Aktueller Wert: %1</translation>
     </message>
     <message>
-        <source>(not set)</source>
-        <translation>(nicht gesetzt)</translation>
+      <source>(not set)</source>
+      <translation>(nicht gesetzt)</translation>
     </message>
     <message>
-        <source>Enter new value</source>
-        <translation>Neuen Wert eingeben</translation>
+      <source>Enter new value</source>
+      <translation>Neuen Wert eingeben</translation>
     </message>
-</context>
-<context>
+  </context>
+  <context>
     <name>LegalPage</name>
     <message>
-        <source>Legal</source>
-        <translation>Legal</translation>
+      <source>Legal</source>
+      <translation>Legal</translation>
     </message>
     <message>
-        <source>Copyright © 2026, Contributors to the openHAB project</source>
-        <translation>Copyright © 2026, Mitwirkende des openHAB Projekts</translation>
+      <source>Copyright © 2026, Contributors to the openHAB project</source>
+      <translation>Copyright © 2026, Mitwirkende des openHAB Projekts</translation>
     </message>
-</context>
-<context>
+  </context>
+  <context>
     <name>MainUiPage</name>
     <message>
-        <source>openHAB Main UI</source>
-        <translation>openHAB  Main-UI</translation>
+      <source>openHAB Main UI</source>
+      <translation>openHAB  Main-UI</translation>
     </message>
-</context>
-<context>
+  </context>
+  <context>
     <name>SettingsPage</name>
     <message>
-        <source>Save</source>
-        <translation>Speichern</translation>
+      <source>Save</source>
+      <translation>Speichern</translation>
     </message>
     <message>
-        <source>Settings</source>
-        <translation>Einstellungen</translation>
+      <source>Settings</source>
+      <translation>Einstellungen</translation>
     </message>
     <message>
-        <source>General</source>
-        <translation>Allgemein</translation>
+      <source>General</source>
+      <translation>Allgemein</translation>
     </message>
     <message>
-        <source>Demo Mode</source>
-        <translation>Demo-Modus</translation>
+      <source>Demo Mode</source>
+      <translation>Demo-Modus</translation>
     </message>
     <message>
-        <source>If selected, Demo SiteMaps and DemoPages will be shown.</source>
-        <translation>Falls ausgewählt, werden Demo-Sitemaps und Demo-Seiten angezeigt.</translation>
+      <source>If selected, Demo SiteMaps and DemoPages will be shown.</source>
+      <translation>Falls ausgewählt, werden Demo-Sitemaps und Demo-Seiten angezeigt.</translation>
     </message>
     <message>
-        <source>Local server</source>
-        <translation>Lokaler Server</translation>
+      <source>Local server</source>
+      <translation>Lokaler Server</translation>
     </message>
     <message>
-        <source>URL</source>
-        <translation>URL</translation>
+      <source>URL</source>
+      <translation>URL</translation>
     </message>
     <message>
-        <source>https://demo.openhab.org</source>
-        <translation>https://demo.openhab.org</translation>
+      <source>https://demo.openhab.org</source>
+      <translation>https://demo.openhab.org</translation>
     </message>
     <message>
-        <source>Cover actions</source>
-        <translation>Cover-Aktionen</translation>
+      <source>Cover actions</source>
+      <translation>Cover-Aktionen</translation>
     </message>
     <message>
-        <source>Left button</source>
-        <translation>Button Links</translation>
+      <source>Left button</source>
+      <translation>Button Links</translation>
     </message>
     <message>
-        <source>Item-ID</source>
-        <translation>Item-ID</translation>
+      <source>Item-ID</source>
+      <translation>Item-ID</translation>
     </message>
     <message>
-        <source>Command</source>
-        <translation>Kommando</translation>
+      <source>Command</source>
+      <translation>Kommando</translation>
     </message>
     <message>
-        <source>e.g. ON, OFF, TOGGLE</source>
-        <translation>z.B. ON, OFF, TOGGLE</translation>
+      <source>e.g. ON, OFF, TOGGLE</source>
+      <translation>z.B. ON, OFF, TOGGLE</translation>
     </message>
     <message>
-        <source>Right button</source>
-        <translation>Button Rechts</translation>
+      <source>Right button</source>
+      <translation>Button Rechts</translation>
     </message>
     <message>
-        <source>Scroll to top</source>
-        <translation>Nach oben scrollen</translation>
+      <source>Scroll to top</source>
+      <translation>Nach oben scrollen</translation>
     </message>
     <message>
-        <source>About</source>
-        <translation>Über</translation>
+      <source>About</source>
+      <translation>Über</translation>
     </message>
     <message>
-        <source>App Version</source>
-        <translation>App-Version</translation>
+      <source>App Version</source>
+      <translation>App-Version</translation>
     </message>
     <message>
-        <source>Legal</source>
-        <translation>Legal</translation>
+      <source>Legal</source>
+      <translation>Legal</translation>
     </message>
     <message>
-        <source>Privacy Policy</source>
-        <translation>Datenschutzerklärung</translation>
+      <source>Privacy Policy</source>
+      <translation>Datenschutzerklärung</translation>
     </message>
     <message>
-        <source>e.g. item_id1</source>
-        <translation>z.B. item_id1</translation>
+      <source>e.g. item_id1</source>
+      <translation>z.B. item_id1</translation>
     </message>
     <message>
-        <source>Report a bug or request a feature</source>
-        <translation>Fehler melden / Feature anfordern</translation>
+      <source>Report a bug or request a feature</source>
+      <translation>Fehler melden / Feature anfordern</translation>
     </message>
     <message>
-        <source>Username</source>
-        <translation>Benutzername</translation>
+      <source>Username</source>
+      <translation>Benutzername</translation>
     </message>
     <message>
-        <source>Password</source>
-        <translation>Passwort</translation>
+      <source>Password</source>
+      <translation>Passwort</translation>
     </message>
     <message>
-        <source>Enter username</source>
-        <translation>Benutzernamen eingeben</translation>
+      <source>Enter username</source>
+      <translation>Benutzernamen eingeben</translation>
     </message>
     <message>
-        <source>Enter password</source>
-        <translation>Passwort eingeben</translation>
+      <source>Enter password</source>
+      <translation>Passwort eingeben</translation>
     </message>
     <message>
-        <source>OPTIONAL: Server username – leave empty to send no credentials.</source>
-        <translation>OPTIONAL: Server-Benutzername - Freilassen, wenn keine Authentifizierung erforderlich ist.</translation>
+      <source>OPTIONAL: Server username – leave empty to send no credentials.</source>
+      <translation>OPTIONAL: Server-Benutzername - Freilassen, wenn keine Authentifizierung erforderlich ist.</translation>
     </message>
     <message>
-        <source>OPTIONAL: Server password – leave empty to send no credentials.</source>
-        <translation>OPTIONAL: Server-Passwort - Freilassen, wenn keine Authentifizierung erforderlich ist.</translation>
+      <source>OPTIONAL: Server password – leave empty to send no credentials.</source>
+      <translation>OPTIONAL: Server-Passwort - Freilassen, wenn keine Authentifizierung erforderlich ist.</translation>
     </message>
     <message>
-        <source>Cover Items</source>
-        <translation>Cover-Items</translation>
+      <source>Cover Items</source>
+      <translation>Cover-Items</translation>
     </message>
     <message>
-        <source>e.g. item_id2</source>
-        <translation>z.B. item_id2</translation>
+      <source>e.g. item_id2</source>
+      <translation>z.B. item_id2</translation>
     </message>
     <message>
-        <source>Configure Item-IDs and commands for the app cover quick actions. Leave empty to hide an action.</source>
-        <translation>Hier können Item-IDs und Commands für Quick-Actions auf dem App-Cover konfiguriert werden. Die Actions werden ausgeblendet, sofern keine Werte befüllt sind.</translation>
+      <source>Configure Item-IDs and commands for the app cover quick actions. Leave empty to hide an action.</source>
+      <translation>Hier können Item-IDs und Commands für Quick-Actions auf dem App-Cover konfiguriert werden. Die Actions werden ausgeblendet, sofern keine Werte befüllt sind.</translation>
     </message>
     <message>
-        <source>Configure Item-IDs for app cover display. Leave empty to do not display item states.</source>
-        <translation>Hier können Item-IDs für die Anzeige auf dem App-Cover konfiguriert werden. Items werden nicht angezeigt, sofern keine Werte befüllt sind.</translation>
+      <source>Configure Item-IDs for app cover display. Leave empty to do not display item states.</source>
+      <translation>Hier können Item-IDs für die Anzeige auf dem App-Cover konfiguriert werden. Items werden nicht angezeigt, sofern keine Werte befüllt sind.</translation>
     </message>
     <message>
-        <source>Cover item refresh time (milliseconds)</source>
-        <translation>Aktualisierungszeit des Cover-Elements (Millisekunden)</translation>
+      <source>Cover item refresh time (milliseconds)</source>
+      <translation>Aktualisierungszeit des Cover-Elements (Millisekunden)</translation>
     </message>
     <message>
-        <source>Add a translation</source>
-        <translation>Neue Übersetzung hinzufügen</translation>
+      <source>Add a translation</source>
+      <translation>Neue Übersetzung hinzufügen</translation>
     </message>
     <message>
-        <source>Automatic</source>
-        <translation type="unfinished"></translation>
+      <source>Automatic</source>
+      <translation type="unfinished">Automatic</translation>
     </message>
     <message>
-        <source>Sync</source>
-        <translation type="unfinished"></translation>
+      <source>Sync</source>
+      <translation type="unfinished">Sync</translation>
     </message>
     <message>
-        <source>Refresh</source>
-        <translation type="unfinished"></translation>
+      <source>Refresh</source>
+      <translation type="unfinished">Refresh</translation>
     </message>
     <message>
-        <source>On</source>
-        <translation type="unfinished"></translation>
+      <source>On</source>
+      <translation type="unfinished">On</translation>
     </message>
     <message>
-        <source>Off</source>
-        <translation type="unfinished"></translation>
+      <source>Off</source>
+      <translation type="unfinished">Off</translation>
     </message>
     <message>
-        <source>Stop</source>
-        <translation type="unfinished"></translation>
+      <source>Stop</source>
+      <translation type="unfinished">Stop</translation>
     </message>
     <message>
-        <source>Timer</source>
-        <translation type="unfinished"></translation>
+      <source>Timer</source>
+      <translation type="unfinished">Timer</translation>
     </message>
     <message>
-        <source>Favorite</source>
-        <translation type="unfinished"></translation>
+      <source>Favorite</source>
+      <translation type="unfinished">Favorite</translation>
     </message>
     <message>
-        <source>Location</source>
-        <translation type="unfinished"></translation>
+      <source>Location</source>
+      <translation type="unfinished">Location</translation>
     </message>
     <message>
-        <source>New</source>
-        <translation type="unfinished"></translation>
+      <source>New</source>
+      <translation type="unfinished">New</translation>
     </message>
-</context>
-<context>
+  </context>
+  <context>
     <name>SitemapPage</name>
     <message>
-        <source>Scroll to top</source>
-        <translation>Nach oben scrollen</translation>
+      <source>Scroll to top</source>
+      <translation>Nach oben scrollen</translation>
     </message>
     <message>
-        <source>No image available</source>
-        <translation>Kein Bild verfügbar</translation>
+      <source>No image available</source>
+      <translation>Kein Bild verfügbar</translation>
     </message>
     <message>
-        <source>Image format not supported</source>
-        <translation>Bildformat nicht unterstützt</translation>
+      <source>Image format not supported</source>
+      <translation>Bildformat nicht unterstützt</translation>
     </message>
     <message>
-        <source>No location data</source>
-        <translation>Keine Standortdaten verfügbar</translation>
+      <source>No location data</source>
+      <translation>Keine Standortdaten verfügbar</translation>
     </message>
     <message>
-        <source>Map tile could not be loaded</source>
-        <translation>Karte konnte nicht geladen werden</translation>
+      <source>Map tile could not be loaded</source>
+      <translation>Karte konnte nicht geladen werden</translation>
     </message>
     <message>
-        <source>No video URL configured</source>
-        <translation>Keine Video-URL konfiguriert</translation>
+      <source>No video URL configured</source>
+      <translation>Keine Video-URL konfiguriert</translation>
     </message>
     <message>
-        <source>Tap to play</source>
-        <translation>Zum Abspielen tippen</translation>
+      <source>Tap to play</source>
+      <translation>Zum Abspielen tippen</translation>
     </message>
     <message>
-        <source>Video</source>
-        <translation>Video</translation>
+      <source>Video</source>
+      <translation>Video</translation>
     </message>
     <message>
-        <source>Open in browser</source>
-        <translation>Im Browser öffnen</translation>
+      <source>Open in browser</source>
+      <translation>Im Browser öffnen</translation>
     </message>
     <message>
-        <source>No buttons configured</source>
-        <translation>Keine Buttons konfiguriert</translation>
+      <source>No buttons configured</source>
+      <translation>Keine Buttons konfiguriert</translation>
     </message>
     <message>
-        <source>Chart unavailable</source>
-        <translation>Chart nicht verfügbar</translation>
+      <source>Chart unavailable</source>
+      <translation>Chart nicht verfügbar</translation>
     </message>
     <message>
-        <source>No item configured</source>
-        <translation>Kein Item konfiguriert</translation>
+      <source>No item configured</source>
+      <translation>Kein Item konfiguriert</translation>
     </message>
     <message>
-        <source>Period: </source>
-        <translation>Zeitspanne:</translation>
+      <source>Period: </source>
+      <translation>Zeitspanne:</translation>
     </message>
     <message>
-        <source>Every %1 min.</source>
-        <translation>Alle %1 Min.</translation>
+      <source>Every %1 min.</source>
+      <translation>Alle %1 Min.</translation>
     </message>
     <message>
-        <source>Refresh Sitemap</source>
-        <translation>Sitemap aktualisieren</translation>
+      <source>Refresh Sitemap</source>
+      <translation>Sitemap aktualisieren</translation>
     </message>
-</context>
-<context>
+  </context>
+  <context>
     <name>SitemapPullDownMenu</name>
     <message>
-        <source>Refresh Sitemaps</source>
-        <translation>Sitemaps aktualisieren</translation>
+      <source>Refresh Sitemaps</source>
+      <translation>Sitemaps aktualisieren</translation>
     </message>
     <message>
-        <source>Settings</source>
-        <translation>Einstellungen</translation>
+      <source>Settings</source>
+      <translation>Einstellungen</translation>
     </message>
     <message>
-        <source>─────────────────</source>
-        <translation>─────────────────</translation>
+      <source>─────────────────</source>
+      <translation>─────────────────</translation>
     </message>
     <message>
-        <source>Main</source>
-        <translation>Hauptseite</translation>
+      <source>Main</source>
+      <translation>Hauptseite</translation>
     </message>
-</context>
-<context>
+  </context>
+  <context>
     <name>SitemapSelectionPage</name>
     <message>
-        <source>Navigation</source>
-        <translation>Navigation</translation>
+      <source>Navigation</source>
+      <translation>Navigation</translation>
     </message>
     <message>
-        <source>Sitemaps</source>
-        <translation>Sitemaps</translation>
+      <source>Sitemaps</source>
+      <translation>Sitemaps</translation>
     </message>
     <message>
-        <source>Settings</source>
-        <translation>Einstellungen</translation>
+      <source>Settings</source>
+      <translation>Einstellungen</translation>
     </message>
     <message>
-        <source>Refresh Sitemaps</source>
-        <translation>Sitemaps aktualisieren</translation>
+      <source>Refresh Sitemaps</source>
+      <translation>Sitemaps aktualisieren</translation>
     </message>
     <message>
-        <source>Home</source>
-        <translation>Home</translation>
+      <source>Home</source>
+      <translation>Home</translation>
     </message>
     <message>
-        <source>Main</source>
-        <translation>Hauptseite</translation>
+      <source>Main</source>
+      <translation>Hauptseite</translation>
     </message>
     <message>
-        <source>System</source>
-        <translation>System</translation>
+      <source>System</source>
+      <translation>System</translation>
     </message>
-</context>
+  </context>
 </TS>
