@@ -24,6 +24,21 @@ Dialog {
         )
     }
 
+    function coverActionIconOptions() {
+        return [
+            { "name": "", "label": qsTr("Automatic") },
+            { "name": "icon-cover-sync", "label": qsTr("Sync") },
+            { "name": "icon-cover-refresh", "label": qsTr("Refresh") },
+            { "name": "icon-cover-play", "label": qsTr("On") },
+            { "name": "icon-cover-pause", "label": qsTr("Off") },
+            { "name": "icon-cover-cancel", "label": qsTr("Stop") },
+            { "name": "icon-cover-timer", "label": qsTr("Timer") },
+            { "name": "icon-cover-favorite", "label": qsTr("Favorite") },
+            { "name": "icon-cover-location", "label": qsTr("Location") },
+            { "name": "icon-cover-new", "label": qsTr("New") }
+        ]
+    }
+
     Component.onCompleted: { }
 
     SilicaFlickable {
@@ -182,6 +197,13 @@ Dialog {
                 EnterKey.onClicked: coverAction2Field.focus = true
             }
 
+            CoverActionIconComboBox {
+                id: coverAction1IconField
+                width: parent.width
+                options: settingspage.coverActionIconOptions()
+                iconName: settings.coverAction1_icon
+            }
+
             // Right cover action
             SectionHeader {
                 text: qsTr("Right button")
@@ -210,6 +232,13 @@ Dialog {
                 EnterKey.enabled: text.length > 0
                 EnterKey.iconSource: "image://theme/icon-m-enter-next"
                 EnterKey.onClicked: coverItem1Field.focus = true
+            }
+
+            CoverActionIconComboBox {
+                id: coverAction2IconField
+                width: parent.width
+                options: settingspage.coverActionIconOptions()
+                iconName: settings.coverAction2_icon
             }
 
             // cover Item - displays one or two items with current state in cover
@@ -438,8 +467,10 @@ Dialog {
             //settings.openhab_cloud_service = openhabCloudServiceField.checked
             settings.coverAction1 = coverAction1Field.text
             settings.coverAction1_command = coverAction1CommandField.text
+            settings.coverAction1_icon = coverAction1IconField.selectedIconName
             settings.coverAction2 = coverAction2Field.text
             settings.coverAction2_command = coverAction2CommandField.text
+            settings.coverAction2_icon = coverAction2IconField.selectedIconName
             settings.coverItem1 = coverItem1Field.text
             settings.coverItem2 = coverItem2Field.text
             var refreshMs = parseInt(coverItemRefreshTimeField.text, 10)
