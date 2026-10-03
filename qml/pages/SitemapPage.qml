@@ -68,37 +68,6 @@ Page {
         return sitemapName !== "" ? "/" + sitemapName : ""
     }
 
-    /**
-     * Open the command selection for a sitemap widget (context menu entry).
-     * The widget's own mappings take priority over the static table.
-     */
-    function openNfcWriteForWidget(widget, mappingsJson) {
-        console.log("[NFC] context menu entry tapped, item = "
-                    + (widget && widget.item ? widget.item.name : "<undefined>"))
-        if (!widget || !widget.item || !widget.item.name) {
-            // Silent aborts here look exactly like "the entry is not clickable",
-            // so say so instead of returning quietly.
-            console.warn("[NFC] no usable widget behind the context menu entry")
-            return
-        }
-
-        var label = widget.label
-                ? String(widget.label).replace(/\s*\[.*\]/, "").trim()
-                : ""
-        var mappings = mappingsJson && mappingsJson !== ""
-                ? mappingsJson
-                : JSON.stringify(widget.mappings || [])
-
-        pageStack.animatorPush(Qt.resolvedUrl("NfcCommandPage.qml"), {
-            "itemName": widget.item.name,
-            "itemLabel": label || widget.item.label || widget.item.name,
-            "itemType": widget.item.type || "",
-            "mappingsJson": mappings,
-            "commandJson": JSON.stringify(widget.item.commandDescription || null),
-            "staticCommands": appWindow.nfcStaticCommands
-        })
-    }
-
     /** Write the currently shown sitemap page onto a tag. */
     function openNfcWriteForSitemap() {
         var path = nfcSitemapPath()
@@ -521,25 +490,8 @@ Page {
         id: switchComp
         ListItem {
             id: switchListItem
-            // Captured here so the ContextMenu below can reach them by id;
-            // inside the menu's own component scope the Loader's
-            // properties are not reliably visible.
-            readonly property var nfcWidget: widget
-            readonly property string nfcMappings: mappingsJson
             width: listView.width
             contentHeight: Theme.itemSizeMedium
-
-            // Long-press writes this item's command to a tag.
-            // Declared inline rather than shared, because a ContextMenu
-            // resolves names in the scope it is written in -- `widget` only
-            // exists inside this delegate.
-            menu: ContextMenu {
-                MenuItem {
-                    text: qsTr("Write Command to NFC Tag")
-                    visible: page.nfcWriteAvailable
-                    onClicked: page.openNfcWriteForWidget(switchListItem.nfcWidget, switchListItem.nfcMappings)
-                }
-            }
             onClicked: sendCommand(widget.item.name, currentState === "ON" ? "OFF" : "ON")
 
             Row {
@@ -631,21 +583,8 @@ Page {
         id: rollershutterButtonsComp
         ListItem {
             id: shutterItem
-            // Captured here so the ContextMenu below can reach them by id;
-            // inside the menu's own component scope the Loader's
-            // properties are not reliably visible.
-            readonly property var nfcWidget: widget
-            readonly property string nfcMappings: mappingsJson
             width: listView.width
             contentHeight: Theme.itemSizeMedium
-
-            menu: ContextMenu {
-                MenuItem {
-                    text: qsTr("Write Command to NFC Tag")
-                    visible: page.nfcWriteAvailable
-                    onClicked: page.openNfcWriteForWidget(shutterItem.nfcWidget, shutterItem.nfcMappings)
-                }
-            }
             implicitHeight: Theme.itemSizeMedium
 
             Row {
@@ -704,21 +643,8 @@ Page {
         id: switchWithMappingsComp
         ListItem {
             id: mappingsItem
-            // Captured here so the ContextMenu below can reach them by id;
-            // inside the menu's own component scope the Loader's
-            // properties are not reliably visible.
-            readonly property var nfcWidget: widget
-            readonly property string nfcMappings: mappingsJson
             width: listView.width
             contentHeight: Theme.itemSizeMedium
-
-            menu: ContextMenu {
-                MenuItem {
-                    text: qsTr("Write Command to NFC Tag")
-                    visible: page.nfcWriteAvailable
-                    onClicked: page.openNfcWriteForWidget(mappingsItem.nfcWidget, mappingsItem.nfcMappings)
-                }
-            }
             highlighted: false
 
             // Parse mappings from the JSON string passed via the model
@@ -834,21 +760,8 @@ Page {
         id: selectionComp
         ListItem {
             id: selectionItem
-            // Captured here so the ContextMenu below can reach them by id;
-            // inside the menu's own component scope the Loader's
-            // properties are not reliably visible.
-            readonly property var nfcWidget: widget
-            readonly property string nfcMappings: mappingsJson
             width: listView.width
             contentHeight: Theme.itemSizeMedium
-
-            menu: ContextMenu {
-                MenuItem {
-                    text: qsTr("Write Command to NFC Tag")
-                    visible: page.nfcWriteAvailable
-                    onClicked: page.openNfcWriteForWidget(selectionItem.nfcWidget, selectionItem.nfcMappings)
-                }
-            }
 
             // Parse mappings from the JSON string passed via the model
             readonly property var mappings: {
@@ -1200,21 +1113,8 @@ Page {
         id: setpointComp
         ListItem {
             id: setpointItem
-            // Captured here so the ContextMenu below can reach them by id;
-            // inside the menu's own component scope the Loader's
-            // properties are not reliably visible.
-            readonly property var nfcWidget: widget
-            readonly property string nfcMappings: mappingsJson
             width: listView.width
             contentHeight: Theme.itemSizeMedium
-
-            menu: ContextMenu {
-                MenuItem {
-                    text: qsTr("Write Command to NFC Tag")
-                    visible: page.nfcWriteAvailable
-                    onClicked: page.openNfcWriteForWidget(setpointItem.nfcWidget, setpointItem.nfcMappings)
-                }
-            }
             implicitHeight: Theme.itemSizeMedium
             highlighted: false
 
@@ -1812,21 +1712,8 @@ Page {
         id: inputComp
         ListItem {
             id: inputListItem
-            // Captured here so the ContextMenu below can reach them by id;
-            // inside the menu's own component scope the Loader's
-            // properties are not reliably visible.
-            readonly property var nfcWidget: widget
-            readonly property string nfcMappings: mappingsJson
             width: listView.width
             contentHeight: Theme.itemSizeMedium
-
-            menu: ContextMenu {
-                MenuItem {
-                    text: qsTr("Write Command to NFC Tag")
-                    visible: page.nfcWriteAvailable
-                    onClicked: page.openNfcWriteForWidget(inputListItem.nfcWidget, inputListItem.nfcMappings)
-                }
-            }
 
             readonly property string displayState: {
                 if (currentState && currentState !== "") {
@@ -1935,21 +1822,8 @@ Page {
         id: buttongridComp
         ListItem {
             id: buttongridItem
-            // Captured here so the ContextMenu below can reach them by id;
-            // inside the menu's own component scope the Loader's
-            // properties are not reliably visible.
-            readonly property var nfcWidget: widget
-            readonly property string nfcMappings: mappingsJson
             width: listView.width
             contentHeight: bgColumn.height + Theme.paddingMedium
-
-            menu: ContextMenu {
-                MenuItem {
-                    text: qsTr("Write Command to NFC Tag")
-                    visible: page.nfcWriteAvailable
-                    onClicked: page.openNfcWriteForWidget(buttongridItem.nfcWidget, buttongridItem.nfcMappings)
-                }
-            }
             implicitHeight: contentHeight
             highlighted: false
 

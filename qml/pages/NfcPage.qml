@@ -147,7 +147,8 @@ Page {
                 text: nfcPage.showAllItems ? qsTr("Show sitemap items")
                                            : qsTr("Show all items")
                 onClicked: {
-                    nfcPage.filter = ""
+                    // The search text is kept on purpose: an item missing
+                    // from the sitemap can then be found among all items.
                     nfcPage.showAllItems = !nfcPage.showAllItems
                     nfcPage.reload()
                 }
@@ -183,7 +184,6 @@ Page {
             }
 
             SearchField {
-                visible: nfcPage.showAllItems
                 width: parent.width
                 placeholderText: qsTr("Search item")
                 onTextChanged: nfcPage.filter = text.trim()
