@@ -213,13 +213,15 @@ CoverBackground {
 
     Image {
         anchors {
-            centerIn: parent
+            horizontalCenter: parent.horizontalCenter
+            verticalCenter: parent.verticalCenter
+            verticalCenterOffset: -parent.height * 0.08
         }
-        width: parent.width * 1.22
+        width: parent.width * 0.88
         height: width
         fillMode: Image.PreserveAspectFit
         smooth: true
-        opacity: 0.12
+        opacity: 0.2
         source: "qrc:///cover/cover-background"
     }
 
