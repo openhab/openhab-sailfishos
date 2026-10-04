@@ -14,6 +14,7 @@
 int Q_DECL_EXPORT main(int argc, char *argv[])
 {
     qRegisterMetaType<QNetworkAccessManager::NetworkAccessibility>("QNetworkAccessManager::NetworkAccessibility");
+    qRegisterMetaType<QNetworkAccessManager::NetworkAccessibility>("NetworkAccessibility");
     QGuiApplication *app = SailfishApp::application(argc, argv);
     app->setApplicationVersion(APP_VERSION "-" APP_RELEASE);
     QQuickView* view = SailfishApp::createView();
