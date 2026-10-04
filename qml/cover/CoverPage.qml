@@ -211,12 +211,12 @@ CoverBackground {
         onCoverItem2Changed:            _settingsChangedTimer.restart()
     }
 
+    // Watermark logo. Without the action legend it sits slightly above the
+    // centre (clear of the cover action bar); with the legend it is centred
+    // in the free space above it.
     Image {
-        anchors {
-            horizontalCenter: parent.horizontalCenter
-            verticalCenter: parent.verticalCenter
-            verticalCenterOffset: -parent.height * 0.08
-        }
+        anchors.horizontalCenter: parent.horizontalCenter
+        y: (actionLegend.visible ? actionLegend.y / 2 : parent.height * 0.42) - height / 2
         width: parent.width * 0.88
         height: width
         fillMode: Image.PreserveAspectFit
@@ -360,30 +360,97 @@ CoverBackground {
                 }
             }
         }
+    }
 
-        // ── Action labels (hidden when cover items are configured) ────────────
-        Label {
-            anchors.horizontalCenter: parent.horizontalCenter
-            width: parent.width
-            wrapMode: Text.WordWrap
-            text: label1 + "  " + cleanSetting(settings.coverAction1_command)
-            font.pixelSize: Theme.fontSizeSmall
-            color: Theme.highlightColor
-            visible: cleanSetting(settings.coverItem1) === "" && cleanSetting(settings.coverItem2) === ""
-                     && actionConfigured(settings.coverAction1, settings.coverAction1_command)
-            height: visible ? implicitHeight : 0
+    // ── Action legend (only when no cover items are configured) ──────────────
+    // One row per configured cover action, showing the button's own icon so
+    // the description is visually tied to the button right below it.
+    Column {
+        id: actionLegend
+        anchors {
+            left: parent.left
+            leftMargin: Theme.paddingMedium
+            right: parent.right
+            rightMargin: Theme.paddingMedium
+            bottom: parent.bottom
+            bottomMargin: parent.height * 0.22
         }
+        spacing: Theme.paddingSmall
+        visible: cleanSetting(settings.coverItem1) === "" && cleanSetting(settings.coverItem2) === ""
+                 && (actionConfigured(settings.coverAction1, settings.coverAction1_command)
+                     || actionConfigured(settings.coverAction2, settings.coverAction2_command))
 
-        Label {
-            anchors.horizontalCenter: parent.horizontalCenter
-            width: parent.width
-            wrapMode: Text.WordWrap
-            text: label2 + "  " + cleanSetting(settings.coverAction2_command)
-            font.pixelSize: Theme.fontSizeSmall
-            color: Theme.highlightColor
-            visible: cleanSetting(settings.coverItem1) === "" && cleanSetting(settings.coverItem2) === ""
-                     && actionConfigured(settings.coverAction2, settings.coverAction2_command)
-            height: visible ? implicitHeight : 0
+        Repeater {
+            model: [
+                {
+                    "configured": actionConfigured(settings.coverAction1, settings.coverAction1_command),
+                    "icon": configuredActionIcon(settings.coverAction1_command,
+                                                 settings.coverAction1_icon, "icon-cover-sync"),
+                    "label": label1,
+                    "command": cleanSetting(settings.coverAction1_command)
+                },
+                {
+                    "configured": actionConfigured(settings.coverAction2, settings.coverAction2_command),
+                    "icon": configuredActionIcon(settings.coverAction2_command,
+                                                 settings.coverAction2_icon, "icon-cover-refresh"),
+                    "label": label2,
+                    "command": cleanSetting(settings.coverAction2_command)
+                }
+            ]
+
+            delegate: Item {
+                visible: modelData.configured
+                width: actionLegend.width
+                height: visible ? Math.max(legendIcon.height, legendText.height) + 2 * Theme.paddingSmall : 0
+
+                Rectangle {
+                    anchors.fill: parent
+                    color: Theme.rgba(Theme.overlayBackgroundColor, 0.28)
+                    radius: Theme.paddingSmall
+                }
+
+                Image {
+                    id: legendIcon
+                    anchors {
+                        left: parent.left
+                        leftMargin: Theme.paddingSmall
+                        verticalCenter: parent.verticalCenter
+                    }
+                    width: Theme.iconSizeSmall
+                    height: Theme.iconSizeSmall
+                    sourceSize.width: width
+                    sourceSize.height: height
+                    fillMode: Image.PreserveAspectFit
+                    source: modelData.icon
+                }
+
+                Column {
+                    id: legendText
+                    anchors {
+                        left: legendIcon.right
+                        leftMargin: Theme.paddingSmall
+                        right: parent.right
+                        rightMargin: Theme.paddingSmall
+                        verticalCenter: parent.verticalCenter
+                    }
+
+                    Label {
+                        width: parent.width
+                        text: modelData.label
+                        font.pixelSize: Theme.fontSizeExtraSmall
+                        color: Theme.secondaryColor
+                        truncationMode: TruncationMode.Fade
+                    }
+
+                    Label {
+                        width: parent.width
+                        text: modelData.command
+                        font.pixelSize: Theme.fontSizeSmall
+                        color: Theme.highlightColor
+                        truncationMode: TruncationMode.Fade
+                    }
+                }
+            }
         }
     }
 
