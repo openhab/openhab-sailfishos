@@ -104,6 +104,18 @@ Page {
     function populateSitemap(data) {
         var entries = [];
 
+        // Pages opened by name or URL alone (app start, NFC tag) have no
+        // caller-supplied title and would show the raw URL; take the title
+        // from the server's answer instead. Titles passed in (group label,
+        // sitemap selection) are left untouched.
+        if (pageTitle === sitemapName) {
+            var serverTitle = data.title
+                    || (data.homepage && data.homepage.title)
+                    || data.label || "";
+            serverTitle = String(serverTitle).replace(/\s*\[.*\]/, "").trim();
+            if (serverTitle !== "") pageTitle = serverTitle;
+        }
+
         var rootWidgets = (data.homepage && data.homepage.widgets) ? data.homepage.widgets : (data.widgets ? data.widgets : []);
 
         function unpackWidgets(widgetList) {
