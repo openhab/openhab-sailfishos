@@ -457,17 +457,17 @@ Page {
             //}
 
             MenuItem {
+                text: qsTr("Write this Sitemap to NFC Tag")
+                visible: page.nfcWriteAvailable && page.nfcSitemapPath() !== ""
+                onClicked: page.openNfcWriteForSitemap()
+            }
+
+            MenuItem {
                 text: qsTr("Refresh Sitemap")
                 onClicked: {
                     // fetch current sitemap
                     fetchSitemap()
                 }
-            }
-
-            MenuItem {
-                text: qsTr("Write this Sitemap to NFC Tag")
-                visible: page.nfcWriteAvailable && page.nfcSitemapPath() !== ""
-                onClicked: page.openNfcWriteForSitemap()
             }
         }
 
@@ -2243,7 +2243,7 @@ Page {
                         font.pixelSize: Theme.fontSizeSmall
                     }
                 }
-                
+
                 Row {
                     x: Theme.horizontalPageMargin
                     width: parent.width - 2 * Theme.horizontalPageMargin
