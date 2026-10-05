@@ -5,23 +5,23 @@
     <name>ColorPickerPage</name>
     <message>
         <source>Color Picker</source>
-        <translation type="unfinished">Color Picker</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Hue</source>
-        <translation type="unfinished">Hue</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Saturation</source>
-        <translation type="unfinished">Saturation</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Brightness</source>
-        <translation type="unfinished">Brightness</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Preset Colors</source>
-        <translation type="unfinished">Preset Colors</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -54,176 +54,176 @@
     <name>InputDialog</name>
     <message>
         <source>Set value</source>
-        <translation type="unfinished">Set value</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">Cancel</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Current value: %1</source>
-        <translation type="unfinished">Current value: %1</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>(not set)</source>
-        <translation type="unfinished">(not set)</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Enter new value</source>
-        <translation type="unfinished">Enter new value</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>LegalPage</name>
     <message>
         <source>Legal</source>
-        <translation type="unfinished">Legal</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Copyright © 2026, Contributors to the openHAB project</source>
-        <translation type="unfinished">Copyright © 2026, Contributors to the openHAB project</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>MainUiPage</name>
     <message>
         <source>openHAB Main UI</source>
-        <translation type="unfinished">openHAB Main UI</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>SettingsPage</name>
     <message>
         <source>Save</source>
-        <translation type="unfinished">Save</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Settings</source>
-        <translation type="unfinished">Settings</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>General</source>
-        <translation type="unfinished">General</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Demo Mode</source>
-        <translation type="unfinished">Demo Mode</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>If selected, Demo SiteMaps and DemoPages will be shown.</source>
-        <translation type="unfinished">If selected, Demo SiteMaps and DemoPages will be shown.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Local server</source>
-        <translation type="unfinished">Local server</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>URL</source>
-        <translation type="unfinished">URL</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>https://demo.openhab.org</source>
-        <translation type="unfinished">https://demo.openhab.org</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Cover actions</source>
-        <translation type="unfinished">Cover actions</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Left button</source>
-        <translation type="unfinished">Left button</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Item-ID</source>
-        <translation type="unfinished">Item-ID</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Command</source>
-        <translation type="unfinished">Command</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>e.g. ON, OFF, TOGGLE</source>
-        <translation type="unfinished">e.g. ON, OFF, TOGGLE</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Right button</source>
-        <translation type="unfinished">Right button</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Scroll to top</source>
-        <translation type="unfinished">Scroll to top</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>About</source>
-        <translation type="unfinished">About</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>App Version</source>
-        <translation type="unfinished">App Version</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Legal</source>
-        <translation type="unfinished">Legal</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Privacy Policy</source>
-        <translation type="unfinished">Privacy Policy</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>e.g. item_id1</source>
-        <translation type="unfinished">e.g. item_id1</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Report a bug or request a feature</source>
-        <translation type="unfinished">Report a bug or request a feature</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Username</source>
-        <translation type="unfinished">Username</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Password</source>
-        <translation type="unfinished">Password</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Enter username</source>
-        <translation type="unfinished">Enter username</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Enter password</source>
-        <translation type="unfinished">Enter password</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>OPTIONAL: Server username – leave empty to send no credentials.</source>
-        <translation type="unfinished">OPTIONAL: Server username – leave empty to send no credentials.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>OPTIONAL: Server password – leave empty to send no credentials.</source>
-        <translation type="unfinished">OPTIONAL: Server password – leave empty to send no credentials.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Cover Items</source>
-        <translation type="unfinished">Cover Items</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>e.g. item_id2</source>
-        <translation type="unfinished">e.g. item_id2</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Configure Item-IDs and commands for the app cover quick actions. Leave empty to hide an action.</source>
-        <translation type="unfinished">Configure Item-IDs and commands for the app cover quick actions. Leave empty to hide an action.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Configure Item-IDs for app cover display. Leave empty to do not display item states.</source>
-        <translation type="unfinished">Configure Item-IDs for app cover display. Leave empty to do not display item states.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Cover item refresh time (milliseconds)</source>
-        <translation type="unfinished">Cover item refresh time (milliseconds)</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Add a translation</source>
-        <translation type="unfinished">Add a translation</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Automatic</source>
@@ -270,113 +270,113 @@
     <name>SitemapPage</name>
     <message>
         <source>Scroll to top</source>
-        <translation type="unfinished">Scroll to top</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>No image available</source>
-        <translation type="unfinished">No image available</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Image format not supported</source>
-        <translation type="unfinished">Image format not supported</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>No location data</source>
-        <translation type="unfinished">No location data</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Map tile could not be loaded</source>
-        <translation type="unfinished">Map tile could not be loaded</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>No video URL configured</source>
-        <translation type="unfinished">No video URL configured</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Tap to play</source>
-        <translation type="unfinished">Tap to play</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Video</source>
-        <translation type="unfinished">Video</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Open in browser</source>
-        <translation type="unfinished">Open in browser</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>No buttons configured</source>
-        <translation type="unfinished">No buttons configured</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Chart unavailable</source>
-        <translation type="unfinished">Chart unavailable</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>No item configured</source>
-        <translation type="unfinished">No item configured</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Period: </source>
-        <translation type="unfinished">Period: </translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Every %1 min.</source>
-        <translation type="unfinished">Every %1 min.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Refresh Sitemap</source>
-        <translation type="unfinished">Refresh Sitemap</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>SitemapPullDownMenu</name>
     <message>
         <source>Refresh Sitemaps</source>
-        <translation type="unfinished">Refresh Sitemaps</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Settings</source>
-        <translation type="unfinished">Settings</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>─────────────────</source>
-        <translation type="unfinished">─────────────────</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Main</source>
-        <translation type="unfinished">Main</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>SitemapSelectionPage</name>
     <message>
         <source>Navigation</source>
-        <translation type="unfinished">Navigation</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Sitemaps</source>
-        <translation type="unfinished">Sitemaps</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Settings</source>
-        <translation type="unfinished">Settings</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Refresh Sitemaps</source>
-        <translation type="unfinished">Refresh Sitemaps</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Home</source>
-        <translation type="unfinished">Home</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Main</source>
-        <translation type="unfinished">Main</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>System</source>
-        <translation type="unfinished">System</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

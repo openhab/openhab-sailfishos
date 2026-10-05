@@ -223,7 +223,7 @@
     </message>
     <message>
         <source>Add a translation</source>
-        <translation type="unfinished">Add a translation</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Automatic</source>
