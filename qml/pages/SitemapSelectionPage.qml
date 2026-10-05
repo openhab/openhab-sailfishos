@@ -39,7 +39,7 @@ Page {
 
                 onClicked: {
                     SseEvents.stopSSE(sseManager)
-                    pageStack.animatorReplace(Qt.resolvedUrl("MainUiPage.qml"))
+                    pageStack.replaceAbove(null, Qt.resolvedUrl("MainUiPage.qml"))
                 }
 
                 Row {

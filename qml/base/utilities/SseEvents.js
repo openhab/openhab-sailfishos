@@ -7,6 +7,14 @@
  * - stopSSE(): Disconnects SSE and deregisters the message handler
  * - restartSSE(): Stops the existing connection and starts a new one
  * - rebindModel(): Rebinds the handler to a different model without reconnecting
+ * - attachModel(): Binds a page's model, starting SSE first if it is not running
+ * - releaseModel(): Called by a page on destruction; stops SSE only if that
+ *   page owns the connection and no other live page is still bound to it
+ *
+ * Ownership: the model passed to startSSE() owns the connection. Pages are
+ * destroyed asynchronously (e.g. pageStack.clear() destroys the old pages
+ * only after the new ones are built), so "the page that is going away stops
+ * SSE" would cut off a page that has already taken over.
  *
  * Because of .pragma library, there is exactly ONE instance of these variables
  * shared across all QML files that import this script.
@@ -16,6 +24,8 @@
 var _currentHandler = null;
 // The model currently receiving updates
 var _currentModel = null;
+// The model of the page that started (and therefore owns) the connection
+var _ownerModel = null;
 // Reference to the sseManager for disconnect operations
 var _sseManager = null;
 // Stored credentials for reconnect/restart scenarios
@@ -42,6 +52,7 @@ function startSSE(sseManager, baseUrl, model, username, password) {
 
     _sseManager = sseManager;
     _currentModel = model;
+    _ownerModel = model;
     _currentUsername = username || "";
     _currentPassword = password || "";
 
@@ -74,6 +85,7 @@ function stopSSE(sseManager) {
 
     mgr.disconnectFromOpenHAB();
     _currentModel = null;
+    _ownerModel = null;
     _sseManager = null;
     _currentUsername = "";
     _currentPassword = "";
@@ -99,6 +111,50 @@ function restartSSE(sseManager, baseUrl, model, username, password) {
 function rebindModel(model) {
     _currentModel = model;
     console.log("[SseEvents] Model rebound (count: " + (model ? model.count : "null") + ")");
+}
+
+/**
+ * True while a connection has been started and not stopped. Not the same as
+ * sseManager.active, which only turns true once the first data arrived.
+ */
+function isRunning() {
+    return _currentHandler !== null;
+}
+
+/**
+ * Binds a page's model: rebinds if SSE is running, otherwise starts SSE with
+ * this model as owner. Used by pages that are not necessarily opened on top
+ * of a running sitemap (e.g. a subpage opened from an NFC tag or at app start).
+ */
+function attachModel(sseManager, baseUrl, model, username, password) {
+    if (isRunning()) {
+        rebindModel(model);
+    } else {
+        startSSE(sseManager, baseUrl, model, username, password);
+    }
+}
+
+/**
+ * To be called when the page owning `model` is destroyed.
+ * - Not the owner: just unbind if still bound (the page below rebinds when
+ *   it becomes active again); the connection keeps running.
+ * - Owner, and no other page bound: stop SSE.
+ * - Owner, but another page is bound: that page is alive and now in charge,
+ *   so ownership passes to it instead of cutting it off.
+ * @return {boolean} true if SSE was stopped
+ */
+function releaseModel(sseManager, model) {
+    if (model !== _ownerModel) {
+        if (_currentModel === model) _currentModel = null;
+        return false;
+    }
+    if (_currentModel === null || _currentModel === model) {
+        stopSSE(sseManager);
+        return true;
+    }
+    _ownerModel = _currentModel;
+    console.log("[SseEvents] Ownership handed over to the bound model");
+    return false;
 }
 
 // --- Message handling ---

@@ -313,29 +313,29 @@ Page {
       }
       fetchSitemap()
 
-      if (!isSubPage && sseManager) {
-          // Top-level sitemap: start SSE connection and bind to our model
+      if (!sseManager) {
+          console.error("[SitemapPage] SSEManager not available!");
+      } else if (!isSubPage) {
+          // Top-level sitemap: (re)start SSE; this page becomes its owner
           SseEvents.startSSE(sseManager, settings.base_url, sitemapModel,
                              settings.username_local, settings.decodePassword(settings.password_local));
           console.log("[SitemapPage] SSE started (top-level sitemap)");
-      } else if (isSubPage) {
-          // Sub-page: rebind the existing SSE handler to our model
-          SseEvents.rebindModel(sitemapModel);
-          console.log("[SitemapPage] SSE model rebound to sub-page");
       } else {
-          console.error("[SitemapPage] SSEManager not available!");
+          // Sub-page: usually opened on top of a running sitemap and just
+          // rebinds; opened on its own (NFC tag, app start) it starts SSE.
+          SseEvents.attachModel(sseManager, settings.base_url, sitemapModel,
+                                settings.username_local, settings.decodePassword(settings.password_local));
+          console.log("[SitemapPage] SSE attached to sub-page");
       }
    }
 
    Component.onDestruction: {
-       if (!isSubPage && sseManager) {
-           // Top-level sitemap leaving: stop SSE entirely
-           SseEvents.stopSSE(sseManager);
-           console.log("[SitemapPage] SSE stopped (leaving top-level sitemap)");
-       } else if (isSubPage) {
-           // Sub-page leaving: nothing to do, the parent page will rebind
-           // when it becomes active again (handled by status change below)
-           console.log("[SitemapPage] Sub-page destroyed, parent will rebind model");
+       // Only the owning page stops SSE, and only if no other page has taken
+       // over meanwhile -- old pages may be destroyed after new ones started.
+       if (sseManager && SseEvents.releaseModel(sseManager, sitemapModel)) {
+           console.log("[SitemapPage] SSE stopped (owning page destroyed)");
+       } else {
+           console.log("[SitemapPage] Page destroyed, SSE left running");
        }
    }
 
@@ -345,11 +345,15 @@ Page {
    onStatusChanged: {
        if (status === PageStatus.Active && _wasActive) {
            // Returning from a sub-page or overlay
-            if (!isSubPage && sseManager && !sseManager.active) {
-                // SSE was stopped (e.g. by navigating to MainUiPage) – restart it
+            if (sseManager && !SseEvents.isRunning()) {
+                // SSE was stopped (e.g. by the sitemap selection page) –
+                // restart it, for sub-pages as well. Not sseManager.active:
+                // that is false until the first data arrives, so a connection
+                // started just before would be torn down and rebuilt. Dropped
+                // streams are reconnected by SSEManager itself.
                 SseEvents.startSSE(sseManager, settings.base_url, sitemapModel,
                                    settings.username_local, settings.decodePassword(settings.password_local));
-                console.log("[SitemapPage] SSE restarted after returning to top-level sitemap");
+                console.log("[SitemapPage] SSE restarted after returning to sitemap page");
            } else {
                // SSE still running – just rebind to our model
                SseEvents.rebindModel(sitemapModel);

@@ -231,7 +231,14 @@ ApplicationWindow {
                 // command should not steal the foreground.
                 appWindow.activate()
 
+                // For a subpage, put the root sitemap underneath so "back"
+                // leads to it; the root page also owns the SSE connection.
                 pageStack.clear()
+                if (isSub) {
+                    pageStack.push(Qt.resolvedUrl("pages/SitemapPage.qml"),
+                                   { "sitemapName": tag.rootSitemap },
+                                   PageStackAction.Immediate)
+                }
                 pageStack.push(Qt.resolvedUrl("pages/SitemapPage.qml"),
                                { "sitemapName": target })
             },
