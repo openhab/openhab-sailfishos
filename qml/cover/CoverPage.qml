@@ -286,7 +286,11 @@ CoverBackground {
                     text: itemData1 !== null ? itemData1.label : ""
                     font.pixelSize: Theme.fontSizeExtraSmall
                     color: Theme.secondaryColor
-                    truncationMode: TruncationMode.Fade
+                    // Long item labels wrap onto a second line instead of
+                    // fading out; anything beyond that is elided.
+                    wrapMode: Text.Wrap
+                    maximumLineCount: 2
+                    elide: Text.ElideRight
                 }
 
                 Label {
@@ -347,7 +351,11 @@ CoverBackground {
                     text: itemData2 !== null ? itemData2.label : ""
                     font.pixelSize: Theme.fontSizeExtraSmall
                     color: Theme.secondaryColor
-                    truncationMode: TruncationMode.Fade
+                    // Long item labels wrap onto a second line instead of
+                    // fading out; anything beyond that is elided.
+                    wrapMode: Text.Wrap
+                    maximumLineCount: 2
+                    elide: Text.ElideRight
                 }
 
                 Label {
@@ -439,7 +447,10 @@ CoverBackground {
                         text: modelData.label
                         font.pixelSize: Theme.fontSizeExtraSmall
                         color: Theme.secondaryColor
-                        truncationMode: TruncationMode.Fade
+                        // Same as the item tiles: wrap, at most two lines.
+                        wrapMode: Text.Wrap
+                        maximumLineCount: 2
+                        elide: Text.ElideRight
                     }
 
                     Label {
