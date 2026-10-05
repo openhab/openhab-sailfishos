@@ -485,6 +485,38 @@
         <source>Write this Sitemap to NFC Tag</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Server not reachable.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Not authorized. Check username and password in the settings.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This sitemap page was not found on the server.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server error %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not load the sitemap (HTTP %1).</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not read the sitemap.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This page is empty</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pull down to refresh</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>SitemapPullDownMenu</name>

@@ -18,6 +18,13 @@ Page {
     property string pageTitle: sitemapName
     property var initialPageData: null
 
+    // Load state of the sitemap request; drives the placeholder below.
+    property bool loading: false
+    property string loadError: ""
+    // Incremented per request so a late answer for a previous sitemap
+    // (e.g. after switching sitemaps) cannot overwrite the current one.
+    property int _requestId: 0
+
     // Subpages will be called with full URL (http...) → no own SSE start
     readonly property bool isSubPage: sitemapName.indexOf("http") === 0
 
@@ -88,8 +95,14 @@ Page {
         return settings.base_url + url.substring(restIndex);
     }
 
+    /**
+     * Fill the model from a sitemap/page JSON. If the rows match what is
+     * already shown (same types and items in the same order) they are updated
+     * in place, so a background refresh neither flickers nor loses the
+     * scroll position; otherwise the model is rebuilt.
+     */
     function populateSitemap(data) {
-        sitemapModel.clear();
+        var entries = [];
 
         var rootWidgets = (data.homepage && data.homepage.widgets) ? data.homepage.widgets : (data.widgets ? data.widgets : []);
 
@@ -109,7 +122,7 @@ Page {
 
                 // Handle different widget types and their specific data needs
                 if (widget.type === "Frame" && widget.widgets) {
-                    sitemapModel.append({
+                    entries.push({
                         "type": "Header",
                         "itemName": "",
                         "itemState": "",
@@ -120,7 +133,7 @@ Page {
                     unpackWidgets(widget.widgets);
                 }
                 else if (widget.item && widget.type === "Slider") {
-                    sitemapModel.append({
+                    entries.push({
                         "type": widget.type || "Unknown",
                         "itemName": name,
                         "itemState": state,
@@ -130,7 +143,7 @@ Page {
                     });
                 }
                 else if (widget.item && widget.item.type === "Rollershutter") {
-                    sitemapModel.append({
+                    entries.push({
                         "type": "Rollershutter",
                         "itemName": name,
                         "itemState": state,
@@ -141,7 +154,7 @@ Page {
                 }
                 // For Switch widgets with mappings, use a special type to indicate the presence of mappings
                 else if (widget.type === "Switch" && widget.mappings && widget.mappings.length > 0) {
-                    sitemapModel.append({
+                    entries.push({
                         "type": "SwitchWithMappings",
                         "itemName": name,
                         "itemState": state,
@@ -154,7 +167,7 @@ Page {
                 else if (widget.item && widget.type === "Selection" && (!widget.mappings || widget.mappings.length === 0)) {
                     var commandOptions = (widget.item.commandDescription && widget.item.commandDescription.commandOptions)
                             ? widget.item.commandDescription.commandOptions : [];
-                    sitemapModel.append({
+                    entries.push({
                         "type": widget.type,
                         "itemName": name,
                         "itemState": state,
@@ -165,7 +178,7 @@ Page {
                 }
                 // For Selection widgets with mappings, use the provided mappings
                 else if (widget.item && widget.type === "Selection") {
-                    sitemapModel.append({
+                    entries.push({
                         "type": widget.type,
                         "itemName": name,
                         "itemState": state,
@@ -191,7 +204,7 @@ Page {
                     }
                     var buttonsJson = JSON.stringify(btnArr);
                     //console.log("[Buttongrid] buttons found: " + btnArr.length + " json: " + buttonsJson.substring(0, 200));
-                    sitemapModel.append({
+                    entries.push({
                         "type": "Buttongrid",
                         "itemName": name,
                         "itemState": state,
@@ -202,7 +215,7 @@ Page {
                 }
                 // Default case for other widget types
                 else {
-                    sitemapModel.append({
+                    entries.push({
                         "type": widget.type,
                         "itemName": name,
                         "itemState": state,
@@ -215,33 +228,78 @@ Page {
         }
         unpackWidgets(rootWidgets);
 
-        // After async model load, rebind SSE to this (now populated) model
-        SseEvents.rebindModel(sitemapModel);
-        console.log("[SitemapPage] Model populated with " + sitemapModel.count + " entries, SSE rebound");
+        var sameLayout = entries.length === sitemapModel.count;
+        for (var i = 0; sameLayout && i < entries.length; i++) {
+            var row = sitemapModel.get(i);
+            sameLayout = row.type === entries[i].type && row.itemName === entries[i].itemName;
+        }
+
+        if (sameLayout) {
+            for (var j = 0; j < entries.length; j++) {
+                sitemapModel.set(j, entries[j]);
+            }
+        } else {
+            sitemapModel.clear();
+            for (var k = 0; k < entries.length; k++) {
+                sitemapModel.append(entries[k]);
+            }
+        }
+
+        // No SSE rebind here: SSE is bound to this ListModel object (in
+        // onCompleted / onStatusChanged), which clear()/set() keep. Rebinding
+        // from a late response could steal SSE from a sub-page opened since.
+        console.log("[SitemapPage] Model " + (sameLayout ? "updated" : "populated") + " with "
+                    + sitemapModel.count + " entries");
+    }
+
+    function loadErrorText(xhr) {
+        switch (OpenHabApi.classifyError(xhr).kind) {
+        case "network":      return qsTr("Server not reachable.");
+        case "unauthorized": return qsTr("Not authorized. Check username and password in the settings.");
+        case "notFound":     return qsTr("This sitemap page was not found on the server.");
+        case "server":       return qsTr("Server error %1.").arg(xhr.status);
+        default:             return qsTr("Could not load the sitemap (HTTP %1).").arg(xhr.status);
+        }
     }
 
     function fetchSitemap() {
+        var requestId = ++_requestId;
+        var url = fullApiUrl;
+        loading = true;
+        loadError = "";
         var xhr = new XMLHttpRequest();
         xhr.onreadystatechange = function() {
-            if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
-                var json = JSON.parse(xhr.responseText);
-                populateSitemap(json);
-            } else if (xhr.readyState === XMLHttpRequest.DONE) {
-                console.log("[SitemapPage] Failed to load sitemap from " + fullApiUrl + " status: " + xhr.status);
+            if (xhr.readyState !== XMLHttpRequest.DONE) return;
+            if (requestId !== _requestId) return;   // superseded by a newer request
+            loading = false;
+            if (xhr.status === 200) {
+                try {
+                    populateSitemap(JSON.parse(xhr.responseText));
+                } catch (e) {
+                    loadError = qsTr("Could not read the sitemap.");
+                    console.warn("[SitemapPage] Invalid sitemap JSON from " + url + ": " + e);
+                }
+            } else {
+                // Rows already on screen (e.g. from initialPageData) stay
+                // visible; the placeholder only shows up on an empty page.
+                loadError = loadErrorText(xhr);
+                console.log("[SitemapPage] Failed to load sitemap from " + url + " status: " + xhr.status);
             }
         }
-        xhr.open("GET", fullApiUrl);
+        xhr.open("GET", url);
         var auth = getAuthHeader()
         if (auth) xhr.setRequestHeader("Authorization", auth)
         xhr.send();
     }
 
    Component.onCompleted: {
+      // A sub-page gets its widgets from the parent's response, so it can be
+      // shown at once. That data is as old as the parent page, though, so
+      // fetch the page anyway and update the rows in place.
       if (initialPageData && initialPageData.widgets) {
           populateSitemap(initialPageData);
-      } else {
-          fetchSitemap()
       }
+      fetchSitemap()
 
       if (!isSubPage && sseManager) {
           // Top-level sitemap: start SSE connection and bind to our model
@@ -350,6 +408,9 @@ Page {
                             // Restart SSE and re-fetch sitemap for the newly selected sitemap
                             SseEvents.restartSSE(sseManager, settings.base_url, sitemapModel,
                                                  settings.username_local, settings.decodePassword(settings.password_local))
+                            // Drop the old sitemap's rows so a failing load
+                            // shows the error instead of the previous sitemap.
+                            sitemapModel.clear()
                             fetchSitemap()
                         })
                     })
@@ -464,6 +525,18 @@ Page {
                     }
                 }
             }
+        }
+
+        BusyIndicator {
+            anchors.centerIn: parent
+            size: BusyIndicatorSize.Large
+            running: page.loading && sitemapModel.count === 0
+        }
+
+        ViewPlaceholder {
+            enabled: !page.loading && sitemapModel.count === 0
+            text: page.loadError !== "" ? page.loadError : qsTr("This page is empty")
+            hintText: qsTr("Pull down to refresh")
         }
     }
 
