@@ -75,6 +75,33 @@ Page {
         return sitemapName !== "" ? "/" + sitemapName : ""
     }
 
+    /**
+     * Open the command selection for a sitemap widget (context menu entry).
+     * The widget's own mappings take priority over the static table.
+     */
+    function openNfcWriteForWidget(widget, mappingsJson) {
+        if (!widget || !widget.item || !widget.item.name) {
+            console.warn("[NFC] no usable widget behind the context menu entry")
+            return
+        }
+
+        var label = widget.label
+                ? String(widget.label).replace(/\s*\[.*\]/, "").trim()
+                : ""
+        var mappings = mappingsJson && mappingsJson !== ""
+                ? mappingsJson
+                : JSON.stringify(widget.mappings || [])
+
+        pageStack.animatorPush(Qt.resolvedUrl("NfcCommandPage.qml"), {
+            "itemName": widget.item.name,
+            "itemLabel": label || widget.item.label || widget.item.name,
+            "itemType": widget.item.type || "",
+            "mappingsJson": mappings,
+            "commandJson": JSON.stringify(widget.item.commandDescription || null),
+            "staticCommands": appWindow.nfcStaticCommands
+        })
+    }
+
     /** Write the currently shown sitemap page onto a tag. */
     function openNfcWriteForSitemap() {
         var path = nfcSitemapPath()
@@ -496,7 +523,10 @@ Page {
 
         delegate: Item {
             width: listView.width
-            height: type === "Image"                  ? componentLoader.implicitHeight
+            readonly property real _menuHeight: componentLoader.item && componentLoader.item._menuItem
+                                                ? componentLoader.item._menuItem.height : 0
+            height: _menuHeight + (
+                    type === "Image"                  ? componentLoader.implicitHeight
                   : type === "Video"                  ? componentLoader.implicitHeight
                   : type === "Mapview"                ? componentLoader.implicitHeight
                   : type === "Webview"                ? componentLoader.implicitHeight
@@ -505,7 +535,7 @@ Page {
                   : type === "Header"                 ? Theme.itemSizeSmall
                   : type === "Slider"                 ? Theme.itemSizeLarge
                   : type === "Colortemperaturepicker" ? Theme.itemSizeLarge
-                  : Theme.itemSizeMedium
+                  : Theme.itemSizeMedium)
 
             // If new widget types are added, add them as new cases in the switch statement below and create corresponding components
             Loader {
@@ -579,6 +609,21 @@ Page {
         id: switchComp
         ListItem {
             id: switchListItem
+            // Captured here: inside the ContextMenu's own scope the Loader's
+            // properties are not reliably visible.
+            readonly property var nfcWidget: widget
+            readonly property string nfcMappings: mappingsJson
+            // Long-press: write this item's command to an NFC tag.
+            menu: page.nfcWriteAvailable ? nfcContextMenu : null
+            Component {
+                id: nfcContextMenu
+                ContextMenu {
+                    MenuItem {
+                        text: qsTr("Write Command to NFC Tag")
+                        onClicked: page.openNfcWriteForWidget(switchListItem.nfcWidget, switchListItem.nfcMappings)
+                    }
+                }
+            }
             width: listView.width
             contentHeight: Theme.itemSizeMedium
             onClicked: sendCommand(widget.item.name, currentState === "ON" ? "OFF" : "ON")
@@ -672,6 +717,21 @@ Page {
         id: rollershutterButtonsComp
         ListItem {
             id: shutterItem
+            // Captured here: inside the ContextMenu's own scope the Loader's
+            // properties are not reliably visible.
+            readonly property var nfcWidget: widget
+            readonly property string nfcMappings: mappingsJson
+            // Long-press: write this item's command to an NFC tag.
+            menu: page.nfcWriteAvailable ? nfcContextMenu : null
+            Component {
+                id: nfcContextMenu
+                ContextMenu {
+                    MenuItem {
+                        text: qsTr("Write Command to NFC Tag")
+                        onClicked: page.openNfcWriteForWidget(shutterItem.nfcWidget, shutterItem.nfcMappings)
+                    }
+                }
+            }
             width: listView.width
             contentHeight: Theme.itemSizeMedium
             implicitHeight: Theme.itemSizeMedium
@@ -732,6 +792,21 @@ Page {
         id: switchWithMappingsComp
         ListItem {
             id: mappingsItem
+            // Captured here: inside the ContextMenu's own scope the Loader's
+            // properties are not reliably visible.
+            readonly property var nfcWidget: widget
+            readonly property string nfcMappings: mappingsJson
+            // Long-press: write this item's command to an NFC tag.
+            menu: page.nfcWriteAvailable ? nfcContextMenu : null
+            Component {
+                id: nfcContextMenu
+                ContextMenu {
+                    MenuItem {
+                        text: qsTr("Write Command to NFC Tag")
+                        onClicked: page.openNfcWriteForWidget(mappingsItem.nfcWidget, mappingsItem.nfcMappings)
+                    }
+                }
+            }
             width: listView.width
             contentHeight: Theme.itemSizeMedium
             highlighted: false
@@ -849,6 +924,21 @@ Page {
         id: selectionComp
         ListItem {
             id: selectionItem
+            // Captured here: inside the ContextMenu's own scope the Loader's
+            // properties are not reliably visible.
+            readonly property var nfcWidget: widget
+            readonly property string nfcMappings: mappingsJson
+            // Long-press: write this item's command to an NFC tag.
+            menu: page.nfcWriteAvailable ? nfcContextMenu : null
+            Component {
+                id: nfcContextMenu
+                ContextMenu {
+                    MenuItem {
+                        text: qsTr("Write Command to NFC Tag")
+                        onClicked: page.openNfcWriteForWidget(selectionItem.nfcWidget, selectionItem.nfcMappings)
+                    }
+                }
+            }
             width: listView.width
             contentHeight: Theme.itemSizeMedium
 
@@ -1202,6 +1292,21 @@ Page {
         id: setpointComp
         ListItem {
             id: setpointItem
+            // Captured here: inside the ContextMenu's own scope the Loader's
+            // properties are not reliably visible.
+            readonly property var nfcWidget: widget
+            readonly property string nfcMappings: mappingsJson
+            // Long-press: write this item's command to an NFC tag.
+            menu: page.nfcWriteAvailable ? nfcContextMenu : null
+            Component {
+                id: nfcContextMenu
+                ContextMenu {
+                    MenuItem {
+                        text: qsTr("Write Command to NFC Tag")
+                        onClicked: page.openNfcWriteForWidget(setpointItem.nfcWidget, setpointItem.nfcMappings)
+                    }
+                }
+            }
             width: listView.width
             contentHeight: Theme.itemSizeMedium
             implicitHeight: Theme.itemSizeMedium
@@ -1801,6 +1906,21 @@ Page {
         id: inputComp
         ListItem {
             id: inputListItem
+            // Captured here: inside the ContextMenu's own scope the Loader's
+            // properties are not reliably visible.
+            readonly property var nfcWidget: widget
+            readonly property string nfcMappings: mappingsJson
+            // Long-press: write this item's command to an NFC tag.
+            menu: page.nfcWriteAvailable ? nfcContextMenu : null
+            Component {
+                id: nfcContextMenu
+                ContextMenu {
+                    MenuItem {
+                        text: qsTr("Write Command to NFC Tag")
+                        onClicked: page.openNfcWriteForWidget(inputListItem.nfcWidget, inputListItem.nfcMappings)
+                    }
+                }
+            }
             width: listView.width
             contentHeight: Theme.itemSizeMedium
 
@@ -1911,6 +2031,21 @@ Page {
         id: buttongridComp
         ListItem {
             id: buttongridItem
+            // Captured here: inside the ContextMenu's own scope the Loader's
+            // properties are not reliably visible.
+            readonly property var nfcWidget: widget
+            readonly property string nfcMappings: mappingsJson
+            // Long-press: write this item's command to an NFC tag.
+            menu: page.nfcWriteAvailable ? nfcContextMenu : null
+            Component {
+                id: nfcContextMenu
+                ContextMenu {
+                    MenuItem {
+                        text: qsTr("Write Command to NFC Tag")
+                        onClicked: page.openNfcWriteForWidget(buttongridItem.nfcWidget, buttongridItem.nfcMappings)
+                    }
+                }
+            }
             width: listView.width
             contentHeight: bgColumn.height + Theme.paddingMedium
             implicitHeight: contentHeight

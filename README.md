@@ -41,11 +41,10 @@ For more screenshots, see [docs/images/](docs/images/) in the GitHub repository.
 
 ## Roadmap
 
-- Version 1.0.0 (planned):
-  - Add support for remote access (via openHAB cloud)
-  - Add App Notifications (via openHAB cloud)
-  - Add support for openHAB tiles (HABPanel, Basic UI, etc.)
-  - Management of translations via CrowdIn
+- Add support for remote access (via openHAB cloud)
+- Add App Notifications (via openHAB cloud)
+- Add support for openHAB tiles (HABPanel, Basic UI, etc.)
+- Add support for widget-confirm-button via Sitemap
 
 ## Contributing to the project
 
