@@ -11,6 +11,9 @@ which produces huge whitespace-only diffs. Running this on the Crowdin PR
 branch converts its output back to Qt's format, so the PR shows only real
 translation changes and `main` stays in the format lupdate/Linguist produce.
 
+Also empties unfinished translations that are just a copy of the English
+source text (Crowdin export), so they match what lupdate writes.
+
 Run manually:  python3 normalize_ts.py translations/*.ts
 In CI:         called by fix-crowdin-indentation.yml
 """
@@ -18,6 +21,32 @@ In CI:         called by fix-crowdin-indentation.yml
 import sys
 import re
 import lxml.etree as etree
+
+
+def clear_source_copies(root):
+    """
+    Crowdin exports untranslated strings with the English source text copied
+    into the translation (still marked type="unfinished"), whereas lupdate
+    leaves them empty. lrelease ignores unfinished entries either way, so the
+    copy only adds noise: empty such translations again to match lupdate.
+    Real translations and unfinished entries with other text are kept.
+    """
+    for message in root.iter('message'):
+        source = message.find('source')
+        translation = message.find('translation')
+        if source is None or translation is None:
+            continue
+        if translation.get('type') != 'unfinished':
+            continue
+        source_text = source.text or ''
+        forms = translation.findall('numerusform')
+        if forms:
+            # Plural forms: clear only if every form is just the source copy
+            if all((f.text or '') == source_text for f in forms):
+                for f in forms:
+                    f.text = None
+        elif (translation.text or '') == source_text:
+            translation.text = None
 
 
 def normalize_ts(filepath):
@@ -33,6 +62,8 @@ def normalize_ts(filepath):
     except etree.XMLSyntaxError as e:
         print(f"  SKIP (invalid XML): {filepath}: {e}", file=sys.stderr)
         return False
+
+    clear_source_copies(root)
 
     # etree.indent gives us clean 4-space-per-level indentation:
     #   <TS>            0
@@ -83,7 +114,8 @@ def normalize_ts(filepath):
     # Exactly one trailing newline
     result = result.rstrip('\n') + '\n'
 
-    with open(filepath, 'w', encoding='utf-8') as f:
+    # newline='\n': keep LF line endings when run manually on Windows too
+    with open(filepath, 'w', encoding='utf-8', newline='\n') as f:
         f.write(result)
 
     return True
