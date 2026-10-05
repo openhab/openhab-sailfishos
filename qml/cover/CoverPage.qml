@@ -211,19 +211,35 @@ CoverBackground {
         onCoverItem2Changed:            _settingsChangedTimer.restart()
     }
 
-    // Watermark logo. Without the action legend it sits slightly above the
-    // centre (clear of the cover action bar); with the legend it is centred
-    // in the free space above it.
+    // Watermark logo. When the bottom part of the cover is taken by the action
+    // legend or by a single item tile, the logo is centred in the free space
+    // above it (and shrunk if it would not fit); otherwise -- nothing shown or
+    // two item tiles -- it sits slightly above the centre.
     Image {
+        // Top edge of the content below the logo, or -1 if the logo is free.
+        readonly property real freeBottom: actionLegend.visible ? actionLegend.y
+                                         : visibleStatusItemCount === 1 ? statusColumn.y
+                                         : -1
+        // Height/width ratio of cover-background.png (479 x 311).
+        readonly property real logoRatio: 311 / 479
+
         anchors.horizontalCenter: parent.horizontalCenter
-        y: (actionLegend.visible ? actionLegend.y / 2 : parent.height * 0.42) - height / 2
-        width: parent.width * 0.88
+        y: (freeBottom >= 0 ? freeBottom / 2 : parent.height * 0.42) - height / 2
+        width: freeBottom >= 0
+               ? Math.min(parent.width * 0.88, (freeBottom - 2 * Theme.paddingSmall) / logoRatio)
+               : parent.width * 0.88
         height: width
         fillMode: Image.PreserveAspectFit
         smooth: true
         opacity: 0.2
         source: "qrc:///cover/cover-background"
     }
+
+    // Item tiles always have the size they have when two items are shown.
+    // The column hangs from the bottom (above the cover action bar), so a
+    // single tile sits at the bottom and leaves the top for the logo.
+    readonly property real statusTileHeight:
+        (height - Theme.paddingLarge - height * 0.22 - Theme.paddingSmall) / 2
 
     Column {
         id: statusColumn
@@ -232,8 +248,6 @@ CoverBackground {
             leftMargin: Theme.paddingMedium
             right: parent.right
             rightMargin: Theme.paddingMedium
-            top: parent.top
-            topMargin: Theme.paddingLarge
             bottom: parent.bottom
             bottomMargin: parent.height * 0.22
         }
@@ -243,7 +257,7 @@ CoverBackground {
         Item {
             visible: cleanSetting(settings.coverItem1) !== "" && itemData1 !== null
             width: parent.width
-            height: visible ? (parent.height - (visibleStatusItemCount - 1) * parent.spacing) / visibleStatusItemCount : 0
+            height: visible ? statusTileHeight : 0
 
             Rectangle {
                 anchors.fill: parent
@@ -308,7 +322,7 @@ CoverBackground {
         Item {
             visible: cleanSetting(settings.coverItem2) !== "" && itemData2 !== null
             width: parent.width
-            height: visible ? (parent.height - (visibleStatusItemCount - 1) * parent.spacing) / visibleStatusItemCount : 0
+            height: visible ? statusTileHeight : 0
 
             Rectangle {
                 anchors.fill: parent
