@@ -1,6 +1,5 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
-import Nemo.Notifications 1.0
 import "../base"
 import "../base/utilities/PatternFormatter.js" as PatternFormatter
 import "../base/utilities/OpenHabApi.js" as OpenHabApi
@@ -44,11 +43,14 @@ CoverBackground {
 
     function showCommandFailure(itemName, status) {
         var reason = status === 0 ? qsTr("Network error") : qsTr("HTTP %1").arg(status)
-        commandFailureNotification.summary = qsTr("Cover action failed")
-        commandFailureNotification.body = qsTr("Could not send command to %1 (%2).").arg(itemName).arg(reason)
-        commandFailureNotification.previewSummary = commandFailureNotification.summary
-        commandFailureNotification.previewBody = commandFailureNotification.body
-        commandFailureNotification.publish()
+        // Via the app-wide NotificationManager (harbour-openhab.qml).
+        notificationManager.notifyError(
+            qsTr("Cover action failed"),
+            qsTr("Could not send command to %1 (%2).").arg(itemName).arg(reason),
+            { "transient": true,
+              "expireTimeout": 5000,
+              "urgency": "normal",
+              "icon": "image://theme/icon-lock-warning" })
     }
 
     // Returns the Basic Auth header value when both credentials are set
@@ -73,16 +75,6 @@ CoverBackground {
     property var itemData2: null
     property int visibleStatusItemCount: (cleanSetting(settings.coverItem1) !== "" && itemData1 !== null ? 1 : 0)
                                          + (cleanSetting(settings.coverItem2) !== "" && itemData2 !== null ? 1 : 0)
-
-    Notification {
-        id: commandFailureNotification
-        appName: "openHAB"
-        appIcon: "harbour-openhab"
-        icon: "image://theme/icon-lock-warning"
-        expireTimeout: 5000
-        isTransient: true
-        urgency: Notification.Normal
-    }
 
     function getItemLabel(itemName, callback) {
         itemName = cleanSetting(itemName)
