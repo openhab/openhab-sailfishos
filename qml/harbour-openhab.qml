@@ -175,21 +175,36 @@ ApplicationWindow {
         }
     }
 
-    function _nfcDisplayName(tag) {
-        // The label from the tag lets us name the item even when the server is
-        // slow or unreachable -- that is what makes writing `l` worthwhile.
-        return tag.label && tag.label !== "" ? tag.label : tag.item
+    /**
+     * What the notification calls the command. Only the server is trusted
+     * here: the tag's `l` and `m` are free text, so a crafted tag could
+     * claim "Kitchen Light → ON" while switching something else entirely.
+     */
+    function _nfcCommandLabel(item, command) {
+        var lists = [
+            item.commandDescription && item.commandDescription.commandOptions,
+            item.stateDescription && item.stateDescription.options
+        ]
+        for (var l = 0; l < lists.length; l++) {
+            var options = lists[l] || []
+            for (var i = 0; i < options.length; i++) {
+                var option = options[i]
+                var value = option.command !== undefined ? option.command : option.value
+                if (value === command && option.label) {
+                    return option.label
+                }
+            }
+        }
+        return command
     }
 
     function _nfcRunItemCommand(tag) {
-        var name = _nfcDisplayName(tag)
-        var shown = tag.mappedState && tag.mappedState !== ""
-                ? tag.mappedState : tag.command
-
         // Check the item exists before sending, so a tag from another server
         // produces a clear message instead of a silent no-op.
         OpenHabApi.fetchItem(settings.apiConfig(), tag.item,
-            function() {
+            function(item) {
+                var name = item.label && item.label !== "" ? item.label : tag.item
+                var shown = _nfcCommandLabel(item, tag.command)
                 OpenHabApi.sendCommand(settings.apiConfig(), tag.item, tag.command,
                     function() {
                         // "sent", not "executed": a 200 only means openHAB
