@@ -28,26 +28,26 @@
     <name>CoverActionIconComboBox</name>
     <message>
         <source>Icon</source>
-        <translation type="unfinished"></translation>
+        <translation>Symbol</translation>
     </message>
 </context>
 <context>
     <name>CoverPage</name>
     <message>
         <source>Network error</source>
-        <translation type="unfinished"></translation>
+        <translation>Netzwerkfehler</translation>
     </message>
     <message>
         <source>HTTP %1</source>
-        <translation type="unfinished"></translation>
+        <translation>HTTP %1</translation>
     </message>
     <message>
         <source>Cover action failed</source>
-        <translation type="unfinished"></translation>
+        <translation>Cover-Aktion fehlgeschlagen</translation>
     </message>
     <message>
         <source>Could not send command to %1 (%2).</source>
-        <translation type="unfinished"></translation>
+        <translation>Konnte Befehl nicht an %1 (%2) senden.</translation>
     </message>
 </context>
 <context>
@@ -95,26 +95,26 @@
     <name>NfcCommandPage</name>
     <message>
         <source>Choose command</source>
-        <translation type="unfinished"></translation>
+        <translation>Befehl wählen</translation>
     </message>
     <message>
         <source>Or enter a value</source>
-        <translation type="unfinished"></translation>
+        <translation>Oder einen Wert eingeben</translation>
     </message>
     <message>
         <source>Enter a value</source>
-        <translation type="unfinished"></translation>
+        <translation>Wert eingeben</translation>
     </message>
     <message>
         <source>Command</source>
-        <translation type="unfinished">Kommando</translation>
+        <translation>Kommando</translation>
     </message>
 </context>
 <context>
     <name>NfcPage</name>
     <message>
         <source>Open a sitemap first, or show all items from the pulley menu.</source>
-        <translation type="unfinished"></translation>
+        <translation>Zuerst eine Sitemap öffnen oder alle Elemente aus dem Pulley-Menü anzeigen.</translation>
     </message>
     <message>
         <source>This sitemap has no items that accept commands.</source>

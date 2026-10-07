@@ -121,14 +121,23 @@ private slots:
     void onWriteTimeout();
 
 private:
-    void callAsync(const QString &service,
-                   const QString &path,
-                   const QString &interface,
-                   const QString &method,
-                   const QVariantList &args,
-                   const char *slot,
-                   int timeoutMs,
-                   const QString &tagPath);
+    QDBusPendingCallWatcher *callAsync(const QString &service,
+                                       const QString &path,
+                                       const QString &interface,
+                                       const QString &method,
+                                       const QVariantList &args,
+                                       const char *slot,
+                                       int timeoutMs,
+                                       const QString &tagPath);
+    /** Starts a write-path call tagged with the current write attempt. */
+    void callWriteAsync(const QString &tagPath,
+                        const QString &interface,
+                        const QString &method,
+                        const QVariantList &args,
+                        const char *slot,
+                        int timeoutMs);
+    /** Whether a write-path reply still belongs to the running attempt. */
+    bool isCurrentWriteReply(const QDBusPendingCallWatcher *watcher) const;
 
     void subscribeIfNeeded();
     void unsubscribeIfIdle();
@@ -139,6 +148,7 @@ private:
     void beginWrite(const QString &tagPath);
     void finishWrite(bool success, const QString &code, const QString &detail);
     void releaseTag(const QString &tagPath);
+    void sendRelease(const QString &tagPath);
     bool debounce(const QByteArray &serial, const QString &uri);
     void setWriting(bool writing);
 
@@ -188,6 +198,12 @@ private:
     QString m_writeTagPath;
     QByteArray m_writeImage;
     bool m_writePending = false;
+    /**
+     * Bumped for every write attempt. nfcd keeps the object path while a tag
+     * rests on the reader, so the path alone cannot tell a late reply from a
+     * cancelled attempt apart from one of the current attempt.
+     */
+    quint32 m_writeGeneration = 0;
     QTimer *m_writeTimeout = nullptr;
 };
 

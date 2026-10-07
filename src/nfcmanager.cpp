@@ -95,14 +95,14 @@ NfcManager::~NfcManager()
 // Plumbing
 // ---------------------------------------------------------------------------
 
-void NfcManager::callAsync(const QString &service,
-                           const QString &path,
-                           const QString &interface,
-                           const QString &method,
-                           const QVariantList &args,
-                           const char *slot,
-                           int timeoutMs,
-                           const QString &tagPath)
+QDBusPendingCallWatcher *NfcManager::callAsync(const QString &service,
+                                               const QString &path,
+                                               const QString &interface,
+                                               const QString &method,
+                                               const QVariantList &args,
+                                               const char *slot,
+                                               int timeoutMs,
+                                               const QString &tagPath)
 {
     QDBusMessage message =
             QDBusMessage::createMethodCall(service, path, interface, method);
@@ -115,6 +115,26 @@ void NfcManager::callAsync(const QString &service,
     // The reply carries no hint which tag it belongs to, so remember it here.
     watcher->setProperty("tagPath", tagPath);
     connect(watcher, SIGNAL(finished(QDBusPendingCallWatcher*)), this, slot);
+    return watcher;
+}
+
+void NfcManager::callWriteAsync(const QString &tagPath,
+                                const QString &interface,
+                                const QString &method,
+                                const QVariantList &args,
+                                const char *slot,
+                                int timeoutMs)
+{
+    QDBusPendingCallWatcher *watcher = callAsync(kDaemonService, tagPath, interface,
+                                                 method, args, slot, timeoutMs, tagPath);
+    watcher->setProperty("writeGeneration", m_writeGeneration);
+}
+
+bool NfcManager::isCurrentWriteReply(const QDBusPendingCallWatcher *watcher) const
+{
+    return m_writePending
+            && watcher->property("tagPath").toString() == m_writeTagPath
+            && watcher->property("writeGeneration").toUInt() == m_writeGeneration;
 }
 
 QStringList NfcManager::objectPathsFrom(const QVariant &variant)
@@ -528,6 +548,7 @@ void NfcManager::writeUri(const QString &uri, const QString &shortUri)
     m_writeTagPath.clear();
     m_writeImage.clear();
     m_writePending = true;
+    m_writeGeneration++;
     setWriting(true);
 
     subscribeIfNeeded();
@@ -569,36 +590,44 @@ void NfcManager::beginWrite(const QString &tagPath)
     // ndef-write gets away without it because it is done in milliseconds; we
     // are not, so we ask -- but we do not insist, because older nfcd builds
     // may not offer Acquire2 at all.
-    callAsync(kDaemonService, tagPath, kIfaceTag,
-              QStringLiteral("Acquire2"), QVariantList() << QVariant(false),
-              SLOT(onAcquireReply(QDBusPendingCallWatcher*)), 5000, tagPath);
+    callWriteAsync(tagPath, kIfaceTag,
+                   QStringLiteral("Acquire2"), QVariantList() << QVariant(false),
+                   SLOT(onAcquireReply(QDBusPendingCallWatcher*)), 5000);
 }
 
 void NfcManager::onAcquireReply(QDBusPendingCallWatcher *watcher)
 {
     watcher->deleteLater();
     const QString tagPath = watcher->property("tagPath").toString();
-    if (!m_writePending || tagPath != m_writeTagPath) {
+    const QDBusMessage reply = watcher->reply();
+    const bool acquired = (reply.type() != QDBusMessage::ErrorMessage);
+
+    if (!isCurrentWriteReply(watcher)) {
+        // The attempt was cancelled or timed out while Acquire2 was pending.
+        // finishWrite() could not release a lock it did not know about yet,
+        // so give it back here or nfcd keeps it until we exit.
+        if (acquired) {
+            sendRelease(tagPath);
+        }
         return;
     }
 
-    const QDBusMessage reply = watcher->reply();
-    m_tagAcquired = (reply.type() != QDBusMessage::ErrorMessage);
+    m_tagAcquired = acquired;
     if (!m_tagAcquired) {
         qDebug() << "[Nfc] Acquire2 unavailable, continuing without:"
                  << reply.errorMessage();
     }
 
-    callAsync(kDaemonService, tagPath, kIfaceType2,
-              QStringLiteral("ReadAllData"), QVariantList(),
-              SLOT(onReadAllDataReply(QDBusPendingCallWatcher*)), 15000, tagPath);
+    callWriteAsync(tagPath, kIfaceType2,
+                   QStringLiteral("ReadAllData"), QVariantList(),
+                   SLOT(onReadAllDataReply(QDBusPendingCallWatcher*)), 15000);
 }
 
 void NfcManager::onReadAllDataReply(QDBusPendingCallWatcher *watcher)
 {
     watcher->deleteLater();
     const QString tagPath = watcher->property("tagPath").toString();
-    if (!m_writePending || tagPath != m_writeTagPath) {
+    if (!isCurrentWriteReply(watcher)) {
         return;
     }
 
@@ -649,18 +678,18 @@ void NfcManager::onReadAllDataReply(QDBusPendingCallWatcher *watcher)
     }
 
     m_writeImage = image;
-    callAsync(kDaemonService, tagPath, kIfaceType2,
-              QStringLiteral("WriteData"),
-              QVariantList() << QVariant(uint(0))
-                             << QVariant(image.left(bytesToWrite)),
-              SLOT(onWriteDataReply(QDBusPendingCallWatcher*)), 15000, tagPath);
+    callWriteAsync(tagPath, kIfaceType2,
+                   QStringLiteral("WriteData"),
+                   QVariantList() << QVariant(uint(0))
+                                  << QVariant(image.left(bytesToWrite)),
+                   SLOT(onWriteDataReply(QDBusPendingCallWatcher*)), 15000);
 }
 
 void NfcManager::onWriteDataReply(QDBusPendingCallWatcher *watcher)
 {
     watcher->deleteLater();
     const QString tagPath = watcher->property("tagPath").toString();
-    if (!m_writePending || tagPath != m_writeTagPath) {
+    if (!isCurrentWriteReply(watcher)) {
         return;
     }
 
@@ -753,6 +782,11 @@ void NfcManager::releaseTag(const QString &tagPath)
         return;
     }
     m_tagAcquired = false;
+    sendRelease(tagPath);
+}
+
+void NfcManager::sendRelease(const QString &tagPath)
+{
     // Fire and forget: there is nothing useful to do if the release fails,
     // and nfcd drops the lock when our connection goes away anyway.
     QDBusMessage message = QDBusMessage::createMethodCall(
