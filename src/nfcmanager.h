@@ -197,6 +197,8 @@ private:
     QString m_writeShortUri;
     QString m_writeTagPath;
     QByteArray m_writeImage;
+    /** Bytes handed to WriteData; the reply must confirm all of them. */
+    int m_writeLength = 0;
     bool m_writePending = false;
     /**
      * Bumped for every write attempt. nfcd keeps the object path while a tag

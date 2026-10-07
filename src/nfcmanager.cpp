@@ -678,6 +678,7 @@ void NfcManager::onReadAllDataReply(QDBusPendingCallWatcher *watcher)
     }
 
     m_writeImage = image;
+    m_writeLength = bytesToWrite;
     callWriteAsync(tagPath, kIfaceType2,
                    QStringLiteral("WriteData"),
                    QVariantList() << QVariant(uint(0))
@@ -707,6 +708,18 @@ void NfcManager::onWriteDataReply(QDBusPendingCallWatcher *watcher)
     }
 
     const uint written = reply.arguments().value(0).toUInt();
+    if (written != uint(m_writeLength)) {
+        // nfcd reports the byte count even when the transfer broke off
+        // halfway. Write protection and lock bits fail on the very first
+        // block, so a partial write almost always means the tag was lifted.
+        const QString detail = QStringLiteral("wrote %1 of %2 bytes")
+                .arg(written).arg(m_writeLength);
+        finishWrite(false,
+                    written > 0 ? QStringLiteral("tagRemoved")
+                                : QStringLiteral("writeFailed"),
+                    detail);
+        return;
+    }
     qDebug() << "[Nfc] wrote" << written << "bytes to" << tagPath;
     finishWrite(true, QString(), QString());
 }
@@ -767,6 +780,7 @@ void NfcManager::finishWrite(bool success, const QString &code, const QString &d
     m_writeUri.clear();
     m_writeShortUri.clear();
     m_writeImage.clear();
+    m_writeLength = 0;
     setWriting(false);
     unsubscribeIfIdle();
 
