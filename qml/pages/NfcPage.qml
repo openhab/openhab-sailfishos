@@ -23,6 +23,11 @@ Page {
     property bool loading: false
     property string errorText: ""
     property string filter: ""
+    /**
+     * Bumped by every reload(). A reply from an earlier request (source
+     * switched, or Reload tapped while loading) must not touch the model.
+     */
+    property int requestGeneration: 0
 
     // Static per-type command table, loaded once in the ApplicationWindow.
     readonly property var staticCommands: appWindow.nfcStaticCommands
@@ -32,13 +37,14 @@ Page {
 
     // ── loading items ──────────────────────────────────────────────────
     function reload() {
+        requestGeneration++
         itemModel.clear()
         errorText = ""
         loading = true
         if (showAllItems) {
-            loadAllItems()
+            loadAllItems(requestGeneration)
         } else {
-            loadSitemapItems()
+            loadSitemapItems(requestGeneration)
         }
     }
 
@@ -52,7 +58,7 @@ Page {
         return page
     }
 
-    function loadSitemapItems() {
+    function loadSitemapItems(generation) {
         var name = currentSitemapName()
         if (name === "") {
             loading = false
@@ -66,6 +72,7 @@ Page {
         if (auth) xhr.setRequestHeader("Authorization", auth)
         xhr.onreadystatechange = function() {
             if (xhr.readyState !== XMLHttpRequest.DONE) return
+            if (generation !== requestGeneration) return
             loading = false
             if (xhr.status < 200 || xhr.status >= 300) {
                 errorText = OpenHabApi.classifyError(xhr).message
@@ -86,13 +93,15 @@ Page {
         xhr.send()
     }
 
-    function loadAllItems() {
+    function loadAllItems(generation) {
         OpenHabApi.fetchItems(settings.apiConfig(),
             function(json) {
+                if (generation !== requestGeneration) return
                 loading = false
                 fillModel(OpenHabApi.filterCommandableItems(json, readOnlyTypes))
             },
             function(error) {
+                if (generation !== requestGeneration) return
                 loading = false
                 errorText = error.message
             })
