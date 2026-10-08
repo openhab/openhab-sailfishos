@@ -74,9 +74,6 @@ ApplicationWindow {
     }
 
     initialPage: {
-        console.log("[Start] settings.demoMode = " + settings.demoMode)
-        console.log("[Start] settings.lastVisitedPage = " + settings.lastVisitedPage)
-
         if (settings.lastVisitedPage === "Sitemap") {
             return mainUiPageComponent
         }
@@ -278,6 +275,8 @@ ApplicationWindow {
     }
 
     Component.onCompleted: {
+        console.log("[Start] settings.demoMode = " + settings.demoMode)
+        console.log("[Start] settings.lastVisitedPage = " + settings.lastVisitedPage)
         if (!_sitemapsLoaded) {
             loadAvailableSitemaps()
         }

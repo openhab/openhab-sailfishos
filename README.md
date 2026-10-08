@@ -45,6 +45,7 @@ For more screenshots, see [docs/images/](docs/images/) in the GitHub repository.
 - Add App Notifications (via openHAB cloud)
 - Add support for openHAB tiles (HABPanel, Basic UI, etc.)
 - Add support for widget-confirm-button via Sitemap
+- Show Item History (context menu on item in sitemap)
 
 ## Contributing to the project
 

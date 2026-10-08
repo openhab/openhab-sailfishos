@@ -129,8 +129,6 @@ Page {
     // The table load is fired once at app start; if it is still running, wait
     // for it so the command selection is never built from an empty table.
     Component.onCompleted: {
-        // The user came here to write a tag; reacting to one that is laid on
-        // the reader would throw them out of the flow.
         nfcManager.suspendReading()
         if (appWindow.nfcCommandTableLoaded) {
             reload()

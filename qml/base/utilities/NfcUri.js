@@ -17,7 +17,7 @@
 var SCHEME = "openhab"
 
 // Parameter names. The long ones are deprecated aliases that Android still
-// reads but no longer writes -- we do exactly the same (flow decision).
+// reads but no longer writes -- we do exactly the same
 var PARAM_ITEM = "i"
 var PARAM_STATE = "s"
 var PARAM_LABEL = "l"

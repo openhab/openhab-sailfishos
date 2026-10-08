@@ -784,7 +784,10 @@ void NfcManager::finishWrite(bool success, const QString &code, const QString &d
     setWriting(false);
     unsubscribeIfIdle();
 
-    if (!success) {
+    if (code == QLatin1String("cancelled")) {
+        // The user aborted the write.
+        qDebug() << "[Nfc] write cancelled";
+    } else if (!success) {
         qWarning() << "[Nfc] write failed:" << code << detail;
     }
     emit writeFinished(success, code, detail);
