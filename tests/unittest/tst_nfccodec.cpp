@@ -5,10 +5,6 @@
  * -- the golden vectors below fix the NDEF message bytes, so a change in the encoder cannot silently break tags
  * written by Android.
  *
- * The "factory image" used throughout is the real content of a brand new
- * NTAG213, captured on a Fairphone 4 running Sailfish OS 5.0.0.72
- * (nfc-tag-dump-20260907-135055.log):
- *
  *     01 03 a0 0c 34 03 00 fe 00 00 ... (144 bytes total)
  *      ^^^^^^^^^^^^^ Lock Control TLV -- must survive a write
  */

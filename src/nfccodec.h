@@ -8,7 +8,7 @@
  * Pure NDEF / Type 2 TLV codec.
  *
  * Everything in here is a byte transformation: no D-Bus, no network, no GUI.
- * That is deliberate -- this class is linked into tests/unittest and runs on
+ * This class is linked into tests/unittest and runs on
  * the build host, where neither NFC hardware nor a system bus exists.
  *
  * The tag layout this class produces follows what a factory fresh tag
