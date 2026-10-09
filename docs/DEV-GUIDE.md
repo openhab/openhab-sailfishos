@@ -121,7 +121,29 @@ If openHAB server adds support for a new widget/element type in the [sitemap](ht
 - Go to [SitemapPage.qml](/qml/pages/SitemapPage.qml), scroll to the bottom of the page and copy one existing "component" block (eg. for Switch, Text, etc.) and paste it at the end of the last component.
 - Change the component-id to the new widget/element type and change the content based on your needs.
 - Add new component to 'componentLoader' in the same file (SitemapPage.qml) to make sure it is loaded when the app encounters the new widget/element type in the sitemap.
+- If the new widget/element type sends commands to an item, add the "Write Command to NFC Tag" context menu as well (see eg. `switchComp`), so the command can be written to an NFC tag.
 - Add the new widget/element type to the list of supported types in [README.md](/README.md) and [USAGE.md](/docs/USAGE.md) and update the screenshots if needed.
+
+## NFC support
+
+The NFC feature talks to the Sailfish OS NFC daemon (nfcd) via D-Bus. There is no NFC in the emulator, so please test NFC changes on a real device.
+
+- [nfcmanager.cpp](/src/nfcmanager.cpp): Reading and writing tags via nfcd. Everything is asynchronous - please do not add blocking D-Bus calls.
+- [nfccodec.cpp](/src/nfccodec.cpp): Pure NDEF / Type 2 byte handling, without D-Bus, network or GUI.
+- [NfcUri.js](/qml/base/utilities/NfcUri.js): Builds and parses the `openhab://` URIs stored on the tags. The format is shared with the openHAB Android app - do NOT change or extend it, otherwise tags written by one app cannot be read by the other.
+- [item-commands.json](/qml/base/data/item-commands.json): Fallback command list per item type, used when neither openHAB nor the sitemap widget offers commands. Add new item types here if needed.
+
+## Unit tests
+
+C++ unit tests are located in [tests/unittest](/tests/unittest/) and can be run on the build host:
+
+```shell
+cd tests/unittest
+qmake5 nfccodec.pro && make && ./tst_nfccodec
+qmake5 unittest.pro && make && ./tst_ssemanager
+```
+
+Please add tests for changes in `NfcCodec` - wrong bytes on a tag cannot be fixed by an app update.
 
 ## Checks to be done before submitting a pull request
 
@@ -131,6 +153,6 @@ If openHAB server adds support for a new widget/element type in the [sitemap](ht
 - Are new permissions needed for the app? If so, please add them to the `harbour-openhab.desktop`.
 - If you have added new features, please update:
   - [USAGE.md](/docs/USAGE.md) for full documentation
-  - [README.md](/docs/README.md) update short list of features
+  - [README.md](/README.md) update short list of features
   - add new screenshots - if needed - to the [images](/docs/images/) folder and update the screenshots in the documentation accordingly.
 - Do we need to update our privacy policy? If so, please update the [PRIVACY_POLICY](https://github.com/openhabfoundation/openhabfoundation.github.io/blob/main/privacy.md) documentation and raise a Pull Request.

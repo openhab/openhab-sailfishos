@@ -20,6 +20,7 @@
 - ADDED: Notification error message when quick action fails to execute provided by @ZeiP
 - ADDED: Notification manager implementation
 - ADDED: Centralized OpenHabApi service to handle API calls centrally.
+- FIX: Added missing runtime Requires: sailfish-components-webview-qt5-popups, sailfish-components-webview-qt5-pickers to the RPM spec file (Main UI could not be loaded without them, eg. in the emulator).
 
 * Tue May 28 2026 Dominik Heidinger <dominikh@atomicmail.io> 0.3-2
 - CHANGED: translations migrated to crowdin.com

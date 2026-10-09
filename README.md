@@ -27,8 +27,10 @@ The documentation is available at [www.openhab.org/docs/](https://www.openhab.or
 - Display your Main UI Webview
 - Display your sitemaps and widgets and control your devices from your mobile device
 - Supported widgets/element-types within sitemap: Frame, Text, Group, Switch, Switches with Button-Mappings, Selections, Slider, Rollershutter, Colorpicker, Setpoint, Image, Mapview, Input, Webview, Video, Colortemperaturepicker, Buttongrid, Chart
-- Customizable CoverAction-Buttons via Settings
+- Customizable CoverAction-Buttons (incl. selectable icons) via Settings
 - Customizable CoverPage (display of max. 2 item states) via Settings
+- Notifications when a CoverAction or NFC command fails
+- NFC Tag support: Write item commands or sitemap pages to NFC tags and trigger them by laying the tag on your phone - compatible with tags written by the openHAB Android app (NFC Forum Type 2 tags like NTAG21x; Type 5 tags like ICODE SLIX are not supported by Sailfish OS)
 
 <img src="docs/images/main-ui.png" alt="Main UI" width=200px> <img src="docs/images/sitemap-1.png" alt="sitemap view" width=200px> <img src="docs/images/sitemap-2.png" alt="Sitemap view" width=200px>
 

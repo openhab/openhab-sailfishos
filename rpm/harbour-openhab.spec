@@ -11,6 +11,9 @@ Source0:    %{name}-%{version}.tar.bz2
 Requires:   sailfishsilica-qt5 >= 0.10.9
 Requires:   nemo-qml-plugin-configuration-qt5
 Requires:   sailfish-components-webview-qt5
+# WebView.qml imports these; on devices the browser pulls them in, the emulator lacks them
+Requires:   sailfish-components-webview-qt5-popups
+Requires:   sailfish-components-webview-qt5-pickers
 # NFC read/write feedback goes through the system notification area
 Requires:   nemo-qml-plugin-notifications-qt5
 #Requires:   qt5-qtimageformats-plugin-webp - maybe required for displaying of item type "Image", but should be installed automatically.
