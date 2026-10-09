@@ -113,6 +113,51 @@ private slots:
     void sse_emptyMessage();
     void sse_unchangedState();
     void sse_multipleRows();
+
+    // ── NfcUri: building ──
+    void nfc_buildShortItemUri();
+    void nfc_buildLongItemUri();
+    void nfc_buildOmitsEmptyOptionals();
+    void nfc_buildEncodesSpecialCharacters();
+    void nfc_buildRejectsMissingFields();
+    void nfc_buildSitemapUri();
+    void nfc_buildSitemapUriAddsLeadingSlash();
+
+    // ── NfcUri: parsing item tags ──
+    void nfc_parseShortItemUri();
+    void nfc_parseLongItemUri();
+    void nfc_parseDeprecatedAliases();
+    void nfc_parseDecodesPercentEncoding();
+    void nfc_parseIgnoresUnknownParameters();
+
+    // ── NfcUri: rejection paths ──
+    void nfc_parseRejectsForeignScheme();
+    void nfc_parseRejectsEmpty();
+    void nfc_parseRejectsDeviceIdTag();
+    void nfc_parseRejectsMissingItem();
+    void nfc_parseRejectsMissingCommand();
+    void nfc_parseSurvivesMalformedEscape();
+
+    // ── NfcUri: sitemap tags ──
+    void nfc_parseSitemapRoot();
+    void nfc_parseSitemapSubPage();
+    void nfc_isSubPagePath();
+    void nfc_rootSitemapOf();
+
+    // ── NfcUri: round trips ──
+    void nfc_roundTripItem();
+    void nfc_roundTripSitemap();
+
+    // ── OpenHabApi: pure helpers ──
+    void api_baseTypeOf();
+    void api_classifyError();
+    void api_commandsPreferCommandOptions();
+    void api_commandsFallBackToMappings();
+    void api_commandsFallBackToStaticTable();
+    void api_commandsEmptyMeansFreeText();
+    void api_collectSitemapItems();
+    void api_collectSitemapItemsSkipsReadOnly();
+    void api_filterCommandableItems();
 };
 
 // ════════════════════════════════════════════════
@@ -145,6 +190,14 @@ void tst_JsLogic::initTestCase()
 
     // ── Load SseEvents.js ──
     loadScript(QStringLiteral("../../qml/base/utilities/SseEvents.js"));
+
+    // ── Load NfcUri.js (openhab:// tag URIs) ──
+    loadScript(QStringLiteral("../../qml/base/utilities/NfcUri.js"));
+
+    // ── Load OpenHabApi.js ──
+    // Only its pure helpers are exercised here; the XHR based functions need
+    // a server and the Qt object, neither of which exists in QJSEngine.
+    loadScript(QStringLiteral("../../qml/base/utilities/OpenHabApi.js"));
 
     // ── MockModel (replaces QML ListModel for SSE tests) ──
     engine.evaluate(QStringLiteral(
@@ -378,6 +431,289 @@ void tst_JsLogic::sse_multipleRows() {
     QCOMPARE(engine.evaluate("_m6.get(0).itemState").toString(), QStringLiteral("75"));
     QCOMPARE(engine.evaluate("_m6.get(1).itemState").toString(), QStringLiteral("75"));
     engine.evaluate("rebindModel(null)");
+}
+
+// ════════════════════════════════════════════════
+//  NfcUri – building openhab:// tag URIs
+//
+//  The exact wire format is dictated by the openHAB Android app. These tests
+//  are what stops a refactoring from silently producing tags Android cannot
+//  read.
+// ════════════════════════════════════════════════
+
+void tst_JsLogic::nfc_buildShortItemUri() {
+    QCOMPARE(engine.evaluate("buildShortItemUri('Light', 'ON')").toString(),
+             QStringLiteral("openhab://?i=Light&s=ON"));
+}
+
+void tst_JsLogic::nfc_buildLongItemUri() {
+    QCOMPARE(engine.evaluate("buildItemUri('Light', 'ON', 'Kitchen', 'On')").toString(),
+             QStringLiteral("openhab://?i=Light&s=ON&l=Kitchen&m=On"));
+}
+
+void tst_JsLogic::nfc_buildOmitsEmptyOptionals() {
+    // Empty optionals must vanish entirely, not appear as "&l=".
+    QCOMPARE(engine.evaluate("buildItemUri('Light', 'ON', '', '')").toString(),
+             QStringLiteral("openhab://?i=Light&s=ON"));
+    QCOMPARE(engine.evaluate("buildItemUri('Light', 'ON', 'Kitchen', '')").toString(),
+             QStringLiteral("openhab://?i=Light&s=ON&l=Kitchen"));
+}
+
+void tst_JsLogic::nfc_buildEncodesSpecialCharacters() {
+    // Labels carry spaces and umlauts, HSB commands carry commas.
+    QCOMPARE(engine.evaluate("buildItemUri('Light', 'ON', 'Küche Decke', '')").toString(),
+             QStringLiteral("openhab://?i=Light&s=ON&l=K%C3%BCche%20Decke"));
+    QCOMPARE(engine.evaluate("buildItemUri('RGB', '0,100,50', '', '')").toString(),
+             QStringLiteral("openhab://?i=RGB&s=0%2C100%2C50"));
+}
+
+void tst_JsLogic::nfc_buildRejectsMissingFields() {
+    QCOMPARE(engine.evaluate("buildItemUri('', 'ON', '', '')").toString(), QStringLiteral(""));
+    QCOMPARE(engine.evaluate("buildItemUri('Light', '', '', '')").toString(), QStringLiteral(""));
+}
+
+void tst_JsLogic::nfc_buildSitemapUri() {
+    QCOMPARE(engine.evaluate("buildSitemapUri('/demo/0100')").toString(),
+             QStringLiteral("openhab:///demo/0100"));
+}
+
+void tst_JsLogic::nfc_buildSitemapUriAddsLeadingSlash() {
+    QCOMPARE(engine.evaluate("buildSitemapUri('demo')").toString(),
+             QStringLiteral("openhab:///demo"));
+}
+
+// ════════════════════════════════════════════════
+//  NfcUri – parsing item tags
+// ════════════════════════════════════════════════
+
+void tst_JsLogic::nfc_parseShortItemUri() {
+    engine.evaluate("var r = parse('openhab://?i=Light&s=ON')");
+    QVERIFY(engine.evaluate("r.valid").toBool());
+    QCOMPARE(engine.evaluate("r.kind").toString(), QStringLiteral("item"));
+    QCOMPARE(engine.evaluate("r.item").toString(), QStringLiteral("Light"));
+    QCOMPARE(engine.evaluate("r.command").toString(), QStringLiteral("ON"));
+}
+
+void tst_JsLogic::nfc_parseLongItemUri() {
+    engine.evaluate("var r = parse('openhab://?i=Light&s=ON&l=Kitchen&m=On')");
+    QVERIFY(engine.evaluate("r.valid").toBool());
+    QCOMPARE(engine.evaluate("r.label").toString(), QStringLiteral("Kitchen"));
+    QCOMPARE(engine.evaluate("r.mappedState").toString(), QStringLiteral("On"));
+}
+
+void tst_JsLogic::nfc_parseDeprecatedAliases() {
+    // Written by older Android versions; still read, never written.
+    engine.evaluate("var r = parse('openhab://?item=Light&command=OFF')");
+    QVERIFY(engine.evaluate("r.valid").toBool());
+    QCOMPARE(engine.evaluate("r.item").toString(), QStringLiteral("Light"));
+    QCOMPARE(engine.evaluate("r.command").toString(), QStringLiteral("OFF"));
+}
+
+void tst_JsLogic::nfc_parseDecodesPercentEncoding() {
+    engine.evaluate("var r = parse('openhab://?i=RGB&s=0%2C100%2C50&l=K%C3%BCche%20Decke')");
+    QCOMPARE(engine.evaluate("r.command").toString(), QStringLiteral("0,100,50"));
+    QCOMPARE(engine.evaluate("r.label").toString(), QString::fromUtf8("Küche Decke"));
+}
+
+void tst_JsLogic::nfc_parseIgnoresUnknownParameters() {
+    engine.evaluate("var r = parse('openhab://?i=Light&s=ON&zzz=1')");
+    QVERIFY(engine.evaluate("r.valid").toBool());
+    QCOMPARE(engine.evaluate("r.item").toString(), QStringLiteral("Light"));
+}
+
+// ════════════════════════════════════════════════
+//  NfcUri – rejection paths
+// ════════════════════════════════════════════════
+
+void tst_JsLogic::nfc_parseRejectsForeignScheme() {
+    engine.evaluate("var r = parse('https://example.org/')");
+    QVERIFY(!engine.evaluate("r.valid").toBool());
+    QCOMPARE(engine.evaluate("r.reason").toString(), QStringLiteral("notOpenhab"));
+}
+
+void tst_JsLogic::nfc_parseRejectsEmpty() {
+    engine.evaluate("var r = parse('')");
+    QVERIFY(!engine.evaluate("r.valid").toBool());
+    QCOMPARE(engine.evaluate("r.reason").toString(), QStringLiteral("empty"));
+}
+
+void tst_JsLogic::nfc_parseRejectsDeviceIdTag() {
+    // Android's device-id mode: the state is a placeholder that must never be
+    // sent to the server verbatim.
+    engine.evaluate("var r = parse('openhab://?i=Phone&s=UNSUPPORTED&d=true')");
+    QVERIFY(!engine.evaluate("r.valid").toBool());
+    QCOMPARE(engine.evaluate("r.reason").toString(), QStringLiteral("deviceId"));
+}
+
+void tst_JsLogic::nfc_parseRejectsMissingItem() {
+    engine.evaluate("var r = parse('openhab://?s=ON')");
+    QVERIFY(!engine.evaluate("r.valid").toBool());
+    QCOMPARE(engine.evaluate("r.reason").toString(), QStringLiteral("missingItem"));
+}
+
+void tst_JsLogic::nfc_parseRejectsMissingCommand() {
+    engine.evaluate("var r = parse('openhab://?i=Light')");
+    QVERIFY(!engine.evaluate("r.valid").toBool());
+    QCOMPARE(engine.evaluate("r.reason").toString(), QStringLiteral("missingCommand"));
+}
+
+void tst_JsLogic::nfc_parseSurvivesMalformedEscape() {
+    // A broken escape must not throw out of the read path.
+    engine.evaluate("var r = parse('openhab://?i=Light&s=1%ZZ')");
+    QVERIFY(engine.evaluate("r.valid").toBool());
+    QCOMPARE(engine.evaluate("r.command").toString(), QStringLiteral("1%ZZ"));
+}
+
+// ════════════════════════════════════════════════
+//  NfcUri – sitemap tags
+// ════════════════════════════════════════════════
+
+void tst_JsLogic::nfc_parseSitemapRoot() {
+    engine.evaluate("var r = parse('openhab:///demo')");
+    QVERIFY(engine.evaluate("r.valid").toBool());
+    QCOMPARE(engine.evaluate("r.kind").toString(), QStringLiteral("sitemap"));
+    QCOMPARE(engine.evaluate("r.path").toString(), QStringLiteral("/demo"));
+    QCOMPARE(engine.evaluate("r.rootSitemap").toString(), QStringLiteral("demo"));
+}
+
+void tst_JsLogic::nfc_parseSitemapSubPage() {
+    engine.evaluate("var r = parse('openhab:///demo/0100')");
+    QVERIFY(engine.evaluate("r.valid").toBool());
+    QCOMPARE(engine.evaluate("r.path").toString(), QStringLiteral("/demo/0100"));
+    // Only the root may be persisted as lastVisitedPage.
+    QCOMPARE(engine.evaluate("r.rootSitemap").toString(), QStringLiteral("demo"));
+}
+
+void tst_JsLogic::nfc_isSubPagePath() {
+    QVERIFY(engine.evaluate("isSubPagePath('/demo/0100')").toBool());
+    QVERIFY(!engine.evaluate("isSubPagePath('/demo')").toBool());
+    QVERIFY(!engine.evaluate("isSubPagePath('')").toBool());
+}
+
+void tst_JsLogic::nfc_rootSitemapOf() {
+    QCOMPARE(engine.evaluate("rootSitemapOf('/demo/0100')").toString(), QStringLiteral("demo"));
+    QCOMPARE(engine.evaluate("rootSitemapOf('demo')").toString(), QStringLiteral("demo"));
+    QCOMPARE(engine.evaluate("rootSitemapOf('')").toString(), QStringLiteral(""));
+}
+
+// ════════════════════════════════════════════════
+//  NfcUri – round trips
+// ════════════════════════════════════════════════
+
+void tst_JsLogic::nfc_roundTripItem() {
+    engine.evaluate("var u = buildItemUri('Licht_WZ', 'ON', 'Wohnzimmer Decke', 'Ein');"
+                    "var r = parse(u);");
+    QVERIFY(engine.evaluate("r.valid").toBool());
+    QCOMPARE(engine.evaluate("r.item").toString(), QStringLiteral("Licht_WZ"));
+    QCOMPARE(engine.evaluate("r.command").toString(), QStringLiteral("ON"));
+    QCOMPARE(engine.evaluate("r.label").toString(), QStringLiteral("Wohnzimmer Decke"));
+    QCOMPARE(engine.evaluate("r.mappedState").toString(), QStringLiteral("Ein"));
+}
+
+void tst_JsLogic::nfc_roundTripSitemap() {
+    engine.evaluate("var u = buildSitemapUri('/demo/0100');"
+                    "var r = parse(u);");
+    QVERIFY(engine.evaluate("r.valid").toBool());
+    QCOMPARE(engine.evaluate("r.path").toString(), QStringLiteral("/demo/0100"));
+}
+
+// ════════════════════════════════════════════════
+//  OpenHabApi – pure helpers
+// ════════════════════════════════════════════════
+
+void tst_JsLogic::api_baseTypeOf() {
+    QCOMPARE(engine.evaluate("baseTypeOf('Switch')").toString(),              QStringLiteral("Switch"));
+    QCOMPARE(engine.evaluate("baseTypeOf('Number:Temperature')").toString(),  QStringLiteral("Number"));
+    QCOMPARE(engine.evaluate("baseTypeOf('Group:Switch')").toString(),        QStringLiteral("Switch"));
+    QCOMPARE(engine.evaluate("baseTypeOf('Group:Number:Temperature')").toString(), QStringLiteral("Number"));
+    QCOMPARE(engine.evaluate("baseTypeOf('')").toString(),                    QStringLiteral(""));
+}
+
+void tst_JsLogic::api_classifyError() {
+    // Telling these apart is the whole point here: a switched off server
+    // must not be reported as "this item does not exist".
+    QCOMPARE(engine.evaluate("classifyError({status: 0}).kind").toString(),   QStringLiteral("network"));
+    QCOMPARE(engine.evaluate("classifyError({status: 404}).kind").toString(), QStringLiteral("notFound"));
+    QCOMPARE(engine.evaluate("classifyError({status: 401}).kind").toString(), QStringLiteral("unauthorized"));
+    QCOMPARE(engine.evaluate("classifyError({status: 403}).kind").toString(), QStringLiteral("unauthorized"));
+    QCOMPARE(engine.evaluate("classifyError({status: 503}).kind").toString(), QStringLiteral("server"));
+    QCOMPARE(engine.evaluate("classifyError({status: 418}).kind").toString(), QStringLiteral("http"));
+}
+
+void tst_JsLogic::api_commandsPreferCommandOptions() {
+    engine.evaluate(
+        "var item = { type:'String', commandDescription: { commandOptions: ["
+        "  { command:'A', label:'Alpha' }, { command:'B' } ] } };"
+        "var r = commandsForItem(item, [{command:'M', label:'Mapped'}], {String:['X']});");
+    QCOMPARE(engine.evaluate("r.length").toInt(), 2);
+    QCOMPARE(engine.evaluate("r[0].command").toString(), QStringLiteral("A"));
+    QCOMPARE(engine.evaluate("r[0].label").toString(),   QStringLiteral("Alpha"));
+    // Missing label falls back to the command itself.
+    QCOMPARE(engine.evaluate("r[1].label").toString(),   QStringLiteral("B"));
+}
+
+void tst_JsLogic::api_commandsFallBackToMappings() {
+    engine.evaluate(
+        "var item = { type:'Switch' };"
+        "var r = commandsForItem(item, [{command:'ON', label:'Ein'}], {Switch:['ON','OFF']});");
+    QCOMPARE(engine.evaluate("r.length").toInt(), 1);
+    QCOMPARE(engine.evaluate("r[0].label").toString(), QStringLiteral("Ein"));
+}
+
+void tst_JsLogic::api_commandsFallBackToStaticTable() {
+    engine.evaluate(
+        "var item = { type:'Switch' };"
+        "var r = commandsForItem(item, [], {Switch:['ON','OFF']});");
+    QCOMPARE(engine.evaluate("r.length").toInt(), 2);
+    QCOMPARE(engine.evaluate("r[1].command").toString(), QStringLiteral("OFF"));
+}
+
+void tst_JsLogic::api_commandsEmptyMeansFreeText() {
+    // Number has no fixed command list -- the page must offer free text.
+    engine.evaluate("var r = commandsForItem({type:'Number'}, [], {Number:[]});");
+    QCOMPARE(engine.evaluate("r.length").toInt(), 0);
+    // Unknown type behaves the same rather than throwing.
+    engine.evaluate("var r2 = commandsForItem({type:'Whatever'}, [], {Switch:['ON']});");
+    QCOMPARE(engine.evaluate("r2.length").toInt(), 0);
+}
+
+void tst_JsLogic::api_collectSitemapItems() {
+    engine.evaluate(
+        "var sitemap = { homepage: { widgets: ["
+        "  { label:'Light [ON]', item:{ name:'Light', type:'Switch' } },"
+        "  { type:'Frame', widgets: ["
+        "      { label:'Blind', item:{ name:'Blind', type:'Rollershutter' } },"
+        "      { label:'Light again', item:{ name:'Light', type:'Switch' } } ] } ] } };"
+        "var r = collectSitemapItems(sitemap, []);");
+    // Depth first, duplicates dropped.
+    QCOMPARE(engine.evaluate("r.length").toInt(), 2);
+    QCOMPARE(engine.evaluate("r[0].name").toString(), QStringLiteral("Light"));
+    // The "[ON]" state part of a sitemap label is not part of the item name.
+    QCOMPARE(engine.evaluate("r[0].label").toString(), QStringLiteral("Light"));
+    QCOMPARE(engine.evaluate("r[1].name").toString(), QStringLiteral("Blind"));
+}
+
+void tst_JsLogic::api_collectSitemapItemsSkipsReadOnly() {
+    engine.evaluate(
+        "var sitemap = { widgets: ["
+        "  { label:'Door', item:{ name:'Door', type:'Contact' } },"
+        "  { label:'Light', item:{ name:'Light', type:'Switch' } } ] };"
+        "var r = collectSitemapItems(sitemap, ['Contact']);");
+    QCOMPARE(engine.evaluate("r.length").toInt(), 1);
+    QCOMPARE(engine.evaluate("r[0].name").toString(), QStringLiteral("Light"));
+}
+
+void tst_JsLogic::api_filterCommandableItems() {
+    engine.evaluate(
+        "var items = ["
+        "  { name:'Door',  type:'Contact' },"
+        "  { name:'Light', type:'Switch', label:'Kitchen' },"
+        "  { name:'Temp',  type:'Number:Temperature' } ];"
+        "var r = filterCommandableItems(items, ['Contact']);");
+    QCOMPARE(engine.evaluate("r.length").toInt(), 2);
+    QCOMPARE(engine.evaluate("r[0].label").toString(), QStringLiteral("Kitchen"));
+    // No label -> the name stands in.
+    QCOMPARE(engine.evaluate("r[1].label").toString(), QStringLiteral("Temp"));
 }
 
 QTEST_MAIN(tst_JsLogic)

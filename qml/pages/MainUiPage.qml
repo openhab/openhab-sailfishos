@@ -67,7 +67,9 @@ Page {
                     selPage.sitemapSelected.connect(function(name, label) {
                         settings.lastVisitedPage = name
                         console.log("[MainUiPage] Sitemap selected: " + settings.lastVisitedPage)
-                        pageStack.animatorReplace(Qt.resolvedUrl("SitemapPage.qml"), {
+                        // Replace the whole stack (see SitemapSelectionPage):
+                        // the MainUI with its WebView must not stay below.
+                        pageStack.replaceAbove(null, Qt.resolvedUrl("SitemapPage.qml"), {
                             "sitemapName": name,
                             "pageTitle": label
                         })

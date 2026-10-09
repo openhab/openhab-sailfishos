@@ -13,9 +13,12 @@
 This app is a native client for openHAB which allows easy access to your sitemaps.
 The documentation is available at [www.openhab.org/docs/](https://www.openhab.org/docs/).
 
-<a href="https://github.com/openhab/openhab-sailfishos/releases"><img src="docs/images/get-it-on-logos/get-it-on-jollaStore.png" alt="Get it on Jolla Store" height="80"></a>
+<p align="center">
+<a href="https://github.com/openhab/openhab-sailfishos/releases"><img src="docs/images/get-it-on-logos/get-it-on-jollaStore.png" alt="Get it on the Jolla Store" height="55"></a>
 <a href="https://openrepos.net/content/openhabfoundationev/openhab-smart-home-automation"><img src="docs/images/get-it-on-logos/get-it-on-openrepos.png" alt="Get it on OpenRepos" height="55"></a>
-<a href="https://github.com/openhab/openhab-sailfishos/releases"><img src="docs/images/get-it-on-logos/direct-apk-download.png" alt="Get it on GitHub" height="80"></a>
+<!--<a href="https://sailfishos-chum.github.io/apps/harbour-ferry/"><img src="docs/images/get-it-on-logos/get-it-on-chum.png" alt="Get it on CHUM" height="55"></a>-->
+<a href="https://github.com/openhab/openhab-sailfishos/releases"><img src="docs/images/get-it-on-logos/direct-rpm-download.png" alt="Direct RPM Download" height="55"></a>
+</p>
 
 ## Features
 
@@ -24,8 +27,10 @@ The documentation is available at [www.openhab.org/docs/](https://www.openhab.or
 - Display your Main UI Webview
 - Display your sitemaps and widgets and control your devices from your mobile device
 - Supported widgets/element-types within sitemap: Frame, Text, Group, Switch, Switches with Button-Mappings, Selections, Slider, Rollershutter, Colorpicker, Setpoint, Image, Mapview, Input, Webview, Video, Colortemperaturepicker, Buttongrid, Chart
-- Customizable CoverAction-Buttons via Settings
+- Customizable CoverAction-Buttons (incl. selectable icons) via Settings
 - Customizable CoverPage (display of max. 2 item states) via Settings
+- Notifications when a CoverAction or NFC command fails
+- NFC Tag support: Write item commands or sitemap pages to NFC tags and trigger them by laying the tag on your phone - compatible with tags written by the openHAB Android app (NFC Forum Type 2 tags like NTAG21x; Type 5 tags like ICODE SLIX are not supported by Sailfish OS)
 
 <img src="docs/images/main-ui.png" alt="Main UI" width=200px> <img src="docs/images/sitemap-1.png" alt="sitemap view" width=200px> <img src="docs/images/sitemap-2.png" alt="Sitemap view" width=200px>
 
@@ -38,11 +43,11 @@ For more screenshots, see [docs/images/](docs/images/) in the GitHub repository.
 
 ## Roadmap
 
-- Version 1.0.0 (planned):
-  - Add support for remote access (via openHAB cloud)
-  - Add App Notifications (via openHAB cloud)
-  - Add support for openHAB tiles (HABPanel, Basic UI, etc.)
-  - Management of translations via CrowdIn
+- Add support for remote access (via openHAB cloud)
+- Add App Notifications (via openHAB cloud)
+- Add support for openHAB tiles (HABPanel, Basic UI, etc.)
+- Add support for widget-confirm-button via Sitemap
+- Show Item History (context menu on item in sitemap)
 
 ## Contributing to the project
 

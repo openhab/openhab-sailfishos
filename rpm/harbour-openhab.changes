@@ -12,6 +12,16 @@
 # * date Author's Name <author's email> version-release
 # - Summary of changes
 
+* Wed Oct 07 2026 Dominik Heidinger <dominikh@atomicmail.io> 0.4-1
+- ADDED: NFC Tag support (write and read NFC tags to trigger openHAB actions)
+- CHANGED: Redesign of Coverpage provided by @ZeiP
+- FIX: Nested sitemaps work correctly provided by @ZeiP
+- ADDED: Icons for the cover quick actions are selectable by the user provided by @ZeiP
+- ADDED: Notification error message when quick action fails to execute provided by @ZeiP
+- ADDED: Notification manager implementation
+- ADDED: Centralized OpenHabApi service to handle API calls centrally.
+- FIX: Added missing runtime Requires: sailfish-components-webview-qt5-popups, sailfish-components-webview-qt5-pickers to the RPM spec file (Main UI could not be loaded without them, eg. in the emulator).
+
 * Tue May 28 2026 Dominik Heidinger <dominikh@atomicmail.io> 0.3-2
 - CHANGED: translations migrated to crowdin.com
 - FIX: Added trigger when settings are changed, to update coverpage item states immediately.
