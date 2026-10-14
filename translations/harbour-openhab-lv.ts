@@ -1,634 +1,634 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
 <TS version="2.1" language="lv" sourcelanguage="en">
-  <context>
+<context>
     <name>ColorPickerPage</name>
     <message>
-      <source>Color Picker</source>
-      <translation type="unfinished">Color Picker</translation>
+        <source>Color Picker</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>Hue</source>
-      <translation type="unfinished">Hue</translation>
+        <source>Hue</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>Saturation</source>
-      <translation type="unfinished">Saturation</translation>
+        <source>Saturation</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>Brightness</source>
-      <translation type="unfinished">Brightness</translation>
+        <source>Brightness</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>Preset Colors</source>
-      <translation type="unfinished">Preset Colors</translation>
+        <source>Preset Colors</source>
+        <translation type="unfinished"></translation>
     </message>
-  </context>
-  <context>
+</context>
+<context>
     <name>CoverActionIconComboBox</name>
     <message>
-      <source>Icon</source>
-      <translation type="unfinished">Icon</translation>
+        <source>Icon</source>
+        <translation type="unfinished"></translation>
     </message>
-  </context>
-  <context>
+</context>
+<context>
     <name>CoverPage</name>
     <message>
-      <source>Network error</source>
-      <translation type="unfinished">Network error</translation>
+        <source>Network error</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>HTTP %1</source>
-      <translation type="unfinished">HTTP %1</translation>
+        <source>HTTP %1</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>Cover action failed</source>
-      <translation type="unfinished">Cover action failed</translation>
+        <source>Cover action failed</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>Could not send command to %1 (%2).</source>
-      <translation type="unfinished">Could not send command to %1 (%2).</translation>
+        <source>Could not send command to %1 (%2).</source>
+        <translation type="unfinished"></translation>
     </message>
-  </context>
-  <context>
+</context>
+<context>
     <name>InputDialog</name>
     <message>
-      <source>Set value</source>
-      <translation type="unfinished">Set value</translation>
+        <source>Set value</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+        <source>Cancel</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>Current value: %1</source>
-      <translation type="unfinished">Current value: %1</translation>
+        <source>Current value: %1</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>(not set)</source>
-      <translation type="unfinished">(not set)</translation>
+        <source>(not set)</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>Enter new value</source>
-      <translation type="unfinished">Enter new value</translation>
+        <source>Enter new value</source>
+        <translation type="unfinished"></translation>
     </message>
-  </context>
-  <context>
+</context>
+<context>
     <name>LegalPage</name>
     <message>
-      <source>Legal</source>
-      <translation type="unfinished">Legal</translation>
+        <source>Legal</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>Copyright © 2026, Contributors to the openHAB project</source>
-      <translation type="unfinished">Copyright © 2026, Contributors to the openHAB project</translation>
+        <source>Copyright © 2026, Contributors to the openHAB project</source>
+        <translation type="unfinished"></translation>
     </message>
-  </context>
-  <context>
+</context>
+<context>
     <name>MainUiPage</name>
     <message>
-      <source>openHAB Main UI</source>
-      <translation type="unfinished">openHAB Main UI</translation>
+        <source>openHAB Main UI</source>
+        <translation type="unfinished"></translation>
     </message>
-  </context>
-  <context>
+</context>
+<context>
     <name>NfcCommandPage</name>
     <message>
-      <source>Choose command</source>
-      <translation type="unfinished">Choose command</translation>
+        <source>Choose command</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>Or enter a value</source>
-      <translation type="unfinished">Or enter a value</translation>
+        <source>Or enter a value</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>Enter a value</source>
-      <translation type="unfinished">Enter a value</translation>
+        <source>Enter a value</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>Command</source>
-      <translation type="unfinished">Command</translation>
+        <source>Command</source>
+        <translation type="unfinished"></translation>
     </message>
-  </context>
-  <context>
+</context>
+<context>
     <name>NfcPage</name>
     <message>
-      <source>Open a sitemap first, or show all items from the pulley menu.</source>
-      <translation type="unfinished">Open a sitemap first, or show all items from the pulley menu.</translation>
+        <source>Open a sitemap first, or show all items from the pulley menu.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>This sitemap has no items that accept commands.</source>
-      <translation type="unfinished">This sitemap has no items that accept commands.</translation>
+        <source>This sitemap has no items that accept commands.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>Could not read the sitemap.</source>
-      <translation type="unfinished">Could not read the sitemap.</translation>
+        <source>Could not read the sitemap.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>Show sitemap items</source>
-      <translation type="unfinished">Show sitemap items</translation>
+        <source>Show sitemap items</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>Show all items</source>
-      <translation type="unfinished">Show all items</translation>
+        <source>Show all items</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>Reload</source>
-      <translation type="unfinished">Reload</translation>
+        <source>Reload</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>Write NFC Tag</source>
-      <translation type="unfinished">Write NFC Tag</translation>
+        <source>Write NFC Tag</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>All items</source>
-      <translation type="unfinished">All items</translation>
+        <source>All items</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>Sitemap %1</source>
-      <translation type="unfinished">Sitemap %1</translation>
+        <source>Sitemap %1</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>This device has no NFC reader.</source>
-      <translation type="unfinished">This device has no NFC reader.</translation>
+        <source>This device has no NFC reader.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>NFC is switched off. Enable it in the system settings.</source>
-      <translation type="unfinished">NFC is switched off. Enable it in the system settings.</translation>
+        <source>NFC is switched off. Enable it in the system settings.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>Search item</source>
-      <translation type="unfinished">Search item</translation>
+        <source>Search item</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>No items</source>
-      <translation type="unfinished">No items</translation>
+        <source>No items</source>
+        <translation type="unfinished"></translation>
     </message>
-  </context>
-  <context>
+</context>
+<context>
     <name>NfcWritePage</name>
     <message>
-      <source>No tag was detected. Please try again.</source>
-      <translation type="unfinished">No tag was detected. Please try again.</translation>
+        <source>No tag was detected. Please try again.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>This tag type cannot be written.</source>
-      <translation type="unfinished">This tag type cannot be written.</translation>
+        <source>This tag type cannot be written.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>The tag could not be read. Hold it still against the phone.</source>
-      <translation type="unfinished">The tag could not be read. Hold it still against the phone.</translation>
+        <source>The tag could not be read. Hold it still against the phone.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>The tag is too small for this command.</source>
-      <translation type="unfinished">The tag is too small for this command.</translation>
+        <source>The tag is too small for this command.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>Writing failed. The tag may be write protected.</source>
-      <translation type="unfinished">Writing failed. The tag may be write protected.</translation>
+        <source>Writing failed. The tag may be write protected.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>The tag was removed too early. Its content may be incomplete.</source>
-      <translation type="unfinished">The tag was removed too early. Its content may be incomplete.</translation>
+        <source>The tag was removed too early. Its content may be incomplete.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>Cancelled.</source>
-      <translation type="unfinished">Cancelled.</translation>
+        <source>Cancelled.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>Writing failed.</source>
-      <translation type="unfinished">Writing failed.</translation>
+        <source>Writing failed.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>Tag written.</source>
-      <translation type="unfinished">Tag written.</translation>
+        <source>Tag written.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>Write NFC Tag</source>
-      <translation type="unfinished">Write NFC Tag</translation>
+        <source>Write NFC Tag</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>Hold the tag against the back of the phone.</source>
-      <translation type="unfinished">Hold the tag against the back of the phone.</translation>
+        <source>Hold the tag against the back of the phone.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>Done</source>
-      <translation type="unfinished">Done</translation>
+        <source>Done</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>Try again</source>
-      <translation type="unfinished">Try again</translation>
+        <source>Try again</source>
+        <translation type="unfinished"></translation>
     </message>
-  </context>
-  <context>
+</context>
+<context>
     <name>SettingsPage</name>
     <message>
-      <source>Save</source>
-      <translation type="unfinished">Save</translation>
+        <source>Save</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>Settings</source>
-      <translation type="unfinished">Settings</translation>
+        <source>Settings</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>General</source>
-      <translation type="unfinished">General</translation>
+        <source>General</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>Demo Mode</source>
-      <translation type="unfinished">Demo Mode</translation>
+        <source>Demo Mode</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>If selected, Demo SiteMaps and DemoPages will be shown.</source>
-      <translation type="unfinished">If selected, Demo SiteMaps and DemoPages will be shown.</translation>
+        <source>If selected, Demo SiteMaps and DemoPages will be shown.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>Local server</source>
-      <translation type="unfinished">Local server</translation>
+        <source>Local server</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>URL</source>
-      <translation type="unfinished">URL</translation>
+        <source>URL</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>https://demo.openhab.org</source>
-      <translation type="unfinished">https://demo.openhab.org</translation>
+        <source>https://demo.openhab.org</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>Cover actions</source>
-      <translation type="unfinished">Cover actions</translation>
+        <source>Cover actions</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>Left button</source>
-      <translation type="unfinished">Left button</translation>
+        <source>Left button</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>Item-ID</source>
-      <translation type="unfinished">Item-ID</translation>
+        <source>Item-ID</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>Command</source>
-      <translation type="unfinished">Command</translation>
+        <source>Command</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>e.g. ON, OFF, TOGGLE</source>
-      <translation type="unfinished">e.g. ON, OFF, TOGGLE</translation>
+        <source>e.g. ON, OFF, TOGGLE</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>Right button</source>
-      <translation type="unfinished">Right button</translation>
+        <source>Right button</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>Scroll to top</source>
-      <translation type="unfinished">Scroll to top</translation>
+        <source>Scroll to top</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>About</source>
-      <translation type="unfinished">About</translation>
+        <source>About</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>App Version</source>
-      <translation type="unfinished">App Version</translation>
+        <source>App Version</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>Legal</source>
-      <translation type="unfinished">Legal</translation>
+        <source>Legal</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>Privacy Policy</source>
-      <translation type="unfinished">Privacy Policy</translation>
+        <source>Privacy Policy</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>e.g. item_id1</source>
-      <translation type="unfinished">e.g. item_id1</translation>
+        <source>e.g. item_id1</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>Report a bug or request a feature</source>
-      <translation type="unfinished">Report a bug or request a feature</translation>
+        <source>Report a bug or request a feature</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>Username</source>
-      <translation type="unfinished">Username</translation>
+        <source>Username</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>Password</source>
-      <translation type="unfinished">Password</translation>
+        <source>Password</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>Enter username</source>
-      <translation type="unfinished">Enter username</translation>
+        <source>Enter username</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>Enter password</source>
-      <translation type="unfinished">Enter password</translation>
+        <source>Enter password</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>OPTIONAL: Server username – leave empty to send no credentials.</source>
-      <translation type="unfinished">OPTIONAL: Server username – leave empty to send no credentials.</translation>
+        <source>OPTIONAL: Server username – leave empty to send no credentials.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>OPTIONAL: Server password – leave empty to send no credentials.</source>
-      <translation type="unfinished">OPTIONAL: Server password – leave empty to send no credentials.</translation>
+        <source>OPTIONAL: Server password – leave empty to send no credentials.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>Cover Items</source>
-      <translation type="unfinished">Cover Items</translation>
+        <source>Cover Items</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>e.g. item_id2</source>
-      <translation type="unfinished">e.g. item_id2</translation>
+        <source>e.g. item_id2</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>Configure Item-IDs and commands for the app cover quick actions. Leave empty to hide an action.</source>
-      <translation type="unfinished">Configure Item-IDs and commands for the app cover quick actions. Leave empty to hide an action.</translation>
+        <source>Configure Item-IDs and commands for the app cover quick actions. Leave empty to hide an action.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>Configure Item-IDs for app cover display. Leave empty to do not display item states.</source>
-      <translation type="unfinished">Configure Item-IDs for app cover display. Leave empty to do not display item states.</translation>
+        <source>Configure Item-IDs for app cover display. Leave empty to do not display item states.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>Cover item refresh time (milliseconds)</source>
-      <translation type="unfinished">Cover item refresh time (milliseconds)</translation>
+        <source>Cover item refresh time (milliseconds)</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>Add a translation</source>
-      <translation type="unfinished">Add a translation</translation>
+        <source>Add a translation</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>NFC</source>
-      <translation type="unfinished">NFC</translation>
+        <source>NFC</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>Detect NFC Actions</source>
-      <translation type="unfinished">Detect NFC Actions</translation>
+        <source>Detect NFC Actions</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>Lay an openHAB tag on the phone to send its command. Works while the app is running, also from the cover.</source>
-      <translation type="unfinished">Lay an openHAB tag on the phone to send its command. Works while the app is running, also from the cover.</translation>
+        <source>Lay an openHAB tag on the phone to send its command. Works while the app is running, also from the cover.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>This device has no NFC reader.</source>
-      <translation type="unfinished">This device has no NFC reader.</translation>
+        <source>This device has no NFC reader.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>NFC is currently switched off in the system settings.</source>
-      <translation type="unfinished">NFC is currently switched off in the system settings.</translation>
+        <source>NFC is currently switched off in the system settings.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>Automatic</source>
-      <translation type="unfinished">Automatic</translation>
+        <source>Automatic</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>Sync</source>
-      <translation type="unfinished">Sync</translation>
+        <source>Sync</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>Refresh</source>
-      <translation type="unfinished">Refresh</translation>
+        <source>Refresh</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>On</source>
-      <translation type="unfinished">On</translation>
+        <source>On</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>Off</source>
-      <translation type="unfinished">Off</translation>
+        <source>Off</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>Stop</source>
-      <translation type="unfinished">Stop</translation>
+        <source>Stop</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>Timer</source>
-      <translation type="unfinished">Timer</translation>
+        <source>Timer</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>Favorite</source>
-      <translation type="unfinished">Favorite</translation>
+        <source>Favorite</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>Location</source>
-      <translation type="unfinished">Location</translation>
+        <source>Location</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>New</source>
-      <translation type="unfinished">New</translation>
+        <source>New</source>
+        <translation type="unfinished"></translation>
     </message>
-  </context>
-  <context>
+</context>
+<context>
     <name>SitemapPage</name>
     <message>
-      <source>Scroll to top</source>
-      <translation type="unfinished">Scroll to top</translation>
+        <source>Scroll to top</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>No image available</source>
-      <translation type="unfinished">No image available</translation>
+        <source>No image available</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>Image format not supported</source>
-      <translation type="unfinished">Image format not supported</translation>
+        <source>Image format not supported</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>No location data</source>
-      <translation type="unfinished">No location data</translation>
+        <source>No location data</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>Map tile could not be loaded</source>
-      <translation type="unfinished">Map tile could not be loaded</translation>
+        <source>Map tile could not be loaded</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>No video URL configured</source>
-      <translation type="unfinished">No video URL configured</translation>
+        <source>No video URL configured</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>Tap to play</source>
-      <translation type="unfinished">Tap to play</translation>
+        <source>Tap to play</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>Video</source>
-      <translation type="unfinished">Video</translation>
+        <source>Video</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>Open in browser</source>
-      <translation type="unfinished">Open in browser</translation>
+        <source>Open in browser</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>No buttons configured</source>
-      <translation type="unfinished">No buttons configured</translation>
+        <source>No buttons configured</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>Chart unavailable</source>
-      <translation type="unfinished">Chart unavailable</translation>
+        <source>Chart unavailable</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>No item configured</source>
-      <translation type="unfinished">No item configured</translation>
+        <source>No item configured</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>Period: </source>
-      <translation type="unfinished">Period: </translation>
+        <source>Period: </source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>Every %1 min.</source>
-      <translation type="unfinished">Every %1 min.</translation>
+        <source>Every %1 min.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>Refresh Sitemap</source>
-      <translation type="unfinished">Refresh Sitemap</translation>
+        <source>Refresh Sitemap</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>Sitemap %1</source>
-      <translation type="unfinished">Sitemap %1</translation>
+        <source>Sitemap %1</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>Write this Sitemap to NFC Tag</source>
-      <translation type="unfinished">Write this Sitemap to NFC Tag</translation>
+        <source>Write this Sitemap to NFC Tag</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>Server not reachable.</source>
-      <translation type="unfinished">Server not reachable.</translation>
+        <source>Server not reachable.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>Not authorized. Check username and password in the settings.</source>
-      <translation type="unfinished">Not authorized. Check username and password in the settings.</translation>
+        <source>Not authorized. Check username and password in the settings.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>This sitemap page was not found on the server.</source>
-      <translation type="unfinished">This sitemap page was not found on the server.</translation>
+        <source>This sitemap page was not found on the server.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>Server error %1.</source>
-      <translation type="unfinished">Server error %1.</translation>
+        <source>Server error %1.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>Could not load the sitemap (HTTP %1).</source>
-      <translation type="unfinished">Could not load the sitemap (HTTP %1).</translation>
+        <source>Could not load the sitemap (HTTP %1).</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>Could not read the sitemap.</source>
-      <translation type="unfinished">Could not read the sitemap.</translation>
+        <source>Could not read the sitemap.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>This page is empty</source>
-      <translation type="unfinished">This page is empty</translation>
+        <source>This page is empty</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>Pull down to refresh</source>
-      <translation type="unfinished">Pull down to refresh</translation>
+        <source>Pull down to refresh</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>Write Command to NFC Tag</source>
-      <translation type="unfinished">Write Command to NFC Tag</translation>
+        <source>Write Command to NFC Tag</source>
+        <translation type="unfinished"></translation>
     </message>
-  </context>
-  <context>
+</context>
+<context>
     <name>SitemapPullDownMenu</name>
     <message>
-      <source>Refresh Sitemaps</source>
-      <translation type="unfinished">Refresh Sitemaps</translation>
+        <source>Refresh Sitemaps</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>Settings</source>
-      <translation type="unfinished">Settings</translation>
+        <source>Settings</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>─────────────────</source>
-      <translation type="unfinished">─────────────────</translation>
+        <source>─────────────────</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>Main</source>
-      <translation type="unfinished">Main</translation>
+        <source>Main</source>
+        <translation type="unfinished"></translation>
     </message>
-  </context>
-  <context>
+</context>
+<context>
     <name>SitemapSelectionPage</name>
     <message>
-      <source>Navigation</source>
-      <translation type="unfinished">Navigation</translation>
+        <source>Navigation</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>Sitemaps</source>
-      <translation type="unfinished">Sitemaps</translation>
+        <source>Sitemaps</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>Settings</source>
-      <translation type="unfinished">Settings</translation>
+        <source>Settings</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>Refresh Sitemaps</source>
-      <translation type="unfinished">Refresh Sitemaps</translation>
+        <source>Refresh Sitemaps</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>Home</source>
-      <translation type="unfinished">Home</translation>
+        <source>Home</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>Main</source>
-      <translation type="unfinished">Main</translation>
+        <source>Main</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>System</source>
-      <translation type="unfinished">System</translation>
+        <source>System</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>NFC</source>
-      <translation type="unfinished">NFC</translation>
+        <source>NFC</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>Write NFC Tag</source>
-      <translation type="unfinished">Write NFC Tag</translation>
+        <source>Write NFC Tag</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>No NFC reader on this device</source>
-      <translation type="unfinished">No NFC reader on this device</translation>
+        <source>No NFC reader on this device</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>Not available in demo mode</source>
-      <translation type="unfinished">Not available in demo mode</translation>
+        <source>Not available in demo mode</source>
+        <translation type="unfinished"></translation>
     </message>
-  </context>
-  <context>
+</context>
+<context>
     <name>harbour-openhab</name>
     <message>
-      <source>Command sent to openHAB</source>
-      <translation type="unfinished">Command sent to openHAB</translation>
+        <source>Command sent to openHAB</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>Command failed</source>
-      <translation type="unfinished">Command failed</translation>
+        <source>Command failed</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>Item &quot;%1&quot; does not exist on this server.</source>
-      <translation type="unfinished">Item &quot;%1&quot; does not exist on this server.</translation>
+        <source>Item "%1" does not exist on this server.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>Sitemap not opened</source>
-      <translation type="unfinished">Sitemap not opened</translation>
+        <source>Sitemap not opened</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>This sitemap does not exist on this server.</source>
-      <translation type="unfinished">This sitemap does not exist on this server.</translation>
+        <source>This sitemap does not exist on this server.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>Server not reachable.</source>
-      <translation type="unfinished">Server not reachable.</translation>
+        <source>Server not reachable.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>Not authorized. Check user name and password.</source>
-      <translation type="unfinished">Not authorized. Check user name and password.</translation>
+        <source>Not authorized. Check user name and password.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>Not found on this server.</source>
-      <translation type="unfinished">Not found on this server.</translation>
+        <source>Not found on this server.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>The server reported an error (%1).</source>
-      <translation type="unfinished">The server reported an error (%1).</translation>
+        <source>The server reported an error (%1).</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-      <source>Request failed (%1).</source>
-      <translation type="unfinished">Request failed (%1).</translation>
+        <source>Request failed (%1).</source>
+        <translation type="unfinished"></translation>
     </message>
-  </context>
+</context>
 </TS>
