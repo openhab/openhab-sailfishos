@@ -8,6 +8,8 @@ import "../base/utilities/SseEvents.js" as SseEvents
 import "../base/utilities/PatternFormatter.js" as PatternFormatter
 import "../base/utilities/ColorUtils.js" as ColorUtils
 import "../base/utilities/ImageUtils.js" as ImageUtils
+import "../base/utilities/OpenHabApi.js" as OpenHabApi
+import "../base/utilities/NfcUri.js" as NfcUri
 
 Page {
     id: page
@@ -15,6 +17,13 @@ Page {
     property string sitemapName: ""
     property string pageTitle: sitemapName
     property var initialPageData: null
+
+    // Load state of the sitemap request; drives the placeholder below.
+    property bool loading: false
+    property string loadError: ""
+    // Incremented per request so a late answer for a previous sitemap
+    // (e.g. after switching sitemaps) cannot overwrite the current one.
+    property int _requestId: 0
 
     // Subpages will be called with full URL (http...) → no own SSE start
     readonly property bool isSubPage: sitemapName.indexOf("http") === 0
@@ -33,30 +42,75 @@ Page {
 
     // --- Logic ---
 
+    // Both helpers now delegate to OpenHabApi.js, which is the single place
+    // where openHAB REST access lives. The signatures stay as they were
+    // so none of the ~20 call sites in this file had to change.
+
     // Returns the Basic Auth header value when both username and password are set,
     // otherwise returns null. Credentials are only sent when BOTH values are non-empty.
     function getAuthHeader() {
-        var u = settings.username_local
-        var p = settings.decodePassword(settings.password_local)
-        if (u && u !== "" && p && p !== "") {
-            return "Basic " + Qt.btoa(u + ":" + p)
-        }
-        return null
+        return OpenHabApi.authHeader(settings.apiConfig())
     }
 
     function sendCommand(itemName, command) {
-        if (!itemName) return;
-        var xhr = new XMLHttpRequest();
-        xhr.open("POST", settings.base_url + "/rest/items/" + itemName, true);
-        xhr.setRequestHeader("Content-Type", "text/plain");
-        var auth = getAuthHeader()
-        if (auth) xhr.setRequestHeader("Authorization", auth)
-        xhr.onreadystatechange = function() {
-            if (xhr.readyState === XMLHttpRequest.DONE && xhr.status >= 200 && xhr.status < 300) {
-                //refreshTimer.restart();
-            }
+        OpenHabApi.sendCommand(settings.apiConfig(), itemName, command)
+    }
+
+    // ── NFC ────────────────────────────────────────────────────────────
+
+    /** True when writing tags is offered at all. */
+    readonly property bool nfcWriteAvailable: nfcManager.available && !settings.demoMode
+
+    /**
+     * The path behind /rest/sitemaps, which is what a sitemap tag stores.
+     * Subpages arrive here as a full URL in sitemapName, root sitemaps as a
+     * bare name -- the same overloading the startup code relies on.
+     */
+    function nfcSitemapPath() {
+        if (sitemapName.indexOf("http") === 0) {
+            var marker = "/rest/sitemaps"
+            var index = sitemapName.indexOf(marker)
+            return index >= 0 ? sitemapName.substring(index + marker.length) : ""
         }
-        xhr.send(command);
+        return sitemapName !== "" ? "/" + sitemapName : ""
+    }
+
+    /**
+     * Open the command selection for a sitemap widget (context menu entry).
+     * The widget's own mappings take priority over the static table.
+     */
+    function openNfcWriteForWidget(widget, mappingsJson) {
+        if (!widget || !widget.item || !widget.item.name) {
+            console.warn("[NFC] no usable widget behind the context menu entry")
+            return
+        }
+
+        var label = widget.label
+                ? String(widget.label).replace(/\s*\[.*\]/, "").trim()
+                : ""
+        var mappings = mappingsJson && mappingsJson !== ""
+                ? mappingsJson
+                : JSON.stringify(widget.mappings || [])
+
+        pageStack.animatorPush(Qt.resolvedUrl("NfcCommandPage.qml"), {
+            "itemName": widget.item.name,
+            "itemLabel": label || widget.item.label || widget.item.name,
+            "itemType": widget.item.type || "",
+            "mappingsJson": mappings,
+            "commandJson": JSON.stringify(widget.item.commandDescription || null),
+            "staticCommands": appWindow.nfcStaticCommands
+        })
+    }
+
+    /** Write the currently shown sitemap page onto a tag. */
+    function openNfcWriteForSitemap() {
+        var path = nfcSitemapPath()
+        if (path === "") return
+        pageStack.animatorPush(Qt.resolvedUrl("NfcWritePage.qml"), {
+            "uri": NfcUri.buildSitemapUri(path),
+            "shortUri": "",
+            "summary": qsTr("Sitemap %1").arg(path)
+        })
     }
 
     function normalizeRestUrl(url) {
@@ -68,8 +122,26 @@ Page {
         return settings.base_url + url.substring(restIndex);
     }
 
+    /**
+     * Fill the model from a sitemap/page JSON. If the rows match what is
+     * already shown (same types and items in the same order) they are updated
+     * in place, so a background refresh neither flickers nor loses the
+     * scroll position; otherwise the model is rebuilt.
+     */
     function populateSitemap(data) {
-        sitemapModel.clear();
+        var entries = [];
+
+        // Pages opened by name or URL alone (app start, NFC tag) have no
+        // caller-supplied title and would show the raw URL; take the title
+        // from the server's answer instead. Titles passed in (group label,
+        // sitemap selection) are left untouched.
+        if (pageTitle === sitemapName) {
+            var serverTitle = data.title
+                    || (data.homepage && data.homepage.title)
+                    || data.label || "";
+            serverTitle = String(serverTitle).replace(/\s*\[.*\]/, "").trim();
+            if (serverTitle !== "") pageTitle = serverTitle;
+        }
 
         var rootWidgets = (data.homepage && data.homepage.widgets) ? data.homepage.widgets : (data.widgets ? data.widgets : []);
 
@@ -89,7 +161,7 @@ Page {
 
                 // Handle different widget types and their specific data needs
                 if (widget.type === "Frame" && widget.widgets) {
-                    sitemapModel.append({
+                    entries.push({
                         "type": "Header",
                         "itemName": "",
                         "itemState": "",
@@ -100,7 +172,7 @@ Page {
                     unpackWidgets(widget.widgets);
                 }
                 else if (widget.item && widget.type === "Slider") {
-                    sitemapModel.append({
+                    entries.push({
                         "type": widget.type || "Unknown",
                         "itemName": name,
                         "itemState": state,
@@ -110,7 +182,7 @@ Page {
                     });
                 }
                 else if (widget.item && widget.item.type === "Rollershutter") {
-                    sitemapModel.append({
+                    entries.push({
                         "type": "Rollershutter",
                         "itemName": name,
                         "itemState": state,
@@ -121,7 +193,7 @@ Page {
                 }
                 // For Switch widgets with mappings, use a special type to indicate the presence of mappings
                 else if (widget.type === "Switch" && widget.mappings && widget.mappings.length > 0) {
-                    sitemapModel.append({
+                    entries.push({
                         "type": "SwitchWithMappings",
                         "itemName": name,
                         "itemState": state,
@@ -134,7 +206,7 @@ Page {
                 else if (widget.item && widget.type === "Selection" && (!widget.mappings || widget.mappings.length === 0)) {
                     var commandOptions = (widget.item.commandDescription && widget.item.commandDescription.commandOptions)
                             ? widget.item.commandDescription.commandOptions : [];
-                    sitemapModel.append({
+                    entries.push({
                         "type": widget.type,
                         "itemName": name,
                         "itemState": state,
@@ -145,7 +217,7 @@ Page {
                 }
                 // For Selection widgets with mappings, use the provided mappings
                 else if (widget.item && widget.type === "Selection") {
-                    sitemapModel.append({
+                    entries.push({
                         "type": widget.type,
                         "itemName": name,
                         "itemState": state,
@@ -171,7 +243,7 @@ Page {
                     }
                     var buttonsJson = JSON.stringify(btnArr);
                     //console.log("[Buttongrid] buttons found: " + btnArr.length + " json: " + buttonsJson.substring(0, 200));
-                    sitemapModel.append({
+                    entries.push({
                         "type": "Buttongrid",
                         "itemName": name,
                         "itemState": state,
@@ -182,7 +254,7 @@ Page {
                 }
                 // Default case for other widget types
                 else {
-                    sitemapModel.append({
+                    entries.push({
                         "type": widget.type,
                         "itemName": name,
                         "itemState": state,
@@ -195,57 +267,102 @@ Page {
         }
         unpackWidgets(rootWidgets);
 
-        // After async model load, rebind SSE to this (now populated) model
-        SseEvents.rebindModel(sitemapModel);
-        console.log("[SitemapPage] Model populated with " + sitemapModel.count + " entries, SSE rebound");
+        var sameLayout = entries.length === sitemapModel.count;
+        for (var i = 0; sameLayout && i < entries.length; i++) {
+            var row = sitemapModel.get(i);
+            sameLayout = row.type === entries[i].type && row.itemName === entries[i].itemName;
+        }
+
+        if (sameLayout) {
+            for (var j = 0; j < entries.length; j++) {
+                sitemapModel.set(j, entries[j]);
+            }
+        } else {
+            sitemapModel.clear();
+            for (var k = 0; k < entries.length; k++) {
+                sitemapModel.append(entries[k]);
+            }
+        }
+
+        // No SSE rebind here: SSE is bound to this ListModel object (in
+        // onCompleted / onStatusChanged), which clear()/set() keep. Rebinding
+        // from a late response could steal SSE from a sub-page opened since.
+        console.log("[SitemapPage] Model " + (sameLayout ? "updated" : "populated") + " with "
+                    + sitemapModel.count + " entries");
+    }
+
+    function loadErrorText(xhr) {
+        switch (OpenHabApi.classifyError(xhr).kind) {
+        case "network":      return qsTr("Server not reachable.");
+        case "unauthorized": return qsTr("Not authorized. Check username and password in the settings.");
+        case "notFound":     return qsTr("This sitemap page was not found on the server.");
+        case "server":       return qsTr("Server error %1.").arg(xhr.status);
+        default:             return qsTr("Could not load the sitemap (HTTP %1).").arg(xhr.status);
+        }
     }
 
     function fetchSitemap() {
+        var requestId = ++_requestId;
+        var url = fullApiUrl;
+        loading = true;
+        loadError = "";
         var xhr = new XMLHttpRequest();
         xhr.onreadystatechange = function() {
-            if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
-                var json = JSON.parse(xhr.responseText);
-                populateSitemap(json);
-            } else if (xhr.readyState === XMLHttpRequest.DONE) {
-                console.log("[SitemapPage] Failed to load sitemap from " + fullApiUrl + " status: " + xhr.status);
+            if (xhr.readyState !== XMLHttpRequest.DONE) return;
+            if (requestId !== _requestId) return;   // superseded by a newer request
+            loading = false;
+            if (xhr.status === 200) {
+                try {
+                    populateSitemap(JSON.parse(xhr.responseText));
+                } catch (e) {
+                    loadError = qsTr("Could not read the sitemap.");
+                    console.warn("[SitemapPage] Invalid sitemap JSON from " + url + ": " + e);
+                }
+            } else {
+                // Rows already on screen (e.g. from initialPageData) stay
+                // visible; the placeholder only shows up on an empty page.
+                loadError = loadErrorText(xhr);
+                console.log("[SitemapPage] Failed to load sitemap from " + url + " status: " + xhr.status);
             }
         }
-        xhr.open("GET", fullApiUrl);
+        xhr.open("GET", url);
         var auth = getAuthHeader()
         if (auth) xhr.setRequestHeader("Authorization", auth)
         xhr.send();
     }
 
    Component.onCompleted: {
+      // A sub-page gets its widgets from the parent's response, so it can be
+      // shown at once. That data is as old as the parent page, though, so
+      // fetch the page anyway and update the rows in place.
       if (initialPageData && initialPageData.widgets) {
           populateSitemap(initialPageData);
-      } else {
-          fetchSitemap()
       }
+      fetchSitemap()
 
-      if (!isSubPage && sseManager) {
-          // Top-level sitemap: start SSE connection and bind to our model
+      if (!sseManager) {
+          console.error("[SitemapPage] SSEManager not available!");
+      } else if (!isSubPage) {
+          // Top-level sitemap: (re)start SSE; this page becomes its owner
           SseEvents.startSSE(sseManager, settings.base_url, sitemapModel,
                              settings.username_local, settings.decodePassword(settings.password_local));
           console.log("[SitemapPage] SSE started (top-level sitemap)");
-      } else if (isSubPage) {
-          // Sub-page: rebind the existing SSE handler to our model
-          SseEvents.rebindModel(sitemapModel);
-          console.log("[SitemapPage] SSE model rebound to sub-page");
       } else {
-          console.error("[SitemapPage] SSEManager not available!");
+          // Sub-page: usually opened on top of a running sitemap and just
+          // rebinds; opened on its own (NFC tag, app start) it starts SSE.
+          SseEvents.attachModel(sseManager, settings.base_url, sitemapModel,
+                                settings.username_local, settings.decodePassword(settings.password_local));
+          console.log("[SitemapPage] SSE attached to sub-page");
       }
    }
 
    Component.onDestruction: {
-       if (!isSubPage && sseManager) {
-           // Top-level sitemap leaving: stop SSE entirely
-           SseEvents.stopSSE(sseManager);
-           console.log("[SitemapPage] SSE stopped (leaving top-level sitemap)");
-       } else if (isSubPage) {
-           // Sub-page leaving: nothing to do, the parent page will rebind
-           // when it becomes active again (handled by status change below)
-           console.log("[SitemapPage] Sub-page destroyed, parent will rebind model");
+       // Only the owning page stops SSE, and only if no other page has taken
+       // over meanwhile -- old pages may be destroyed after new ones started.
+       if (sseManager && SseEvents.releaseModel(sseManager, sitemapModel)) {
+           console.log("[SitemapPage] SSE stopped (owning page destroyed)");
+       } else {
+           console.log("[SitemapPage] Page destroyed, SSE left running");
        }
    }
 
@@ -255,11 +372,15 @@ Page {
    onStatusChanged: {
        if (status === PageStatus.Active && _wasActive) {
            // Returning from a sub-page or overlay
-            if (!isSubPage && sseManager && !sseManager.active) {
-                // SSE was stopped (e.g. by navigating to MainUiPage) – restart it
+            if (sseManager && !SseEvents.isRunning()) {
+                // SSE was stopped (e.g. by the sitemap selection page) –
+                // restart it, for sub-pages as well. Not sseManager.active:
+                // that is false until the first data arrives, so a connection
+                // started just before would be torn down and rebuilt. Dropped
+                // streams are reconnected by SSEManager itself.
                 SseEvents.startSSE(sseManager, settings.base_url, sitemapModel,
                                    settings.username_local, settings.decodePassword(settings.password_local));
-                console.log("[SitemapPage] SSE restarted after returning to top-level sitemap");
+                console.log("[SitemapPage] SSE restarted after returning to sitemap page");
            } else {
                // SSE still running – just rebind to our model
                SseEvents.rebindModel(sitemapModel);
@@ -330,6 +451,9 @@ Page {
                             // Restart SSE and re-fetch sitemap for the newly selected sitemap
                             SseEvents.restartSSE(sseManager, settings.base_url, sitemapModel,
                                                  settings.username_local, settings.decodePassword(settings.password_local))
+                            // Drop the old sitemap's rows so a failing load
+                            // shows the error instead of the previous sitemap.
+                            sitemapModel.clear()
                             fetchSitemap()
                         })
                     })
@@ -376,6 +500,12 @@ Page {
             //}
 
             MenuItem {
+                text: qsTr("Write this Sitemap to NFC Tag")
+                visible: page.nfcWriteAvailable && page.nfcSitemapPath() !== ""
+                onClicked: page.openNfcWriteForSitemap()
+            }
+
+            MenuItem {
                 text: qsTr("Refresh Sitemap")
                 onClicked: {
                     // fetch current sitemap
@@ -393,7 +523,10 @@ Page {
 
         delegate: Item {
             width: listView.width
-            height: type === "Image"                  ? componentLoader.implicitHeight
+            readonly property real _menuHeight: componentLoader.item && componentLoader.item._menuItem
+                                                ? componentLoader.item._menuItem.height : 0
+            height: _menuHeight + (
+                    type === "Image"                  ? componentLoader.implicitHeight
                   : type === "Video"                  ? componentLoader.implicitHeight
                   : type === "Mapview"                ? componentLoader.implicitHeight
                   : type === "Webview"                ? componentLoader.implicitHeight
@@ -402,7 +535,7 @@ Page {
                   : type === "Header"                 ? Theme.itemSizeSmall
                   : type === "Slider"                 ? Theme.itemSizeLarge
                   : type === "Colortemperaturepicker" ? Theme.itemSizeLarge
-                  : Theme.itemSizeMedium
+                  : Theme.itemSizeMedium)
 
             // If new widget types are added, add them as new cases in the switch statement below and create corresponding components
             Loader {
@@ -439,6 +572,18 @@ Page {
                 }
             }
         }
+
+        BusyIndicator {
+            anchors.centerIn: parent
+            size: BusyIndicatorSize.Large
+            running: page.loading && sitemapModel.count === 0
+        }
+
+        ViewPlaceholder {
+            enabled: !page.loading && sitemapModel.count === 0
+            text: page.loadError !== "" ? page.loadError : qsTr("This page is empty")
+            hintText: qsTr("Pull down to refresh")
+        }
     }
 
     // --- Templates and Components ---
@@ -464,6 +609,21 @@ Page {
         id: switchComp
         ListItem {
             id: switchListItem
+            // Captured here: inside the ContextMenu's own scope the Loader's
+            // properties are not reliably visible.
+            readonly property var nfcWidget: widget
+            readonly property string nfcMappings: mappingsJson
+            // Long-press: write this item's command to an NFC tag.
+            menu: page.nfcWriteAvailable ? nfcContextMenu : null
+            Component {
+                id: nfcContextMenu
+                ContextMenu {
+                    MenuItem {
+                        text: qsTr("Write Command to NFC Tag")
+                        onClicked: page.openNfcWriteForWidget(switchListItem.nfcWidget, switchListItem.nfcMappings)
+                    }
+                }
+            }
             width: listView.width
             contentHeight: Theme.itemSizeMedium
             onClicked: sendCommand(widget.item.name, currentState === "ON" ? "OFF" : "ON")
@@ -557,6 +717,21 @@ Page {
         id: rollershutterButtonsComp
         ListItem {
             id: shutterItem
+            // Captured here: inside the ContextMenu's own scope the Loader's
+            // properties are not reliably visible.
+            readonly property var nfcWidget: widget
+            readonly property string nfcMappings: mappingsJson
+            // Long-press: write this item's command to an NFC tag.
+            menu: page.nfcWriteAvailable ? nfcContextMenu : null
+            Component {
+                id: nfcContextMenu
+                ContextMenu {
+                    MenuItem {
+                        text: qsTr("Write Command to NFC Tag")
+                        onClicked: page.openNfcWriteForWidget(shutterItem.nfcWidget, shutterItem.nfcMappings)
+                    }
+                }
+            }
             width: listView.width
             contentHeight: Theme.itemSizeMedium
             implicitHeight: Theme.itemSizeMedium
@@ -617,6 +792,21 @@ Page {
         id: switchWithMappingsComp
         ListItem {
             id: mappingsItem
+            // Captured here: inside the ContextMenu's own scope the Loader's
+            // properties are not reliably visible.
+            readonly property var nfcWidget: widget
+            readonly property string nfcMappings: mappingsJson
+            // Long-press: write this item's command to an NFC tag.
+            menu: page.nfcWriteAvailable ? nfcContextMenu : null
+            Component {
+                id: nfcContextMenu
+                ContextMenu {
+                    MenuItem {
+                        text: qsTr("Write Command to NFC Tag")
+                        onClicked: page.openNfcWriteForWidget(mappingsItem.nfcWidget, mappingsItem.nfcMappings)
+                    }
+                }
+            }
             width: listView.width
             contentHeight: Theme.itemSizeMedium
             highlighted: false
@@ -734,6 +924,21 @@ Page {
         id: selectionComp
         ListItem {
             id: selectionItem
+            // Captured here: inside the ContextMenu's own scope the Loader's
+            // properties are not reliably visible.
+            readonly property var nfcWidget: widget
+            readonly property string nfcMappings: mappingsJson
+            // Long-press: write this item's command to an NFC tag.
+            menu: page.nfcWriteAvailable ? nfcContextMenu : null
+            Component {
+                id: nfcContextMenu
+                ContextMenu {
+                    MenuItem {
+                        text: qsTr("Write Command to NFC Tag")
+                        onClicked: page.openNfcWriteForWidget(selectionItem.nfcWidget, selectionItem.nfcMappings)
+                    }
+                }
+            }
             width: listView.width
             contentHeight: Theme.itemSizeMedium
 
@@ -1087,6 +1292,21 @@ Page {
         id: setpointComp
         ListItem {
             id: setpointItem
+            // Captured here: inside the ContextMenu's own scope the Loader's
+            // properties are not reliably visible.
+            readonly property var nfcWidget: widget
+            readonly property string nfcMappings: mappingsJson
+            // Long-press: write this item's command to an NFC tag.
+            menu: page.nfcWriteAvailable ? nfcContextMenu : null
+            Component {
+                id: nfcContextMenu
+                ContextMenu {
+                    MenuItem {
+                        text: qsTr("Write Command to NFC Tag")
+                        onClicked: page.openNfcWriteForWidget(setpointItem.nfcWidget, setpointItem.nfcMappings)
+                    }
+                }
+            }
             width: listView.width
             contentHeight: Theme.itemSizeMedium
             implicitHeight: Theme.itemSizeMedium
@@ -1686,6 +1906,21 @@ Page {
         id: inputComp
         ListItem {
             id: inputListItem
+            // Captured here: inside the ContextMenu's own scope the Loader's
+            // properties are not reliably visible.
+            readonly property var nfcWidget: widget
+            readonly property string nfcMappings: mappingsJson
+            // Long-press: write this item's command to an NFC tag.
+            menu: page.nfcWriteAvailable ? nfcContextMenu : null
+            Component {
+                id: nfcContextMenu
+                ContextMenu {
+                    MenuItem {
+                        text: qsTr("Write Command to NFC Tag")
+                        onClicked: page.openNfcWriteForWidget(inputListItem.nfcWidget, inputListItem.nfcMappings)
+                    }
+                }
+            }
             width: listView.width
             contentHeight: Theme.itemSizeMedium
 
@@ -1796,6 +2031,21 @@ Page {
         id: buttongridComp
         ListItem {
             id: buttongridItem
+            // Captured here: inside the ContextMenu's own scope the Loader's
+            // properties are not reliably visible.
+            readonly property var nfcWidget: widget
+            readonly property string nfcMappings: mappingsJson
+            // Long-press: write this item's command to an NFC tag.
+            menu: page.nfcWriteAvailable ? nfcContextMenu : null
+            Component {
+                id: nfcContextMenu
+                ContextMenu {
+                    MenuItem {
+                        text: qsTr("Write Command to NFC Tag")
+                        onClicked: page.openNfcWriteForWidget(buttongridItem.nfcWidget, buttongridItem.nfcMappings)
+                    }
+                }
+            }
             width: listView.width
             contentHeight: bgColumn.height + Theme.paddingMedium
             implicitHeight: contentHeight
@@ -2144,7 +2394,7 @@ Page {
                         font.pixelSize: Theme.fontSizeSmall
                     }
                 }
-                
+
                 Row {
                     x: Theme.horizontalPageMargin
                     width: parent.width - 2 * Theme.horizontalPageMargin

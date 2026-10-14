@@ -1,11 +1,14 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
-import Nemo.Notifications 1.0
 import "../base"
 import "../base/utilities/PatternFormatter.js" as PatternFormatter
+import "../base/utilities/OpenHabApi.js" as OpenHabApi
 
 CoverBackground {
     Settings { id: settings }
+
+    // Delegating to the shared OpenHabApi.js. The cover keeps its own
+    // notification feedback (#18) by passing the error callback through.
 
     function cleanSetting(value) {
         return value && typeof value === "string" ? value.trim() : ""
@@ -40,42 +43,28 @@ CoverBackground {
 
     function showCommandFailure(itemName, status) {
         var reason = status === 0 ? qsTr("Network error") : qsTr("HTTP %1").arg(status)
-        commandFailureNotification.summary = qsTr("Cover action failed")
-        commandFailureNotification.body = qsTr("Could not send command to %1 (%2).").arg(itemName).arg(reason)
-        commandFailureNotification.previewSummary = commandFailureNotification.summary
-        commandFailureNotification.previewBody = commandFailureNotification.body
-        commandFailureNotification.publish()
+        // Via the app-wide NotificationManager (harbour-openhab.qml).
+        notificationManager.notifyError(
+            qsTr("Cover action failed"),
+            qsTr("Could not send command to %1 (%2).").arg(itemName).arg(reason),
+            { "transient": true,
+              "expireTimeout": 5000,
+              "urgency": "normal",
+              "icon": "image://theme/icon-lock-warning" })
     }
 
     // Returns the Basic Auth header value when both credentials are set
     function getAuthHeader() {
-        var u = cleanSetting(settings.username_local)
-        var p = settings.decodePassword(settings.password_local)
-        if (u !== "" && p && p !== "") {
-            return "Basic " + Qt.btoa(u + ":" + p)
-        }
-        return null
+        return OpenHabApi.authHeader(settings.apiConfig())
     }
 
     function sendCommand(itemName, command) {
         itemName = cleanSetting(itemName)
         command = cleanSetting(command)
         if (itemName === "" || command === "") return;
-        var xhr = new XMLHttpRequest();
-        xhr.open("POST", itemUrl(itemName), true);
-        xhr.setRequestHeader("Content-Type", "text/plain");
-        var auth = getAuthHeader()
-        if (auth) xhr.setRequestHeader("Authorization", auth)
-        xhr.onreadystatechange = function() {
-            if (xhr.readyState === XMLHttpRequest.DONE && xhr.status >= 200 && xhr.status < 300) {
-                refreshItems()
-            } else if (xhr.readyState === XMLHttpRequest.DONE) {
-                console.warn("[CoverPage] sendCommand failed for item " + itemName
-                             + " with status " + xhr.status + ": " + xhr.responseText)
-                showCommandFailure(itemName, xhr.status)
-            }
-        }
-        xhr.send(command);
+        OpenHabApi.sendCommand(settings.apiConfig(), itemName, command,
+                               function() { refreshItems() },
+                               function(err) { showCommandFailure(itemName, err.status) })
     }
 
     property string label1: ""
@@ -86,16 +75,6 @@ CoverBackground {
     property var itemData2: null
     property int visibleStatusItemCount: (cleanSetting(settings.coverItem1) !== "" && itemData1 !== null ? 1 : 0)
                                          + (cleanSetting(settings.coverItem2) !== "" && itemData2 !== null ? 1 : 0)
-
-    Notification {
-        id: commandFailureNotification
-        appName: "openHAB"
-        appIcon: "harbour-openhab"
-        icon: "image://theme/icon-lock-warning"
-        expireTimeout: 5000
-        isTransient: true
-        urgency: Notification.Normal
-    }
 
     function getItemLabel(itemName, callback) {
         itemName = cleanSetting(itemName)
@@ -224,17 +203,35 @@ CoverBackground {
         onCoverItem2Changed:            _settingsChangedTimer.restart()
     }
 
+    // Watermark logo. When the bottom part of the cover is taken by the action
+    // legend or by a single item tile, the logo is centred in the free space
+    // above it (and shrunk if it would not fit); otherwise -- nothing shown or
+    // two item tiles -- it sits slightly above the centre.
     Image {
-        anchors {
-            centerIn: parent
-        }
-        width: parent.width * 1.22
+        // Top edge of the content below the logo, or -1 if the logo is free.
+        readonly property real freeBottom: actionLegend.visible ? actionLegend.y
+                                         : visibleStatusItemCount === 1 ? statusColumn.y
+                                         : -1
+        // Height/width ratio of cover-background.png (479 x 311).
+        readonly property real logoRatio: 311 / 479
+
+        anchors.horizontalCenter: parent.horizontalCenter
+        y: (freeBottom >= 0 ? freeBottom / 2 : parent.height * 0.42) - height / 2
+        width: freeBottom >= 0
+               ? Math.min(parent.width * 0.88, (freeBottom - 2 * Theme.paddingSmall) / logoRatio)
+               : parent.width * 0.88
         height: width
         fillMode: Image.PreserveAspectFit
         smooth: true
-        opacity: 0.12
+        opacity: 0.2
         source: "qrc:///cover/cover-background"
     }
+
+    // Item tiles always have the size they have when two items are shown.
+    // The column hangs from the bottom (above the cover action bar), so a
+    // single tile sits at the bottom and leaves the top for the logo.
+    readonly property real statusTileHeight:
+        (height - Theme.paddingLarge - height * 0.22 - Theme.paddingSmall) / 2
 
     Column {
         id: statusColumn
@@ -243,8 +240,6 @@ CoverBackground {
             leftMargin: Theme.paddingMedium
             right: parent.right
             rightMargin: Theme.paddingMedium
-            top: parent.top
-            topMargin: Theme.paddingLarge
             bottom: parent.bottom
             bottomMargin: parent.height * 0.22
         }
@@ -254,7 +249,7 @@ CoverBackground {
         Item {
             visible: cleanSetting(settings.coverItem1) !== "" && itemData1 !== null
             width: parent.width
-            height: visible ? (parent.height - (visibleStatusItemCount - 1) * parent.spacing) / visibleStatusItemCount : 0
+            height: visible ? statusTileHeight : 0
 
             Rectangle {
                 anchors.fill: parent
@@ -297,7 +292,11 @@ CoverBackground {
                     text: itemData1 !== null ? itemData1.label : ""
                     font.pixelSize: Theme.fontSizeExtraSmall
                     color: Theme.secondaryColor
-                    truncationMode: TruncationMode.Fade
+                    // Long item labels wrap onto a second line instead of
+                    // fading out; anything beyond that is elided.
+                    wrapMode: Text.Wrap
+                    maximumLineCount: 2
+                    elide: Text.ElideRight
                 }
 
                 Label {
@@ -315,7 +314,7 @@ CoverBackground {
         Item {
             visible: cleanSetting(settings.coverItem2) !== "" && itemData2 !== null
             width: parent.width
-            height: visible ? (parent.height - (visibleStatusItemCount - 1) * parent.spacing) / visibleStatusItemCount : 0
+            height: visible ? statusTileHeight : 0
 
             Rectangle {
                 anchors.fill: parent
@@ -358,7 +357,11 @@ CoverBackground {
                     text: itemData2 !== null ? itemData2.label : ""
                     font.pixelSize: Theme.fontSizeExtraSmall
                     color: Theme.secondaryColor
-                    truncationMode: TruncationMode.Fade
+                    // Long item labels wrap onto a second line instead of
+                    // fading out; anything beyond that is elided.
+                    wrapMode: Text.Wrap
+                    maximumLineCount: 2
+                    elide: Text.ElideRight
                 }
 
                 Label {
@@ -371,30 +374,100 @@ CoverBackground {
                 }
             }
         }
+    }
 
-        // ── Action labels (hidden when cover items are configured) ────────────
-        Label {
-            anchors.horizontalCenter: parent.horizontalCenter
-            width: parent.width
-            wrapMode: Text.WordWrap
-            text: label1 + "  " + cleanSetting(settings.coverAction1_command)
-            font.pixelSize: Theme.fontSizeSmall
-            color: Theme.highlightColor
-            visible: cleanSetting(settings.coverItem1) === "" && cleanSetting(settings.coverItem2) === ""
-                     && actionConfigured(settings.coverAction1, settings.coverAction1_command)
-            height: visible ? implicitHeight : 0
+    // ── Action legend (only when no cover items are configured) ──────────────
+    // One row per configured cover action, showing the button's own icon so
+    // the description is visually tied to the button right below it.
+    Column {
+        id: actionLegend
+        anchors {
+            left: parent.left
+            leftMargin: Theme.paddingMedium
+            right: parent.right
+            rightMargin: Theme.paddingMedium
+            bottom: parent.bottom
+            bottomMargin: parent.height * 0.22
         }
+        spacing: Theme.paddingSmall
+        visible: cleanSetting(settings.coverItem1) === "" && cleanSetting(settings.coverItem2) === ""
+                 && (actionConfigured(settings.coverAction1, settings.coverAction1_command)
+                     || actionConfigured(settings.coverAction2, settings.coverAction2_command))
 
-        Label {
-            anchors.horizontalCenter: parent.horizontalCenter
-            width: parent.width
-            wrapMode: Text.WordWrap
-            text: label2 + "  " + cleanSetting(settings.coverAction2_command)
-            font.pixelSize: Theme.fontSizeSmall
-            color: Theme.highlightColor
-            visible: cleanSetting(settings.coverItem1) === "" && cleanSetting(settings.coverItem2) === ""
-                     && actionConfigured(settings.coverAction2, settings.coverAction2_command)
-            height: visible ? implicitHeight : 0
+        Repeater {
+            model: [
+                {
+                    "configured": actionConfigured(settings.coverAction1, settings.coverAction1_command),
+                    "icon": configuredActionIcon(settings.coverAction1_command,
+                                                 settings.coverAction1_icon, "icon-cover-sync"),
+                    "label": label1,
+                    "command": cleanSetting(settings.coverAction1_command)
+                },
+                {
+                    "configured": actionConfigured(settings.coverAction2, settings.coverAction2_command),
+                    "icon": configuredActionIcon(settings.coverAction2_command,
+                                                 settings.coverAction2_icon, "icon-cover-refresh"),
+                    "label": label2,
+                    "command": cleanSetting(settings.coverAction2_command)
+                }
+            ]
+
+            delegate: Item {
+                visible: modelData.configured
+                width: actionLegend.width
+                height: visible ? Math.max(legendIcon.height, legendText.height) + 2 * Theme.paddingSmall : 0
+
+                Rectangle {
+                    anchors.fill: parent
+                    color: Theme.rgba(Theme.overlayBackgroundColor, 0.28)
+                    radius: Theme.paddingSmall
+                }
+
+                Image {
+                    id: legendIcon
+                    anchors {
+                        left: parent.left
+                        leftMargin: Theme.paddingSmall
+                        verticalCenter: parent.verticalCenter
+                    }
+                    width: Theme.iconSizeSmall
+                    height: Theme.iconSizeSmall
+                    sourceSize.width: width
+                    sourceSize.height: height
+                    fillMode: Image.PreserveAspectFit
+                    source: modelData.icon
+                }
+
+                Column {
+                    id: legendText
+                    anchors {
+                        left: legendIcon.right
+                        leftMargin: Theme.paddingSmall
+                        right: parent.right
+                        rightMargin: Theme.paddingSmall
+                        verticalCenter: parent.verticalCenter
+                    }
+
+                    Label {
+                        width: parent.width
+                        text: modelData.label
+                        font.pixelSize: Theme.fontSizeExtraSmall
+                        color: Theme.secondaryColor
+                        // Same as the item tiles: wrap, at most two lines.
+                        wrapMode: Text.Wrap
+                        maximumLineCount: 2
+                        elide: Text.ElideRight
+                    }
+
+                    Label {
+                        width: parent.width
+                        text: modelData.command
+                        font.pixelSize: Theme.fontSizeSmall
+                        color: Theme.highlightColor
+                        truncationMode: TruncationMode.Fade
+                    }
+                }
+            }
         }
     }
 

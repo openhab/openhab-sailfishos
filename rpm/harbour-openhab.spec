@@ -3,14 +3,18 @@
 Name:       harbour-openhab
 
 Summary:    openHAB client for Sailfish OS
-Version:    0.3
-Release:    2
+Version:    0.4
+Release:    1
 License:    EPL-2.0
 URL:        www.openhab.org
 Source0:    %{name}-%{version}.tar.bz2
 Requires:   sailfishsilica-qt5 >= 0.10.9
 Requires:   nemo-qml-plugin-configuration-qt5
 Requires:   sailfish-components-webview-qt5
+# WebView.qml imports these; on devices the browser pulls them in, the emulator lacks them
+Requires:   sailfish-components-webview-qt5-popups
+Requires:   sailfish-components-webview-qt5-pickers
+# NFC read/write feedback goes through the system notification area
 Requires:   nemo-qml-plugin-notifications-qt5
 #Requires:   qt5-qtimageformats-plugin-webp - maybe required for displaying of item type "Image", but should be installed automatically.
 #Requires:   qt5-qtmultimedia-plugin-mediaservice-gstmediaplayer #If a future implementation switches back to QtMultimedia's Video QML type, add this line
@@ -21,6 +25,7 @@ BuildRequires:  pkgconfig(Qt5Quick)
 BuildRequires:  desktop-file-utils
 BuildRequires:  pkgconfig(qt5embedwidget)
 BuildRequires:  pkgconfig(Qt5Test)
+BuildRequires:  pkgconfig(Qt5DBus)
 
 %description
 This app is a native client for openHAB which allows easy access to your sitemaps. The documentation is available at www.openhab.org/docs/.
@@ -30,7 +35,7 @@ This app is a native client for openHAB which allows easy access to your sitemap
 
 %build
 
-%qmake5 
+%qmake5
 
 %make_build
 
@@ -107,6 +112,9 @@ esac
 
 echo "── Building C++ unit tests (out-of-tree) ──"
 UNITTEST_BUILDDIR="%{_builddir}/test-build-unittest"
+# Wipe first: %%{_builddir} survives between SDK builds, so make would
+# otherwise find a stale target up to date and skip the compile.
+rm -rf "$UNITTEST_BUILDDIR"
 mkdir -p "$UNITTEST_BUILDDIR"
 cd "$UNITTEST_BUILDDIR"
 "$QMAKE" "$SRCDIR/tests/unittest/unittest.pro"
@@ -118,8 +126,29 @@ else
     echo "── Skipping tst_ssemanager execution (cross-compiled for %{_arch}) ──"
 fi
 
+echo "── Building NFC codec tests (out-of-tree) ──"
+# Separate project on purpose: NfcCodec must build without QtNetwork and
+# without a D-Bus connection, which is what makes it runnable here.
+NFCTEST_BUILDDIR="%{_builddir}/test-build-nfccodec"
+# Wipe first: %%{_builddir} survives between SDK builds, so make would
+# otherwise find a stale target up to date and skip the compile.
+rm -rf "$NFCTEST_BUILDDIR"
+mkdir -p "$NFCTEST_BUILDDIR"
+cd "$NFCTEST_BUILDDIR"
+"$QMAKE" "$SRCDIR/tests/unittest/nfccodec.pro"
+make %{?_smp_mflags}
+if [ "$_can_execute" -eq 1 ]; then
+    echo "── Running tst_nfccodec ──"
+    ./tst_nfccodec || exit 1
+else
+    echo "── Skipping tst_nfccodec execution (cross-compiled for %{_arch}) ──"
+fi
+
 echo "── Building QML / JS tests (out-of-tree) ──"
 QMLTEST_BUILDDIR="%{_builddir}/test-build-qmltest"
+# Wipe first: %%{_builddir} survives between SDK builds, so make would
+# otherwise find a stale target up to date and skip the compile.
+rm -rf "$QMLTEST_BUILDDIR"
 mkdir -p "$QMLTEST_BUILDDIR"
 cd "$QMLTEST_BUILDDIR"
 "$QMAKE" "$SRCDIR/tests/qmltest/qmltest.pro"

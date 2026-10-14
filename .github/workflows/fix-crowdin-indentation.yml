@@ -1,47 +1,86 @@
 name: Fix Crowdin Indentation
 
-# Runs when Crowdin creates or updates a PR
 on:
+  # Crowdin creates or updates a PR. Note: pushes made by the Crowdin bot have
+  # not been observed to trigger this event, hence the schedule below.
   pull_request:
     types: [ opened, synchronize ]
+  # Safety net: normalize the Crowdin branch regularly.
+  schedule:
+    - cron: '0 */6 * * *'
+  # Manual run. Start it from the default branch (the workflow file is taken
+  # from the branch selected in the UI) and name the Crowdin branch here.
   workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Crowdin branch to normalize'
+        required: true
+        default: 'l10n_main'
+
+# Never let two runs push to the same branch at the same time.
+concurrency:
+  group: fix-crowdin-indentation-${{ github.head_ref || inputs.branch || 'l10n_main' }}
+  cancel-in-progress: true
 
 jobs:
   fix-indentation:
     name: Normalize .ts file indentation
     runs-on: ubuntu-latest
 
-    # Only act on Crowdin's own branches
-    if: startsWith(github.head_ref, 'l10n_')
+    # pull_request: only act on Crowdin's own branches (github.head_ref is
+    # only set for pull_request events). Manual and scheduled runs target the
+    # branch resolved below.
+    if: github.event_name != 'pull_request' || startsWith(github.head_ref, 'l10n_')
 
     permissions:
       contents: write
 
+    env:
+      TARGET_BRANCH: ${{ github.head_ref || inputs.branch || 'l10n_main' }}
+
     steps:
-      - name: Checkout PR branch
+      - name: Check that the branch exists
+        id: branch
+        run: |
+          if git ls-remote --exit-code --heads \
+               "https://github.com/${{ github.repository }}.git" "$TARGET_BRANCH" > /dev/null; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "Branch $TARGET_BRANCH does not exist - nothing to do."
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Checkout Crowdin branch
+        if: steps.branch.outputs.exists == 'true'
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.head_ref }}
+          ref: ${{ env.TARGET_BRANCH }}
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set up Python
+        if: steps.branch.outputs.exists == 'true'
         uses: actions/setup-python@v5
         with:
           python-version: '3.x'
 
       - name: Install lxml
+        if: steps.branch.outputs.exists == 'true'
         run: pip install lxml
 
       - name: Normalize indentation of all .ts translation files
+        if: steps.branch.outputs.exists == 'true'
         run: |
           find . -name "*.ts" -not -path "./.git/*" \
             -exec python3 .github/scripts/normalize_ts.py {} +
 
       - name: Commit if anything changed
+        if: steps.branch.outputs.exists == 'true'
         run: |
           git diff --quiet && echo "No changes." && exit 0
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add -A
           git commit -m "style: normalize .ts indentation to Crowdin format [skip ci]"
-          git push
+          # Crowdin may have pushed in the meantime
+          git pull --rebase origin "$TARGET_BRANCH"
+          git push origin "HEAD:$TARGET_BRANCH"
