@@ -107,7 +107,7 @@
     </message>
     <message>
         <source>Command</source>
-        <translation type="unfinished">Command</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -599,7 +599,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Item &quot;%1&quot; does not exist on this server.</source>
+        <source>Item "%1" does not exist on this server.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

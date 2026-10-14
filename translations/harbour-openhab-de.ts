@@ -28,26 +28,26 @@
     <name>CoverActionIconComboBox</name>
     <message>
         <source>Icon</source>
-        <translation>Symbol</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>CoverPage</name>
     <message>
         <source>Network error</source>
-        <translation>Netzwerkfehler</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>HTTP %1</source>
-        <translation>HTTP %1</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Cover action failed</source>
-        <translation>Cover-Aktion fehlgeschlagen</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Could not send command to %1 (%2).</source>
-        <translation>Konnte Befehl nicht an %1 (%2) senden.</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -95,129 +95,129 @@
     <name>NfcCommandPage</name>
     <message>
         <source>Choose command</source>
-        <translation>Befehl wählen</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Or enter a value</source>
-        <translation>Oder einen Wert eingeben</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Enter a value</source>
-        <translation>Wert eingeben</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Command</source>
-        <translation>Kommando</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>NfcPage</name>
     <message>
         <source>Open a sitemap first, or show all items from the pulley menu.</source>
-        <translation>Zuerst eine Sitemap öffnen oder alle Elemente aus dem Pulley-Menü anzeigen.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>This sitemap has no items that accept commands.</source>
-        <translation>Diese Sitemap enthält keine Items, die Befehle akzeptieren.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Could not read the sitemap.</source>
-        <translation>Die Sitemap konnte nicht gelesen werden.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Show sitemap items</source>
-        <translation>Sitemap-Elemente anzeigen</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Show all items</source>
-        <translation>Alle Elemente anzeigen</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Reload</source>
-        <translation>Neu laden</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Write NFC Tag</source>
-        <translation>NFC-Tag schreiben</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>All items</source>
-        <translation>Alle Elemente</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Sitemap %1</source>
-        <translation>Sitemap %1</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>This device has no NFC reader.</source>
-        <translation>Dieses Gerät hat keinen NFC-Leser.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>NFC is switched off. Enable it in the system settings.</source>
-        <translation>NFC ist ausgeschaltet. Aktiviere es in den Systemeinstellungen.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Search item</source>
-        <translation>Item suchen</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>No items</source>
-        <translation>Keine Items</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>NfcWritePage</name>
     <message>
         <source>No tag was detected. Please try again.</source>
-        <translation>Kein Tag wurde erkannt. Bitte versuche es erneut.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>This tag type cannot be written.</source>
-        <translation>Dieser Tag-Typ kann nicht beschrieben werden.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>The tag could not be read. Hold it still against the phone.</source>
-        <translation>Der Tag konnte nicht gelesen werden. Halte ihn ruhig gegen das Telefon.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>The tag is too small for this command.</source>
-        <translation>Der Tag-Speicher ist zu klein für diesen Befehl.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Writing failed. The tag may be write protected.</source>
-        <translation>Schreiben fehlgeschlagen. Der Tag ist möglicherweise schreibgeschützt.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>The tag was removed too early. Its content may be incomplete.</source>
-        <translation>Der Tag wurde zu früh entfernt. Sein Inhalt könnte unvollständig sein.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Cancelled.</source>
-        <translation>Abgebrochen.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Writing failed.</source>
-        <translation>Schreiben fehlgeschlagen.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Tag written.</source>
-        <translation>Tag geschrieben.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Write NFC Tag</source>
-        <translation>NFC-Tag beschreiben</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Hold the tag against the back of the phone.</source>
-        <translation>Halte den Tag an die Rückseite des Smartphones.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Done</source>
-        <translation>Fertig</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Try again</source>
-        <translation>Erneut versuchen</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -356,63 +356,63 @@
     </message>
     <message>
         <source>NFC</source>
-        <translation>NFC</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Detect NFC Actions</source>
-        <translation>NFC-Aktionen erkennen</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Lay an openHAB tag on the phone to send its command. Works while the app is running, also from the cover.</source>
-        <translation>Lege einen openHAB-Tag an das Telefon, um seinen Befehl zu senden. Funktioniert, solange die App läuft, auch vom Cover aus.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>This device has no NFC reader.</source>
-        <translation>Dieses Gerät hat keinen NFC-Leser.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>NFC is currently switched off in the system settings.</source>
-        <translation>NFC ist derzeit in den Systemeinstellungen ausgeschaltet.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Automatic</source>
-        <translation>Automatisch</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Sync</source>
-        <translation>Synchronisieren</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Refresh</source>
-        <translation>Aktualisieren</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>On</source>
-        <translation>Ein</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Off</source>
-        <translation>Aus</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Stop</source>
-        <translation>Stopp</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Timer</source>
-        <translation>Timer</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Favorite</source>
-        <translation>Favorit</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Location</source>
-        <translation>Standort</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>New</source>
-        <translation>Neu</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -479,47 +479,47 @@
     </message>
     <message>
         <source>Sitemap %1</source>
-        <translation>Sitemap %1</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Write this Sitemap to NFC Tag</source>
-        <translation>Diese Sitemap auf NFC-Tag schreiben</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Server not reachable.</source>
-        <translation>Server nicht erreichbar.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Not authorized. Check username and password in the settings.</source>
-        <translation>Nicht autorisiert. Prüfe Benutzername und Passwort in den Einstellungen.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>This sitemap page was not found on the server.</source>
-        <translation>Diese Sitemap wurde auf dem Server nicht gefunden.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Server error %1.</source>
-        <translation>Serverfehler %1.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Could not load the sitemap (HTTP %1).</source>
-        <translation>Die Sitemap konnte nicht geladen werden (HTTP %1).</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Could not read the sitemap.</source>
-        <translation>Die Sitemap konnte nicht gelesen werden.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>This page is empty</source>
-        <translation>Diese Seite ist leer</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Pull down to refresh</source>
-        <translation>Zum Aktualisieren nach unten ziehen</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Write Command to NFC Tag</source>
-        <translation>Befehl auf NFC-Tag schreiben</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -573,62 +573,62 @@
     </message>
     <message>
         <source>NFC</source>
-        <translation>NFC</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Write NFC Tag</source>
-        <translation>NFC-Tag schreiben</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>No NFC reader on this device</source>
-        <translation>Kein NFC-Leser auf diesem Gerät</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Not available in demo mode</source>
-        <translation>Im Demo-Modus nicht verfügbar</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>harbour-openhab</name>
     <message>
         <source>Command sent to openHAB</source>
-        <translation>Befehl an openHAB gesendet</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Command failed</source>
-        <translation>Befehl fehlgeschlagen</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Item &quot;%1&quot; does not exist on this server.</source>
-        <translation>Item &quot;%1&quot; existiert auf diesem Server nicht.</translation>
+        <source>Item "%1" does not exist on this server.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Sitemap not opened</source>
-        <translation>Sitemap nicht geöffnet</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>This sitemap does not exist on this server.</source>
-        <translation>Diese Sitemap existiert auf diesem Server nicht.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Server not reachable.</source>
-        <translation>Server nicht erreichbar.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Not authorized. Check user name and password.</source>
-        <translation>Nicht autorisiert. Prüfe Benutzername und Passwort.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Not found on this server.</source>
-        <translation>Auf diesem Server nicht gefunden.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>The server reported an error (%1).</source>
-        <translation>Der Server hat einen Fehler gemeldet (%1).</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Request failed (%1).</source>
-        <translation>Anfrage fehlgeschlagen (%1).</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>
