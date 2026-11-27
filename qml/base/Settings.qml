@@ -23,14 +23,38 @@ ConfigurationGroup {
         }
     }
 
+    // Remote server (openHAB Cloud, e.g. myopenhab.org). Only used when
+    // remote_enabled is on; ConnectionManager then picks local or remote.
+    property bool remote_enabled: false
+    property string remote_url: "https://myopenhab.org"
+    property string username_remote: ""
+    // Stored as base64-obfuscated string (prefix "b64"), like password_local
+    property string password_remote: ""
+
     // Bundles what OpenHabApi.js needs; a .js library cannot read these
-    // properties on its own.
+    // properties on its own. Always the *active* connection (local or
+    // remote, see ConnectionManager), not necessarily base_url.
     function apiConfig() {
         return {
-            baseUrl: normalizeUrl(base_url),
-            username: username_local,
-            password: decodePassword(password_local)
+            baseUrl: connection.baseUrl,
+            username: connection.username,
+            password: connection.password
         }
+    }
+
+    // One line for the UI about the connection in use.
+    function connectionStatusText() {
+        if (connection.checking) return qsTr("Checking connection…")
+        switch (connection.type) {
+        case "local":  return qsTr("Connected via local server")
+        case "remote": return qsTr("Connected via %1").arg(hostOf(connection.baseUrl))
+        default:       return qsTr("No server reachable")
+        }
+    }
+
+    function hostOf(url) {
+        var match = /^[a-z]+:\/\/([^\/:]+)/i.exec(url || "")
+        return match ? match[1] : url
     }
 
     // Normalize a URL string: fix single-slash protocol, strip trailing slashes

@@ -33,7 +33,7 @@ Page {
 
     readonly property string fullApiUrl: sitemapName.indexOf("http") === 0
         ? normalizeRestUrl(sitemapName)
-        : settings.base_url + "/rest/sitemaps/" + sitemapName
+        : connection.baseUrl + "/rest/sitemaps/" + sitemapName
 
     ListModel {
         id: sitemapModel
@@ -119,7 +119,7 @@ Page {
         var restIndex = url.indexOf("/rest/");
         if (restIndex === -1) return url;
 
-        return settings.base_url + url.substring(restIndex);
+        return connection.baseUrl + url.substring(restIndex);
     }
 
     /**
@@ -338,20 +338,21 @@ Page {
       if (initialPageData && initialPageData.widgets) {
           populateSitemap(initialPageData);
       }
+      _shownBaseUrl = connection.baseUrl
       fetchSitemap()
 
       if (!sseManager) {
           console.error("[SitemapPage] SSEManager not available!");
       } else if (!isSubPage) {
           // Top-level sitemap: (re)start SSE; this page becomes its owner
-          SseEvents.startSSE(sseManager, settings.base_url, sitemapModel,
-                             settings.username_local, settings.decodePassword(settings.password_local));
+          SseEvents.startSSE(sseManager, connection.baseUrl, sitemapModel,
+                             connection.username, connection.password);
           console.log("[SitemapPage] SSE started (top-level sitemap)");
       } else {
           // Sub-page: usually opened on top of a running sitemap and just
           // rebinds; opened on its own (NFC tag, app start) it starts SSE.
-          SseEvents.attachModel(sseManager, settings.base_url, sitemapModel,
-                                settings.username_local, settings.decodePassword(settings.password_local));
+          SseEvents.attachModel(sseManager, connection.baseUrl, sitemapModel,
+                                connection.username, connection.password);
           console.log("[SitemapPage] SSE attached to sub-page");
       }
    }
@@ -363,6 +364,27 @@ Page {
            console.log("[SitemapPage] SSE stopped (owning page destroyed)");
        } else {
            console.log("[SitemapPage] Page destroyed, SSE left running");
+       }
+   }
+
+   // Local to remote switch (network change, app back in the foreground):
+   // the URLs above follow connection.baseUrl through their bindings, but
+   // the page content and the SSE stream have to be fetched again.
+   property string _shownBaseUrl: ""
+   Connections {
+       target: connection
+       onActiveChanged: {
+           if (connection.type === "none") return
+           if (page._shownBaseUrl === "" || page._shownBaseUrl === connection.baseUrl) return
+           page._shownBaseUrl = connection.baseUrl
+           console.log("[SitemapPage] connection changed, reloading " + page.sitemapName)
+           // Only the visible page takes over the stream; pages below
+           // reconnect when they become active again (onStatusChanged).
+           if (sseManager && page.status === PageStatus.Active) {
+               SseEvents.restartSSE(sseManager, connection.baseUrl, sitemapModel,
+                                    connection.username, connection.password)
+           }
+           fetchSitemap()
        }
    }
 
@@ -378,8 +400,8 @@ Page {
                 // that is false until the first data arrives, so a connection
                 // started just before would be torn down and rebuilt. Dropped
                 // streams are reconnected by SSEManager itself.
-                SseEvents.startSSE(sseManager, settings.base_url, sitemapModel,
-                                   settings.username_local, settings.decodePassword(settings.password_local));
+                SseEvents.startSSE(sseManager, connection.baseUrl, sitemapModel,
+                                   connection.username, connection.password);
                 console.log("[SitemapPage] SSE restarted after returning to sitemap page");
            } else {
                // SSE still running – just rebind to our model
@@ -449,8 +471,8 @@ Page {
                             page.pageTitle = label
 
                             // Restart SSE and re-fetch sitemap for the newly selected sitemap
-                            SseEvents.restartSSE(sseManager, settings.base_url, sitemapModel,
-                                                 settings.username_local, settings.decodePassword(settings.password_local))
+                            SseEvents.restartSSE(sseManager, connection.baseUrl, sitemapModel,
+                                                 connection.username, connection.password)
                             // Drop the old sitemap's rows so a failing load
                             // shows the error instead of the previous sitemap.
                             sitemapModel.clear()
@@ -476,10 +498,10 @@ Page {
                 sourceSize.width: width
                 sourceSize.height: height
                 visible: parent.iconName !== "" && parent.iconName !== "none"
-                source: parent.iconName ? settings.base_url + "/icon/" + parent.iconName + "?format=png&anyFormat=true" : ""
+                source: parent.iconName ? connection.baseUrl + "/icon/" + parent.iconName + "?format=png&anyFormat=true" : ""
                 onStatusChanged: {
                     if (status === Image.Error && source.toString().indexOf("format=png") !== -1) {
-                        source = settings.base_url + "/icon/" + parent.iconName + "?format=svg";
+                        source = connection.baseUrl + "/icon/" + parent.iconName + "?format=svg";
                     }
                 }
             }
@@ -1050,9 +1072,9 @@ Page {
                     "initialHue":         hsb.h,
                     "initialSaturation":  hsb.s,
                     "initialBrightness":  hsb.b,
-                    "baseUrl":            settings.base_url,
-                    "username":           settings.username_local,
-                    "password":           settings.decodePassword(settings.password_local)
+                    "baseUrl":            connection.baseUrl,
+                    "username":           connection.username,
+                    "password":           connection.password
                 });
             }
 
@@ -2236,7 +2258,7 @@ Page {
     }
 
     // Chart component – fetches the openHAB chart as an image from the /chart endpoint.
-    // URL pattern: {base_url}/chart?items={item.name}&period={period}&legend={legend}
+    // URL pattern: {connection.baseUrl}/chart?items={item.name}&period={period}&legend={legend}
     // The image is automatically reloaded when the refresh timer expires.
     Component {
         id: chartComp
@@ -2288,7 +2310,7 @@ Page {
                 // Cache-busting: forces image reload after timer fires
                 params.push("t=" + _cacheBust);
 
-                return settings.base_url + "/chart?" + params.join("&");
+                return connection.baseUrl + "/chart?" + params.join("&");
             }
 
             // Refresh timer

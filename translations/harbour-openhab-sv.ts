@@ -107,7 +107,7 @@
     </message>
     <message>
         <source>Command</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Kommando</translation>
     </message>
 </context>
 <context>
@@ -217,6 +217,25 @@
     </message>
     <message>
         <source>Try again</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>Settings</name>
+    <message>
+        <source>Checking connection…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No server reachable</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connected via local server</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connected via %1</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -414,6 +433,70 @@
         <source>New</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>reachable</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>reachable, but not an openHAB Cloud (notifications will not be available)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>not reachable</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>login failed, check username and password</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>openHAB Cloud reachable, but your openHAB server is not connected to it</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>answers, but is not an openHAB server</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>no URL entered</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>request failed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remote server (openHAB Cloud)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use remote server</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Access openHAB from outside your home network, e.g. via myopenhab.org. The local server is still used whenever it is reachable.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>E-mail address of your openHAB Cloud account.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Currently: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Test connection</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Local server: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remote server: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>SitemapPage</name>
@@ -599,7 +682,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Item "%1" does not exist on this server.</source>
+        <source>Item &quot;%1&quot; does not exist on this server.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

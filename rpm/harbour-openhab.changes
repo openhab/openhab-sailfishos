@@ -12,6 +12,11 @@
 # * date Author's Name <author's email> version-release
 # - Summary of changes
 
+* Wed Nov 25 2026 Dominik Heidinger <dominikh@atomicmail.io> 0.5-1
+- ADDED: Remote access via openHAB Cloud
+- ADDED: Connection test and display of the active connection (local/remote) in settings and navigation.
+- FIX: Faster reconnect after network changes, also back to the local server
+
 * Wed Oct 07 2026 Dominik Heidinger <dominikh@atomicmail.io> 0.4-1
 - ADDED: NFC Tag support (write and read NFC tags to trigger openHAB actions)
 - CHANGED: Redesign of Coverpage provided by @ZeiP

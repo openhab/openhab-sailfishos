@@ -21,11 +21,65 @@ ApplicationWindow {
 
     function loadAvailableSitemaps() {
         SitemapLoader.loadAvailableSitemaps(
-            settings.base_url, availableSitemapModel,
+            connection.baseUrl, availableSitemapModel,
             undefined, undefined,
-            settings.username_local,
-            settings.decodePassword(settings.password_local)
+            connection.username, connection.password
         )
+    }
+
+    // ════════════════════════════════════════════════
+    //  Connection (local / remote via openHAB Cloud)
+    // ════════════════════════════════════════════════
+
+    /** Hands the stored settings to ConnectionManager (C++). */
+    function syncConnection() {
+        connection.configure(
+            settings.normalizeUrl(settings.base_url),
+            settings.username_local,
+            settings.decodePassword(settings.password_local),
+            // Demo mode stays local-only.
+            settings.remote_enabled && !settings.demoMode,
+            settings.normalizeUrl(settings.remote_url),
+            settings.username_remote,
+            settings.decodePassword(settings.password_remote))
+    }
+
+    Connections {
+        target: settings
+        onBase_urlChanged: syncConnection()
+        onUsername_localChanged: syncConnection()
+        onPassword_localChanged: syncConnection()
+        onRemote_enabledChanged: syncConnection()
+        onRemote_urlChanged: syncConnection()
+        onUsername_remoteChanged: syncConnection()
+        onPassword_remoteChanged: syncConnection()
+        onDemoModeChanged: syncConnection()
+    }
+
+    Connections {
+        target: connection
+        // Switching between local and remote: the sitemap list may differ
+        // in URLs only, but reload it so nothing points at the old server.
+        // Pages refresh themselves (SitemapPage, MainUiPage, CoverPage).
+        onActiveChanged: {
+            if (!_ready) return
+            console.log("[App] connection now " + connection.type + ": " + connection.baseUrl)
+            // Nothing reachable: keep what is shown, it reloads once a
+            // server is back.
+            if (connection.type === "none") return
+            loadAvailableSitemaps()
+        }
+    }
+
+    // Coming back to the foreground: the network may have changed meanwhile
+    // (left home Wi-Fi), so check again which connection to use.
+    Connections {
+        target: Qt.application
+        onStateChanged: {
+            var active = Qt.application.state === Qt.ApplicationActive
+            connection.setForeground(active)
+            if (active) connection.refresh()
+        }
     }
 
     // Track whether sitemaps were already loaded by a base_url change
@@ -38,6 +92,9 @@ ApplicationWindow {
     Connections {
         target: settings
         onBase_urlChanged: {
+            // Update the connection first, so the reload below already goes
+            // to the new server.
+            syncConnection()
             if (!_ready) return
             console.log("[App] base_url changed to: " + settings.base_url + ", reloading sitemaps...")
 
@@ -233,7 +290,7 @@ ApplicationWindow {
                 // root sitemap: a subpage in lastVisitedPage would make every
                 // cold start land there, permanently without SSE.
                 var target = isSub
-                        ? settings.base_url + "/rest/sitemaps" + tag.path
+                        ? connection.baseUrl + "/rest/sitemaps" + tag.path
                         : tag.rootSitemap
                 settings.lastVisitedPage = tag.rootSitemap
 
@@ -277,6 +334,7 @@ ApplicationWindow {
     Component.onCompleted: {
         console.log("[Start] settings.demoMode = " + settings.demoMode)
         console.log("[Start] settings.lastVisitedPage = " + settings.lastVisitedPage)
+        syncConnection()
         if (!_sitemapsLoaded) {
             loadAvailableSitemaps()
         }

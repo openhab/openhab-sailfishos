@@ -66,7 +66,7 @@ Page {
             return
         }
         var xhr = new XMLHttpRequest()
-        xhr.open("GET", settings.base_url + "/rest/sitemaps/" + name, true)
+        xhr.open("GET", connection.baseUrl + "/rest/sitemaps/" + name, true)
         xhr.setRequestHeader("Accept", "application/json")
         var auth = OpenHabApi.authHeader(settings.apiConfig())
         if (auth) xhr.setRequestHeader("Authorization", auth)

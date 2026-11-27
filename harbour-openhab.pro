@@ -17,18 +17,20 @@ CONFIG += link_pkgconfig
 
 # NFC talks to nfcd over the D-Bus system bus
 QT += dbus
+# Connection probing (local/remote) and QML request auth
+QT += network
 
 SOURCES += src/harbour-openhab.cpp\
     src/ssemanager.cpp \
     src/nfccodec.cpp \
-    src/nfcmanager.cpp
+    src/nfcmanager.cpp     src/cloud/connectionmanager.cpp     src/cloud/remoteauth.cpp
 
 RESOURCES += \
     ressources.qrc
 
 HEADERS += src/ssemanager.h \
     src/nfccodec.h \
-    src/nfcmanager.h
+    src/nfcmanager.h     src/cloud/connectionmanager.h     src/cloud/remoteauth.h
 
 DISTFILES += qml/harbour-openhab.qml \
     .editorconfig \
@@ -71,7 +73,7 @@ DISTFILES += qml/harbour-openhab.qml \
 
 SAILFISHAPP_ICONS = 86x86 108x108 128x128 172x172
 
-VERSION = 0.4
+VERSION = 0.5
 RELEASE = 1
 DEFINES += APP_VERSION=\\\"$$VERSION\\\"
 DEFINES += APP_RELEASE=\\\"$$RELEASE\\\"

@@ -3,7 +3,7 @@
 Name:       harbour-openhab
 
 Summary:    openHAB client for Sailfish OS
-Version:    0.4
+Version:    0.5
 Release:    1
 License:    EPL-2.0
 URL:        www.openhab.org
@@ -26,6 +26,7 @@ BuildRequires:  desktop-file-utils
 BuildRequires:  pkgconfig(qt5embedwidget)
 BuildRequires:  pkgconfig(Qt5Test)
 BuildRequires:  pkgconfig(Qt5DBus)
+BuildRequires:  pkgconfig(Qt5Network)
 
 %description
 This app is a native client for openHAB which allows easy access to your sitemaps. The documentation is available at www.openhab.org/docs/.
@@ -142,6 +143,22 @@ if [ "$_can_execute" -eq 1 ]; then
     ./tst_nfccodec || exit 1
 else
     echo "── Skipping tst_nfccodec execution (cross-compiled for %{_arch}) ──"
+fi
+
+echo "── Building ConnectionManager tests (out-of-tree) ──"
+# Local/remote selection against HTTP servers on 127.0.0.1 -- no internet
+# access needed; skipped by the test itself if loopback HTTP is unusable.
+CONNTEST_BUILDDIR="%{_builddir}/test-build-connectionmanager"
+rm -rf "$CONNTEST_BUILDDIR"
+mkdir -p "$CONNTEST_BUILDDIR"
+cd "$CONNTEST_BUILDDIR"
+"$QMAKE" "$SRCDIR/tests/unittest/connectionmanager.pro"
+make %{?_smp_mflags}
+if [ "$_can_execute" -eq 1 ]; then
+    echo "── Running tst_connectionmanager ──"
+    ./tst_connectionmanager || exit 1
+else
+    echo "── Skipping tst_connectionmanager execution (cross-compiled for %{_arch}) ──"
 fi
 
 echo "── Building QML / JS tests (out-of-tree) ──"

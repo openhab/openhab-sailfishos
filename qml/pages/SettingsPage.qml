@@ -39,6 +39,31 @@ Dialog {
         ]
     }
 
+    // Results of the last "Test connection" (ConnectionManager result names).
+    property string testLocalResult: ""
+    property string testRemoteResult: ""
+
+    function testResultText(result) {
+        switch (result) {
+        case "ok":           return qsTr("reachable")
+        case "okNoCloud":    return qsTr("reachable, but not an openHAB Cloud (notifications will not be available)")
+        case "network":      return qsTr("not reachable")
+        case "unauthorized": return qsTr("login failed, check username and password")
+        case "offline":      return qsTr("openHAB Cloud reachable, but your openHAB server is not connected to it")
+        case "notOpenHab":   return qsTr("answers, but is not an openHAB server")
+        case "skipped":      return qsTr("no URL entered")
+        default:             return qsTr("request failed")
+        }
+    }
+
+    Connections {
+        target: connection
+        onTestFinished: {
+            settingspage.testLocalResult = localResult
+            settingspage.testRemoteResult = remoteResult
+        }
+    }
+
     Component.onCompleted: { }
 
     SilicaFlickable {
@@ -91,8 +116,7 @@ Dialog {
                 font.pixelSize: Theme.fontSizeSmall
                 color: Theme.errorColor
                 wrapMode: Text.Wrap
-                // We only point at the system setting rather than flipping it
-                // ourselves -- decided in O-7.
+                // We only point at the system setting rather than flipping it ourselves
                 text: qsTr("NFC is currently switched off in the system settings.")
             }
 
@@ -138,20 +162,129 @@ Dialog {
                 text: settings.decodePassword(settings.password_local)
 
                 EnterKey.iconSource: "image://theme/icon-m-enter-next"
-                EnterKey.onClicked: coverAction1Field.focus = true
+                EnterKey.onClicked: {
+                    if (remoteEnabledField.checked) remoteUrlField.focus = true
+                    else coverAction1Field.focus = true
+                }
             }
 
-            // ── Cloud Service ────────────────────────────
-            //SectionHeader {
-            //    text: qsTr("Remote server")
-            //}
+            // ── Remote Server (openHAB Cloud) ────────────
+            SectionHeader {
+                text: qsTr("Remote server (openHAB Cloud)")
+            }
 
-            //TextSwitch {
-            //    id: openhabCloudServiceField
-            //    checked: settings.openhab_cloud_service
-            //    text: qsTr("openHAB Cloud Service")
-            //    description: qsTr("If selected, Notifications from openHAB Cloud Service can be received.")
-            //}
+            TextSwitch {
+                id: remoteEnabledField
+                checked: settings.remote_enabled && !demoModeField.checked
+                // Demo mode is local-only.
+                enabled: !demoModeField.checked
+                text: qsTr("Use remote server")
+                description: qsTr("Access openHAB from outside your home network, e.g. via myopenhab.org. The local server is still used whenever it is reachable.")
+            }
+
+            TextField {
+                id: remoteUrlField
+                visible: remoteEnabledField.checked
+                width: parent.width
+                label: qsTr("URL")
+                placeholderText: "https://myopenhab.org"
+                text: settings.remote_url
+                inputMethodHints: Qt.ImhUrlCharactersOnly | Qt.ImhNoAutoUppercase
+
+                EnterKey.enabled: text.length > 0
+                EnterKey.iconSource: "image://theme/icon-m-enter-next"
+                EnterKey.onClicked: usernameRemoteField.focus = true
+            }
+
+            TextField {
+                id: usernameRemoteField
+                visible: remoteEnabledField.checked
+                width: parent.width
+                label: qsTr("Username")
+                description: qsTr("E-mail address of your openHAB Cloud account.")
+                placeholderText: qsTr("Enter username")
+                text: settings.username_remote
+                inputMethodHints: Qt.ImhNoAutoUppercase | Qt.ImhNoPredictiveText | Qt.ImhEmailCharactersOnly
+
+                EnterKey.enabled: true
+                EnterKey.iconSource: "image://theme/icon-m-enter-next"
+                EnterKey.onClicked: passwordRemoteField.focus = true
+            }
+
+            PasswordField {
+                id: passwordRemoteField
+                visible: remoteEnabledField.checked
+                width: parent.width
+                label: qsTr("Password")
+                placeholderText: qsTr("Enter password")
+                text: settings.decodePassword(settings.password_remote)
+
+                EnterKey.iconSource: "image://theme/icon-m-enter-close"
+                EnterKey.onClicked: focus = false
+            }
+
+            // ── Connection status & test ─────────────────
+            Label {
+                // Only meaningful once there is a choice to make.
+                visible: connection.remoteConfigured
+                x: Theme.horizontalPageMargin
+                width: parent.width - 2 * Theme.horizontalPageMargin
+                font.pixelSize: Theme.fontSizeSmall
+                color: Theme.secondaryHighlightColor
+                wrapMode: Text.Wrap
+                text: qsTr("Currently: %1").arg(settings.connectionStatusText())
+            }
+
+            Item {
+                width: 1
+                height: Theme.paddingMedium
+            }
+
+            Button {
+                id: testConnectionButton
+                anchors.horizontalCenter: parent.horizontalCenter
+                text: qsTr("Test connection")
+                enabled: !connection.testing && !demoModeField.checked
+                onClicked: {
+                    settingspage.testLocalResult = ""
+                    settingspage.testRemoteResult = ""
+                    // Tests what is in the fields right now, saved or not.
+                    connection.testConnections(
+                        settings.normalizeUrl(baseUrlField.text),
+                        usernameLocalField.text, passwordLocalField.text,
+                        remoteEnabledField.checked ? settings.normalizeUrl(remoteUrlField.text) : "",
+                        usernameRemoteField.text.trim(), passwordRemoteField.text)
+                }
+            }
+
+            BusyIndicator {
+                anchors.horizontalCenter: parent.horizontalCenter
+                size: BusyIndicatorSize.Small
+                running: connection.testing
+                visible: running
+            }
+
+            Label {
+                visible: settingspage.testLocalResult !== ""
+                x: Theme.horizontalPageMargin
+                width: parent.width - 2 * Theme.horizontalPageMargin
+                font.pixelSize: Theme.fontSizeSmall
+                color: settingspage.testLocalResult === "ok" ? Theme.highlightColor : Theme.errorColor
+                wrapMode: Text.Wrap
+                text: qsTr("Local server: %1").arg(settingspage.testResultText(settingspage.testLocalResult))
+            }
+
+            Label {
+                visible: settingspage.testRemoteResult !== "" && settingspage.testRemoteResult !== "skipped"
+                x: Theme.horizontalPageMargin
+                width: parent.width - 2 * Theme.horizontalPageMargin
+                font.pixelSize: Theme.fontSizeSmall
+                color: settingspage.testRemoteResult === "ok" ? Theme.highlightColor
+                     : settingspage.testRemoteResult === "okNoCloud" ? Theme.secondaryHighlightColor
+                     : Theme.errorColor
+                wrapMode: Text.Wrap
+                text: qsTr("Remote server: %1").arg(settingspage.testResultText(settingspage.testRemoteResult))
+            }
 
             // ── Cover Actions ────────────────────────────
             SectionHeader {
@@ -464,7 +597,11 @@ Dialog {
             // so listening is forced off there.
             settings.nfcEnabled = nfcEnabledField.checked && !settings.demoMode
 
-            //settings.openhab_cloud_service = openhabCloudServiceField.checked
+            settings.remote_enabled = remoteEnabledField.checked && !settings.demoMode
+            var remoteUrl = settings.normalizeUrl(remoteUrlField.text.trim())
+            settings.remote_url = remoteUrl !== "" ? remoteUrl : "https://myopenhab.org"
+            settings.username_remote = usernameRemoteField.text.trim()
+            settings.password_remote = settings.encodePassword(passwordRemoteField.text)
             settings.coverAction1 = coverAction1Field.text
             settings.coverAction1_command = coverAction1CommandField.text
             settings.coverAction1_icon = coverAction1IconField.selectedIconName

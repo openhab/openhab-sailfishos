@@ -15,7 +15,7 @@ CoverBackground {
     }
 
     function itemUrl(itemName) {
-        return settings.normalizeUrl(settings.base_url) + "/rest/items/" + encodeURIComponent(itemName)
+        return connection.baseUrl + "/rest/items/" + encodeURIComponent(itemName)
     }
 
     function actionConfigured(itemName, command) {
@@ -38,7 +38,7 @@ CoverBackground {
     }
 
     function itemIconUrl(iconName) {
-        return settings.normalizeUrl(settings.base_url) + "/icon/" + iconName + "?format=png&anyFormat=true"
+        return connection.baseUrl + "/icon/" + iconName + "?format=png&anyFormat=true"
     }
 
     function showCommandFailure(itemName, status) {
@@ -203,6 +203,14 @@ CoverBackground {
         onCoverItem2Changed:            _settingsChangedTimer.restart()
     }
 
+    // Local to remote switch: same items, but from the other server.
+    Connections {
+        target: connection
+        onActiveChanged: {
+            if (connection.type !== "none") _settingsChangedTimer.restart()
+        }
+    }
+
     // Watermark logo. When the bottom part of the cover is taken by the action
     // legend or by a single item tile, the logo is centred in the free space
     // above it (and shrunk if it would not fit); otherwise -- nothing shown or
@@ -273,7 +281,7 @@ CoverBackground {
                 source: visible ? itemIconUrl(itemData1.icon) : ""
                 onStatusChanged: {
                     if (status === Image.Error && source.toString().indexOf("format=png") !== -1)
-                        source = settings.normalizeUrl(settings.base_url) + "/icon/" + itemData1.icon + "?format=svg"
+                        source = connection.baseUrl + "/icon/" + itemData1.icon + "?format=svg"
                 }
             }
 
@@ -338,7 +346,7 @@ CoverBackground {
                 source: visible ? itemIconUrl(itemData2.icon) : ""
                 onStatusChanged: {
                     if (status === Image.Error && source.toString().indexOf("format=png") !== -1)
-                        source = settings.normalizeUrl(settings.base_url) + "/icon/" + itemData2.icon + "?format=svg"
+                        source = connection.baseUrl + "/icon/" + itemData2.icon + "?format=svg"
                 }
             }
 

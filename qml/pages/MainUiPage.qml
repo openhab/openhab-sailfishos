@@ -9,14 +9,83 @@ Page {
 
     Settings { id: settings }
 
+    // Address the WebView was last pointed at.
+    property string _loadedUrl: ""
+    // Login prompts answered for the current load. Capped, so wrong
+    // credentials do not end in a loop of rejected logins.
+    property int _authAnswers: 0
+    readonly property int _maxAuthAnswers: 3
+
+    function loadMainUi() {
+        _loadedUrl = connection.mainUiUrl
+        _authAnswers = 0
+        webView.url = connection.mainUiUrl
+    }
+
+    function hostOf(url) {
+        var match = /^[a-z]+:\/\/([^\/:]+)/i.exec(url || "")
+        return match ? match[1].toLowerCase() : (url || "").toLowerCase()
+    }
+
+    // Answer the login prompt of the Main UI server (the cloud's proxy host
+    // asks for Basic auth) with the credentials of the active connection,
+    // instead of showing the WebView's login dialog.
+    Component {
+        id: autoAuthPopup
+        Item {
+            id: autoAuth
+            // Set by the WebView's popup opener.
+            property string hostname: ""
+            property string realm: ""
+            // Read by the popup opener on accepted().
+            property string usernameValue: ""
+            property string passwordValue: ""
+            property bool rememberValue: false
+            signal accepted
+            signal rejected
+
+            // The opener connects to accepted/rejected only after creating
+            // this item, so answer on the next event loop turn.
+            Timer {
+                running: true
+                interval: 0
+                onTriggered: {
+                    // The opener does not always pass the hostname (empty on
+                    // SFOS 4.5); then the page shown must be the Main UI.
+                    var host = mainUiPage.hostOf(autoAuth.hostname !== ""
+                                                 ? autoAuth.hostname
+                                                 : webView.url.toString())
+                    var ours = host !== "" && host === mainUiPage.hostOf(mainUiPage._loadedUrl)
+                    if (ours && connection.username !== "" && connection.password !== ""
+                            && mainUiPage._authAnswers < mainUiPage._maxAuthAnswers) {
+                        mainUiPage._authAnswers++
+                        console.log("[MainUiPage] answering login prompt for " + host)
+                        autoAuth.usernameValue = connection.username
+                        autoAuth.passwordValue = connection.password
+                        autoAuth.accepted()
+                    } else {
+                        console.log("[MainUiPage] login prompt for " + host + " not answered")
+                        autoAuth.rejected()
+                    }
+                }
+            }
+        }
+    }
+
     Component.onCompleted: {
         console.log("[MainUiPage] loaded")
         settings.lastVisitedPage = "MainUiPage"
+        // Replaces the WebView's login dialog (Sailfish.WebView popups).
+        if (webView.popupProvider) {
+            webView.popupProvider.authPopup = autoAuthPopup
+        } else {
+            console.log("[MainUiPage] WebView has no popupProvider, login dialog stays")
+        }
     }
 
     onStatusChanged: {
         if (status === PageStatus.Active) {
-            webView.url = settings.base_url
+            if (_loadedUrl !== connection.mainUiUrl) loadMainUi()
             webView.active = true
         } else if (status === PageStatus.Deactivating) {
             webView.active = false
@@ -85,7 +154,19 @@ Page {
         y: toolbar.height
         width: mainUiPage.width
         height: mainUiPage.height - toolbar.height
-        url: settings.base_url
         active: false
+    }
+
+    // Local to remote switch while the Main UI is open: the old address is
+    // usually unreachable now, so load the page from the new one.
+    Connections {
+        target: connection
+        onActiveChanged: {
+            if (connection.type === "none") return
+            if (mainUiPage.status === PageStatus.Active
+                    && mainUiPage._loadedUrl !== connection.mainUiUrl) {
+                mainUiPage.loadMainUi()
+            }
+        }
     }
 }

@@ -26,6 +26,9 @@ Page {
 
             PageHeader {
                 title: qsTr("Navigation")
+                // Which server the app talks to -- only shown once a remote
+                // server is set up, otherwise it is always the local one.
+                description: connection.remoteConfigured ? settings.connectionStatusText() : ""
             }
 
             // ── Main ────────────────────────────────────
